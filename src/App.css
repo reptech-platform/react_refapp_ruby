@@ -1,0 +1,214 @@
+html,
+body,
+main,
+#root {
+  height: 100%;
+  padding: 0;
+  margin: 0;
+}
+
+.header-items {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.profile-items {
+  display: flex;
+  align-items: center;
+}
+
+.dashboard-container {
+  margin-top: 16px !important;
+  justify-content: center;
+}
+
+.page-heading {
+  margin: 15px 0px 15px 15px !important;
+}
+
+.action-buttons {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 15px;
+  margin-right: 15px;
+}
+
+.margin-right {
+  margin-right: 8px !important;
+}
+
+.form-container {
+  margin: 15px !important;
+}
+
+.MuiTypography-h6 {
+  font-weight: 600 !important;
+}
+
+/* .Mui-focused {
+  border: 1px solid rgba(0, 0, 0, 0.23) !important;
+  height: 40px !important;
+} */
+
+.row-label p {
+  font-weight: 700;
+  white-space: pre !important;
+}
+
+.orders-list {
+  text-align: left;
+  justify-content: stretch;
+  margin-top: 15px;
+}
+
+.single-order {
+  margin: 4%;
+  display: flex;
+  position: relative;
+  width: fit-content;
+}
+
+.order-img-container {
+  margin-right: 10px;
+}
+
+.orderType {
+  position: absolute;
+  font-size: 9px !important;
+  font-weight: 900;
+  left: -14px;
+  top: -10px;
+}
+
+.MuiTableSortLabel-icon {
+  opacity: 1 !important;
+}
+
+.select-main {
+  position: relative;
+}
+
+.select-main .hoverable {
+  position: absolute;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  opacity: 0;
+  right: -40px;
+  top: 100px;
+}
+
+@media screen and (max-width: 600px) {
+  .responsive-table-row {
+    display: grid !important;
+  }
+
+  .MuiTypography-root {
+    text-align: left !important;
+  }
+
+  .MuiTable-root {
+    width: 100% !important;
+    margin: 0 !important;
+  }
+
+  main {
+    width: auto !important;
+  }
+}
+
+.MuiToolbar-root .MTableToolbar-title-31 {
+  width: 100%;
+}
+
+.product-container {
+  display: flex;
+  flex-direction: row;
+  margin: 0px;
+  padding: 0px;
+  height: calc(100% - 65px);
+}
+
+.product-container .product-list {
+  width: calc(100% - 250px);
+}
+
+.product-container .product-list-full {
+  width: 100%;
+}
+
+.product-container .product-tabs {
+  background-color: #f5f5f5;
+  width: 250px;
+}
+
+.screenContaner {
+  border-radius: 10px;
+  border: gray solid 2px;
+  margin-inline: 20px;
+  margin-bottom: 10px;
+  height: 150px;
+}
+
+.screenContaner>.screenHeader {
+  text-align: center;
+  font-size: 20px;
+  font-weight: 600;
+  margin-top: 20px;
+}
+
+.screenContaner>image {
+  height: 100px;
+}
+
+.muiBoxFormControl {
+  display: flex;
+  width: 50%;
+}
+
+.muiBoxFormControl>div {
+  width: 100%;
+}
+
+input[type="color"] {
+  margin-right: 5px;
+  -webkit-appearance: none;
+  appearance: inherit;
+  border: none;
+  width: auto;
+  height: auto;
+  cursor: pointer;
+  background: none;
+  outline: none;
+  border-radius: 4px;
+  padding: 0px;
+
+  &::-webkit-color-swatch-wrapper {
+    padding: 0;
+    width: 30px;
+    height: 30px;
+  }
+
+  &::-webkit-color-swatch {
+    border: 1px solid #bfc9d9;
+    border-radius: 50px;
+    padding: 0;
+  }
+}
+
+.inputColor {
+  border: 1px solid rgba(0, 0, 0, 0.23);
+  border-radius: 4px;
+  width: 100%;
+  font-size: 14px;
+  padding-left: 5px;
+
+}
+
+.inputColor:focus,
+.inputColor:hover {
+  outline: 0;
+  border-width: 1px;
+  border-color: rgba(0, 0, 0, 0.87);
+}

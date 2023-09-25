@@ -1,0 +1,12 @@
+version: '3.4'
+
+services:
+  reactui:
+    container_name: reactui
+    build:
+      context: .
+    environment:
+      NODE_ENV: production
+      REACT_APP_PUBLIC_URL: http://34.230.35.229:3000
+    ports:
+      - 3000:3000

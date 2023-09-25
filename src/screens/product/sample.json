@@ -1,0 +1,18 @@
+[
+    {
+        "id": 1,
+        "Name": "Puma",
+        "Description": "Puma Sport Shoes",
+        "Type": "shoes",
+        "Rating": "8/10",
+        "Stock": "available"
+    },
+    {
+        "id": 2,
+        "Name": "Boat Nirvana",
+        "Description": "Best Selling Headphones of 2022",
+        "Type": "laptop",
+        "Rating": "8/10",
+        "Stock": "available"
+    }
+]

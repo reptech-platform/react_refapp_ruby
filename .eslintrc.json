@@ -1,0 +1,13 @@
+{
+    "overrides": [
+        {
+            "files": [
+                "**/*.js"
+            ],
+            "rules": {
+                "react-hooks/exhaustive-deps": "off"
+            }
+        }
+    ]
+}
+/*  eslint-disable-next-line */
