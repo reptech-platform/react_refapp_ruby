@@ -193,6 +193,7 @@ const Component = (props) => {
     if (refresh) { setRefresh(false); LoadData(); }
 
     useEffect(() => { setRefresh(true); }, [sortBy, pageInfo, searchStr]);
+    useEffect(() => { setInitialize(true); }, []);
 
     const handleSortModelChange = (e) => {
         setSortBy(null); if (e && e.length > 0) setSortBy(e[0]);
