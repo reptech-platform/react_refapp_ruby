@@ -56,9 +56,11 @@ const Component = (props) => {
     const disabled = mode && mode === 'view' ? true : undefined;
 
     const OnDateChanged = ({ $d }) => {
-        let utcTime = moment($d).toISOString();
+        let utcTime = moment.utc($d).format(
+            "YYYY-MM-DDTHH:mm:ss[Z]"
+        );   
         setInputValue($d);
-        if (OnInputChange) OnInputChange({ name, utcTime });
+        if (OnInputChange) OnInputChange({ name, value: utcTime });
     }
 
     return (
