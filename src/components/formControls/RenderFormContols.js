@@ -3,9 +3,8 @@ import {
     TableContainer, Table, TableBody, TableCell, TableRow, Paper,
     Box, Typography
 } from '@mui/material';
-import { TextInput, ColorPicker, FileInput, CheckInput, DropDown } from "components";
+import { TextInput, ColorPicker, FileInput, CheckInput, DropDown, DateTimePicker } from "components";
 import { ValidatorForm } from 'react-material-ui-form-validator';
-import Helper from "shared/helper";
 
 const RenderFormContols = ({ mode, title, controls, productTypes, onInputChange }) => {
 
@@ -40,7 +39,7 @@ const RenderFormContols = ({ mode, title, controls, productTypes, onInputChange 
                                                 validationMessages={x.validationMessages} OnInputChange={OnInputChange} />
                                         )}
                                         {x.type === 'check' && (
-                                            <CheckInput mode={mode} label={x.label} id={x.key} name={x.key} value={x.value}
+                                            <CheckInput mode={mode} label={x.label} id={x.key} name={x.key} value={x.value || x.default}
                                                 validationMessages={x.validationMessages} OnInputChange={OnInputChange} />
                                         )}
                                         {x.type === 'color' && (
@@ -52,9 +51,13 @@ const RenderFormContols = ({ mode, title, controls, productTypes, onInputChange 
                                                 acceptTypes=".JPG,.JPEG,.PNG" OnInputChange={OnInputChange} />
                                         )}
                                         {x.type === 'date' && (
-                                            <TextInput type="date"  mode={mode} id={x.key} name={x.key} value={x.value} validators={x.validators}
+                                            <TextInput type="date" mode={mode} id={x.key} name={x.key} value={x.value} validators={x.validators}
                                                 validationMessages={x.validationMessages} OnInputChange={OnInputChange} />
-                                            
+
+                                        )}
+                                        {x.type === 'datetime' && (
+                                            <DateTimePicker mode={mode} id={x.key} name={x.key} value={x.value} validators={x.validators}
+                                                validationMessages={x.validationMessages} OnInputChange={OnInputChange} />
                                         )}
                                         {x.type === 'dropdown' && (
                                             <DropDown mode={mode} id={x.key} name={x.key} value={x.value} options={productTypes} valueId="ProductTypeCode" size="small"

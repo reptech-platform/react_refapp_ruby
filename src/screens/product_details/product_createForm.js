@@ -23,6 +23,9 @@ const Component = (props) => {
     const OnSubmit = async () => {
         let rslt, data = newRow;
 
+        console.log(newRow);
+        console.log(data);
+        return;
         global.Busy(true);
         const { status, Doc_Id } = await UploadImage();
         if (status) {
@@ -49,6 +52,7 @@ const Component = (props) => {
     }
 
     const OnInputChange = (e) => {
+        console.log(e);
         setNewRow((prev) => ({
             ...prev,
             [e.name]: e.value

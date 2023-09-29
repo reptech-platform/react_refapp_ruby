@@ -9,8 +9,9 @@ import ColorPicker from "./colorpicker";
 import FileInput from "./fileinput";
 import CheckInput from "./checkinput";
 import AlertMessage from "./msgalert";
+import DateTimePicker from "./datetimepicker";
 
 export {
     Header, Drawer, Container, Image, FileInput, CheckInput,
-    DropDown, SearchInput, TextInput, ColorPicker, AlertMessage
+    DropDown, SearchInput, TextInput, ColorPicker, AlertMessage, DateTimePicker
 };

@@ -98,6 +98,7 @@
             "label": "Return Merch Auth Not Required",
             "type": "check",
             "editable": true,
+            "default": false,
             "validators": [
                 "isTruthy"
             ],
@@ -108,16 +109,28 @@
         {
             "key": "CreatedDate",
             "label": "Created Date",
-            "type": "date",
+            "type": "datetime",
             "editable": false,
-            "default": true
+            "default": true,
+            "validators": [
+                "required"
+            ],
+            "validationMessages": [
+                "Date and Time is required"
+            ]
         },
         {
             "key": "LastModifiedDate",
             "label": "Last Modified Date",
-            "type": "date",
+            "type": "datetime",
             "editable": false,
-            "default": true
+            "default": true,
+            "validators": [
+                "required"
+            ],
+            "validationMessages": [
+                "Date and Time is required"
+            ]
         }
     ],
     "types": [
