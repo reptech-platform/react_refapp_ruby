@@ -1,21 +1,21 @@
-import * as React from "react";
+import { useEffect, useState } from "react";
 import { Box, Typography, Grid, Stack, Button, Divider } from '@mui/material';
-import Container from "../../container";
+import Container from "../container";
 import { useTheme } from '@mui/material/styles';
 import ProductJsonConfig from "config/productConfig.json";
-import RenderFormContols from "../childs/RenderFormContols";
+import RenderFormContols from "components/formControls/RenderFormContols";
 import { useNavigate } from "react-router-dom";
 import { SetProductImage, SetProducts, GetProductTypesApi } from "shared/services";
 import Helper from "shared/helper";
 
 const Component = (props) => {
 
-    const [form, setForm] = React.useState(null);
-    const [row, setRow] = React.useState({});
-    const [newRow, setNewRow] = React.useState({});
-    const [initialized, setInitialized] = React.useState(false);
-    const [showButton, setShowButton] = React.useState(true);
-    const [productTypes, setProductTypes] = React.useState([]);
+    const [form, setForm] = useState(null);
+    const [row, setRow] = useState({});
+    const [newRow, setNewRow] = useState({});
+    const [initialized, setInitialized] = useState(false);
+    const [showButton, setShowButton] = useState(true);
+    const [productTypes, setProductTypes] = useState([]);
     const NavigateTo = useNavigate();
     const theme = useTheme();
     const { title } = props;
@@ -31,6 +31,7 @@ const Component = (props) => {
             data.ProductProductImage = Doc_Id;
             data.ProductSize = parseFloat(data.ProductSize);
             data.ProductPrice = parseFloat(data.ProductPrice);
+            console.log(data)
             rslt = await SetProducts(data);
             global.Busy(false);
             if (rslt.status) {
@@ -79,7 +80,7 @@ const Component = (props) => {
         });
     }
 
-    React.useEffect(() => {
+    useEffect(() => {
         setShowButton(true);
     }, []);
 
@@ -96,7 +97,7 @@ const Component = (props) => {
         setRow(ProductJsonConfig);
     }
 
-    React.useEffect(() => {
+    useEffect(() => {
         setInitialized(true);
     }, []);
 

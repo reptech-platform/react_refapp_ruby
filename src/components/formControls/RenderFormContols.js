@@ -52,7 +52,9 @@ const RenderFormContols = ({ mode, title, controls, productTypes, onInputChange 
                                                 acceptTypes=".JPG,.JPEG,.PNG" OnInputChange={OnInputChange} />
                                         )}
                                         {x.type === 'date' && (
-                                            <Typography nowrap="true" variant="labelheader">{Helper.ToDate(x.value, "DD-MMM-YYYY HH:MM")}</Typography>
+                                            <TextInput type="date"  mode={mode} id={x.key} name={x.key} value={x.value} validators={x.validators}
+                                                validationMessages={x.validationMessages} OnInputChange={OnInputChange} />
+                                            
                                         )}
                                         {x.type === 'dropdown' && (
                                             <DropDown mode={mode} id={x.key} name={x.key} value={x.value} options={productTypes} valueId="ProductTypeCode" size="small"

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Typography, Grid, Stack, Box, Divider, IconButton, Tooltip } from '@mui/material';
 import { AddBox as AddBoxIcon, Edit as EditIcon, DeleteOutlined as DeleteIcon, Close as CancelIcon, Done as DoneIcon } from '@mui/icons-material';
 import { DataGrid, GridActionsCellItem, GridRowModes } from '@mui/x-data-grid';
@@ -21,7 +21,7 @@ const Component = (props) => {
     const [rows, setRows] = useState([]);
     const [loading, setLoading] = useState(false);
     const [searchStr, setSearchStr] = useState("");
-    const [rowModesModel, setRowModesModel] = React.useState({});
+    const [rowModesModel, setRowModesModel] = useState({});
     const [sortBy, setSortBy] = useState(null);
 
     const handleSaveClick = (id, row) => () => {

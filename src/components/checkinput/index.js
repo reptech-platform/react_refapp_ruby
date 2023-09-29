@@ -67,7 +67,7 @@ const Component = (props) => {
                 size="medium"
                 color="secondary"
                 onChange={(e) => OnCheckChanged(e)}
-                value={inputValue || ""}
+                value={inputValue || "false"}
                 checked={inputValue || false}
                 validators={['isTruthy']}
                 errorMessages={validationMessages}

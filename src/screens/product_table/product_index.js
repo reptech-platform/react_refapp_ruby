@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Stack, Box, Grid, Typography, IconButton, Tooltip } from '@mui/material';
 import { useNavigate } from "react-router-dom";
-import Container from "../../container";
+import Container from "screens/container";
 import { DataGrid, GridActionsCellItem } from '@mui/x-data-grid';
 import { GetProducts, GetProductsCount, DeleteProduct } from "shared/services";
 import { SearchInput } from "components";
@@ -32,7 +32,7 @@ const Component = (props) => {
     const [rows, setRows] = useState([]);
     const [productTypes, setProductTypes] = useState([]);
     const [searchStr, setSearchStr] = useState("");
-    const [rowModesModel, setRowModesModel] = React.useState({});
+    const [rowModesModel, setRowModesModel] = useState({});
 
     const NavigateTo = useNavigate();
 
@@ -193,6 +193,7 @@ const Component = (props) => {
     if (refresh) { setRefresh(false); LoadData(); }
 
     useEffect(() => { setRefresh(true); }, [sortBy, pageInfo, searchStr]);
+    useEffect(() => { setInitialize(true); }, []);
 
     const handleSortModelChange = (e) => {
         setSortBy(null); if (e && e.length > 0) setSortBy(e[0]);

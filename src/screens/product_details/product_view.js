@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Typography, Grid, Stack, Button, Box, Divider } from '@mui/material';
 import { ArrowLeft as ArrowLeftIcon } from '@mui/icons-material';
 import { useTheme } from '@mui/material/styles';
@@ -8,16 +8,16 @@ import { GetProduct, GetProductImage, GetProductTypesApi } from "shared/services
 import Helper from "shared/helper";
 
 import ProductJsonConfig from "config/productConfig.json";
-import RenderFormContols from "../childs/RenderFormContols";
+import RenderFormContols from "components/formControls/RenderFormContols";
 
 const Component = (props) => {
     const { title } = props;
     const theme = useTheme();
     const NavigateTo = useNavigate();
     const { id } = useParams();
-    const [initialized, setInitialized] = React.useState(false);
-    const [row, setRow] = React.useState({});
-    const [productTypes, setProductTypes] = React.useState([]);
+    const [initialized, setInitialized] = useState(false);
+    const [row, setRow] = useState({});
+    const [productTypes, setProductTypes] = useState([]);
 
     const GetProductDetails = async () => {
         if (id) {
@@ -53,11 +53,21 @@ const Component = (props) => {
         });
     }
 
-    if (initialized) {
-        setInitialized(false);
-        GetProductTypes();
-        GetProductDetails();
-    }
+    // if (initialized) {
+    //     setInitialized(false);
+    //     GetProductTypes();
+    //     GetProductDetails();
+    // }
+
+    useEffect(() => {
+        const fetchData = async () => {
+          if (initialized) {
+            await GetProductTypes();
+            await GetProductDetails();
+          }
+        };
+        fetchData();
+    }, [initialized]);
 
     useEffect(() => {
         setInitialized(true);
