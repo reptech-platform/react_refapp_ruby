@@ -6,6 +6,7 @@ import ProductJsonConfig from "config/productConfig.json";
 import RenderFormContols from "components/formControls/RenderFormContols";
 import { useNavigate } from "react-router-dom";
 import { SetProductImage, SetProducts, GetProductTypesApi } from "shared/services";
+import { ArrowLeft as ArrowLeftIcon } from '@mui/icons-material';
 import Helper from "shared/helper";
 
 const Component = (props) => {
@@ -106,9 +107,23 @@ const Component = (props) => {
             <Container {...props}>
                 <Box sx={{ width: '100%', height: 50 }}>
                     <Stack direction="row" sx={{ display: "flex", alignItems: "center" }}>
-                        <Typography nowrap="true" variant="subheader" component="div" sx={{ width: "100%" }}>
-                            {title}
-                        </Typography>
+                        <Box sx={{ width: "100%" }}>
+                            <Typography noWrap variant="subheader" component="div">
+                                {title}
+                            </Typography>
+                        </Box>
+                        <Grid container sx={{ justifyContent: 'flex-end' }}>
+                            <Button variant="contained" startIcon={<ArrowLeftIcon />}
+                                sx={{
+                                    color: theme.palette.primary.main,
+                                    backgroundColor: theme.palette.secondary.main,
+                                    '&:hover': {
+                                        backgroundColor: theme.palette.secondary.dark
+                                    },
+                                }}
+                                onClick={() => NavigateTo("/products")}
+                            >Back</Button>
+                        </Grid>
                     </Stack>
                 </Box>
                 <Divider />
