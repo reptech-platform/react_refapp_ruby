@@ -1,11 +1,10 @@
 import * as React from "react";
-import { Box } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { ValidatorComponent } from 'react-material-ui-form-validator';
-import moment from "moment";
-
+import dayjs from 'dayjs';
 
 class DateTimeValidator extends ValidatorComponent {
 
@@ -56,11 +55,19 @@ const Component = (props) => {
     const disabled = mode && mode === 'view' ? true : undefined;
 
     const OnDateChanged = ({ $d }) => {
-        let utcTime = moment.utc($d).format(
-            "YYYY-MM-DDTHH:mm:ss[Z]"
-        );   
+        let utcTime = dayjs($d).format('YYYY-MM-DDTHH:mm:ss[Z]')
         setInputValue($d);
         if (OnInputChange) OnInputChange({ name, value: utcTime });
+    }
+
+    if (mode === 'view') {
+        return (
+            <>
+                <Typography noWrap component="div">
+                    {dayjs(inputValue).format("MM/DD/YYYY hh:mm A") || null}
+                </Typography>
+            </>
+        )
     }
 
     return (
@@ -71,7 +78,7 @@ const Component = (props) => {
                 size="medium"
                 color="secondary"
                 onChange={(e) => OnDateChanged(e)}
-                value={inputValue || null}
+                value={inputValue ? dayjs(inputValue) : null}
                 validators={validators}
                 errorMessages={validationMessages}
                 label={label}
