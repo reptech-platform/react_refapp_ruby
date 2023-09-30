@@ -136,9 +136,9 @@ const Component = (props) => {
             filters.push(`$filter=contains(ProductDescription, '${searchStr}')`);
         }
 
-        /* if (!Helper.IsJSONEmpty(sortBy)) {
+        if (!Helper.IsJSONEmpty(sortBy)) {
             filters.push(`$orderby=${sortBy.field} ${sortBy.sort}`);
-        } */
+        }
 
         if (pageInfo.page > 0) {
             const _skip = pageInfo.page * pageInfo.pageSize;

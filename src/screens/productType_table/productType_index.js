@@ -111,6 +111,10 @@ const Component = (props) => {
 
     }
 
+    const handleSortModelChange = (e) => {
+        setSortBy(null); if (e && e.length > 0) setSortBy(e[0]);
+    }
+
     const OnSearchChanged = (e) => {
         setSearchStr(e);
     }
@@ -138,9 +142,9 @@ const Component = (props) => {
             filters.push(`$filter=contains(ProductTypeDescription, '${searchStr}')`);
         }
 
-        /* if (!Helper.IsJSONEmpty(sortBy)) {
+        if (!Helper.IsJSONEmpty(sortBy)) {
             filters.push(`$orderby=${sortBy.field} ${sortBy.sort}`);
-        } */
+        }
 
         if (pageInfo.page > 0) {
             const _skip = pageInfo.page * pageInfo.pageSize;
@@ -281,6 +285,7 @@ const Component = (props) => {
                         pageSizeOptions={[5, 10, 15, 20, 25]}
                         loading={loading}
                         processRowUpdate={processRowUpdate}
+                        onSortModelChange={handleSortModelChange}
                         onProcessRowUpdateError={(err) => console.log(err)}
                     />
                 </Box>
