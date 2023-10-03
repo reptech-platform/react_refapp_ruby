@@ -136,15 +136,6 @@ const Component = (props) => {
             filters.push(`$filter=contains(ProductDescription, '${searchStr}')`);
         }
 
-        if (!Helper.IsJSONEmpty(sortBy)) {
-            filters.push(`$orderby=${sortBy.field} ${sortBy.sort}`);
-        }
-
-        if (pageInfo.page > 0) {
-            const _skip = pageInfo.page * pageInfo.pageSize;
-            filters.push(`$skip=${_skip}`);
-        }
-
         if (!Helper.IsJSONEmpty(filters)) {
             query = filters.join("&");
         }
@@ -155,6 +146,24 @@ const Component = (props) => {
             })
             .catch((err) => console.log(err));
 
+        if (!Helper.IsJSONEmpty(sortBy)) {
+            console.log(filters)
+            filters.push(`$orderby=${sortBy.field} ${sortBy.sort}`);
+            console.log(filters)
+        }
+
+        if (pageInfo.page > 0) {
+            const _skip = pageInfo.page * pageInfo.pageSize;
+            console.log(pageInfo)
+            console.log(filters)
+            // filters.push(`$skip=${_skip}`);
+            console.log(filters)
+        }
+
+        if (!Helper.IsJSONEmpty(filters)) {
+            query = filters.join("&");
+        }
+
         await GetProducts(query)
             .then(async (res) => {
                 if (res) {
@@ -163,6 +172,7 @@ const Component = (props) => {
                         e.id = i + 1;
                         e.ProductProductType = _types.find((x) => x.ProductTypeCode === e.ProductProductType)?.ProductTypeDescription || 'NA';
                     });
+                    console.log(_rows)
                     setRows(_rows);
                 }
             })
@@ -200,7 +210,11 @@ const Component = (props) => {
     }
 
     const handlePaginationModel = (e) => {
-        setPageInfo({ page: 0, pageSize: 5 }); if (e && e.length > 0) setPageInfo(e[0]);
+        setPageInfo({ page: 0, pageSize: 5 });
+        if (e) {
+            console.log(e);
+            setPageInfo(e);
+        }
     }
 
     const OnSearchChanged = (e) => {
