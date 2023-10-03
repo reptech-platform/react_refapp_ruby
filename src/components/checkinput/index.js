@@ -44,7 +44,6 @@ class CheckBoxValidator extends ValidatorComponent {
     }
 }
 
-
 const Component = (props) => {
 
     const { mode, id, name, value, label, OnInputChange, validationMessages } = props;

@@ -13,4 +13,4 @@ export const NAV = {
 
 export const DRAWER_WIDTH = 200;
 
-export const ROWSPERPAGE = [5, 10, 15, 20];
+export const ROWSPERPAGE = [5, 10, 15, 20, 25];

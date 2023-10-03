@@ -1,25 +1,14 @@
-import { useState, useEffect } from "react";
-import { Stack, Box, Grid, Typography, IconButton, Tooltip } from '@mui/material';
+import { useState, useEffect, useMemo } from "react";
+import { Stack, Box, Grid, Typography, IconButton, Tooltip, TablePagination } from '@mui/material';
 import { useNavigate } from "react-router-dom";
 import Container from "screens/container";
-import { DataGrid, GridActionsCellItem } from '@mui/x-data-grid';
+import { DataGrid, DataTable } from './childs';
 import { GetProducts, GetProductsCount, DeleteProduct } from "shared/services";
-import { SearchInput } from "components";
+import { SearchInput, GridContainer, CardItem, ToggleButtons, ConfirmDialog } from "components";
 import Helper from "shared/helper";
-import { Close as CancelIcon, Done as DoneIcon } from '@mui/icons-material';
-import { GetProductTypesApi } from "shared/services";
-import {
-    AddBox as AddBoxIcon, Edit as EditIcon,
-    DeleteOutlined as DeleteIcon, Visibility as VisibilityIcon
-} from '@mui/icons-material';
+import { GetProductTypesApi, GetProductImage } from "shared/services";
+import { Add as AddBoxIcon } from '@mui/icons-material';
 import { ROWSPERPAGE } from "config";
-
-const columns = [
-    { headerName: "Id", field: "Product_Id" },
-    { headerName: "Name", field: "ProductName", flex: 1 },
-    { headerName: "Description", field: "ProductDescription", flex: 1 },
-    { headerName: "Type", field: "ProductProductType", flex: 1 }
-];
 
 const Component = (props) => {
     const { title } = props;
@@ -27,105 +16,21 @@ const Component = (props) => {
     const [refresh, setRefresh] = useState(false);
     const [pageInfo, setPageInfo] = useState({ page: 0, pageSize: 5 });
     const [sortBy, setSortBy] = useState(null);
-    const [loading, setLoading] = useState(false);
     const [rowsCount, setRowsCount] = useState(0);
     const [rows, setRows] = useState([]);
     const [productTypes, setProductTypes] = useState([]);
     const [searchStr, setSearchStr] = useState("");
-    const [rowModesModel, setRowModesModel] = useState({});
+    const [viewType, setViewType] = useState('LIST');
+    const [showConfirm, setShowConfirm] = useState(false);
+    const [deletedId, setDeletedId] = useState(0);
+    const [dialogInfo, setDialogInfo] = useState({ title: "Confirmation", description: "Are you sure? You want to delete?" });
 
     const NavigateTo = useNavigate();
-
-    const handleDeleteClick = (id) => {
-        setRowModesModel({ [id]: { mode: "Delete" } });
-    };
-
-    const OnConfirmDelete = async (id, bConfirm) => {
-        if (bConfirm) {
-            const rslt = await DeleteProduct(id);
-            if (rslt.status) {
-                setInitialize(true);
-                global.AlertPopup("success", "Record is deleted successful.!");
-            } else {
-                global.AlertPopup("error", "Something went wroing while creating record!");
-            }
-        }
-
-        setRowModesModel({});
-    }
-
-    const RenderGridActions = () => {
-
-        return {
-            headerName: "Actions", type: 'actions', field: "actions", width: 115,
-            getActions: ({ row }) => {
-
-                const isDeleteMode = rowModesModel[row.Product_Id]?.mode === 'Delete';
-
-                if (isDeleteMode) {
-                    return [
-                        <GridActionsCellItem
-                            icon={<DoneIcon />}
-                            label="Delete"
-                            sx={{
-                                color: 'secondary.main',
-                            }}
-                            onClick={() => OnConfirmDelete(row.Product_Id, true)}
-                        />,
-                        <GridActionsCellItem
-                            icon={<CancelIcon />}
-                            label="Cancel"
-                            className="textPrimary"
-                            color="inherit"
-                            onClick={() => OnConfirmDelete(row.Product_Id, false)}
-                        />,
-                    ];
-                }
-
-                return [
-                    <GridActionsCellItem
-                        icon={
-                            <Tooltip title="View" arrow>
-                                <VisibilityIcon />
-                            </Tooltip>
-                        }
-                        label="View"
-                        className="textPrimary"
-                        color="inherit"
-                        onClick={() => NavigateTo(`/products/view/${row.Product_Id}`)}
-                    />,
-                    <GridActionsCellItem
-                        icon={
-                            <Tooltip title="Edit" arrow>
-                                <EditIcon />
-                            </Tooltip>
-                        }
-                        label="Edit"
-                        className="textPrimary"
-                        color="inherit"
-                        onClick={() => NavigateTo(`/products/edit/${row.Product_Id}`)}
-                    />,
-                    <GridActionsCellItem
-                        icon={
-                            <Tooltip title="Delete" arrow>
-                                <DeleteIcon />
-                            </Tooltip>
-                        }
-                        label="Delete"
-                        color="inherit"
-                        onClick={() => handleDeleteClick(row.Product_Id)}
-                    />,
-                ];
-            }
-        };
-
-    }
 
     const LoadData = async (types) => {
 
         let query = null, filters = [];
-        setLoading(true);
-        //setRows([]);
+        //setRows([]); queryCount = null, 
         setRowsCount(0);
 
         const _types = types || productTypes;
@@ -142,10 +47,13 @@ const Component = (props) => {
 
         await GetProductsCount(query)
             .then(async (res) => {
-                if (res) setRowsCount(parseInt(res));
+                if (res) {
+                    setRowsCount(parseInt(res));
+                }
             })
             .catch((err) => console.log(err));
 
+<<<<<<< Updated upstream
         if (!Helper.IsJSONEmpty(sortBy)) {
             console.log(filters)
             filters.push(`$orderby=${sortBy.field} ${sortBy.sort}`);
@@ -173,13 +81,30 @@ const Component = (props) => {
                         e.ProductProductType = _types.find((x) => x.ProductTypeCode === e.ProductProductType)?.ProductTypeDescription || 'NA';
                     });
                     console.log(_rows)
+=======
+        /* filters.push(`limit=${pageInfo.pageSize}`);
+        query = filters.join("&"); */
+
+        let _rows = [];
+        await GetProducts(query)
+            .then(async (res) => {
+                if (res) {
+                    _rows = res.value;
+                    for (let i = 0; i < _rows.length; i++) {
+                        _rows[i].id = i + 1;
+                        _rows[i].ProductProductType = _types.find((x) => x.ProductTypeCode === _rows[i].ProductProductType)?.ProductTypeDescription || 'NA';
+                        _rows[i].ProductImage = await GetProductImage(_rows[i].ProductProductImage);
+                    }
+                    //console.log(_rows);
+>>>>>>> Stashed changes
                     setRows(_rows);
                 }
             })
             .catch((err) => console.log(err));
 
-        setLoading(false);
         global.Busy(false);
+
+        return _rows;
     }
 
     const GetProductTypes = async () => {
@@ -194,6 +119,10 @@ const Component = (props) => {
     }
 
     const FetchResults = async () => {
+
+        setDeletedId(0);
+        setShowConfirm(false);
+
         await GetProductTypes().then(async (types) => {
             await LoadData(types);
         });
@@ -204,6 +133,7 @@ const Component = (props) => {
 
     useEffect(() => { setRefresh(true); }, [sortBy, pageInfo, searchStr]);
     useEffect(() => { setInitialize(true); }, []);
+<<<<<<< Updated upstream
 
     const handleSortModelChange = (e) => {
         setSortBy(null); if (e && e.length > 0) setSortBy(e[0]);
@@ -216,9 +146,50 @@ const Component = (props) => {
             setPageInfo(e);
         }
     }
+=======
+    useEffect(() => {
+        if (deletedId > 0) setShowConfirm(true);
+    }, [deletedId]);
+>>>>>>> Stashed changes
 
     const OnSearchChanged = (e) => {
         setSearchStr(e);
+    }
+
+    const handleChangePage = (event, newPage) => {
+        setPageInfo((prev) => ({
+            ...prev,
+            page: newPage
+        }));
+    };
+
+    const handleChangeRowsPerPage = (event) => {
+        setPageInfo({ page: 0, pageSize: parseInt(event.target.value, 5) });
+    };
+    const OnSortClicked = (e) => { setSortBy(null); if (e && e.length > 0) setSortBy(e[0]); }
+
+    const OnPageClicked = (e) => { setPageInfo({ page: 0, pageSize: 5 }); if (e && e.length > 0) setPageInfo(e[0]); }
+
+    const OnDeleteClicked = (e) => { setDeletedId(e); }
+
+    const OnCloseClicked = async (e) => {
+        if (e) {
+            const rslt = await DeleteProduct(deletedId);
+            if (rslt.status) {
+                setInitialize(true);
+                global.AlertPopup("success", "Record is deleted successful.!");
+            } else {
+                global.AlertPopup("error", "Something went wroing while creating record!");
+            }
+        } else {
+            setDeletedId(0);
+            setShowConfirm(false);
+        }
+    }
+
+    const OnActionClicked = (id, bEdit) => {
+        const _route = bEdit ? `/products/edit/${id}` : `/products/view/${id}`;
+        NavigateTo(_route);
     }
 
     return (
@@ -232,11 +203,17 @@ const Component = (props) => {
                     <Stack direction="row">
                         <Grid container sx={{ justifyContent: 'flex-end' }}>
                             <SearchInput searchStr={searchStr} onSearchChanged={OnSearchChanged} />
+                            <ToggleButtons OnViewChanged={(e) => setViewType(e)} />
                             <IconButton
                                 size="medium"
                                 edge="start"
                                 color="inherit"
                                 aria-label="Add"
+                                sx={{
+                                    marginLeft: "2px",
+                                    borderRadius: "4px",
+                                    border: "1px solid rgba(0, 0, 0, 0.12)",
+                                }}
                                 onClick={() => NavigateTo("/products/create")}
                             >
                                 <AddBoxIcon />
@@ -245,29 +222,12 @@ const Component = (props) => {
                     </Stack>
                 </Box>
                 <Box style={{ width: '100%' }}>
-                    <DataGrid
-                        autoHeight
-                        disableColumnMenu
-                        columns={[...columns, RenderGridActions()]}
-                        rowCount={rowsCount}
-                        rows={rows}
-                        initialState={{
-                            pagination: {
-                                paginationModel: pageInfo,
-                            },
-                        }}
-                        pageSizeOptions={ROWSPERPAGE}
-                        onSortModelChange={handleSortModelChange}
-                        onPaginationModelChange={handlePaginationModel}
-                        loading={loading}
-                        editMode="row"
-                        sx={{
-                            "& .MuiDataGrid-cell:focus-within, & .MuiDataGrid-cell:focus": {
-                                outline: "none !important",
-                            }
-                        }}
-                    />
+                    {viewType === 'LIST' && <DataTable rowsCount={rowsCount} rows={rows} pageInfo={pageInfo} onActionClicked={OnActionClicked}
+                        onSortClicked={OnSortClicked} onPageClicked={OnPageClicked} onDeleteClicked={OnDeleteClicked} />}
+                    {viewType === 'GRID' && <DataGrid rowsCount={rowsCount} rows={rows} pageInfo={pageInfo} onActionClicked={OnActionClicked}
+                        onPageClicked={OnPageClicked} onDeleteClicked={OnDeleteClicked} />}
                 </Box>
+                <ConfirmDialog open={showConfirm} {...dialogInfo} onCloseClicked={OnCloseClicked} />
             </Container>
         </>
 
