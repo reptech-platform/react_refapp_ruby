@@ -8,7 +8,7 @@ import { Image } from "components";
 const Component = (props) => {
 
     const { mode, id, name, value, OnInputChange, style, sx, acceptTypes, fileName,
-        validators, validationMessages } = props;
+        validators, validationMessages, alt } = props;
 
     const [inputValue, setInputValue] = React.useState(value);
     const [imageValue, setImageValue] = React.useState(value);
@@ -48,7 +48,7 @@ const Component = (props) => {
         reader.onload = (e) => {
             setImageValue(e.target.result);
             if (OnInputChange) {
-                OnInputChange({ name: 'ProductImageData', value: e.target.result });
+                OnInputChange({ name: name, value: e.target.result });
             }
         };
         reader.readAsDataURL(input);
@@ -108,7 +108,7 @@ const Component = (props) => {
             {error && <div style={{ color: "rgb(211, 47, 47)" }}>{error}</div>}
             {/* {mode && mode !== 'view' && inputValue && <Image sx={{ width: 200, height: 200, m: 2 }} alt={"Product Image"} src={inputValue} />} */}
             {imageValue &&
-                <Image borderRadius="4px" sx={{ width: 300, border: '1px solid #ddd', p: 1, mt: 2 }} alt={"Product Image"} src={imageValue} />
+                <Image borderRadius="4px" sx={{ width: 300, border: '1px solid #ddd', p: 1, mt: 2 }} alt={alt || "Product Image"} src={imageValue} />
             }
 
         </>
