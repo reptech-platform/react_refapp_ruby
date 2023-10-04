@@ -35,16 +35,15 @@ const Component = (props) => {
             rslt = await SetProducts(data);
             global.Busy(false);
             if (rslt.status) {
-                global.AlertPopup("success", "Record is created successful!");
-                setShowButton(false);
-                setNewRow({});
+                NavigateTo("/products");
+                global.AlertPopup("success", "Product is created successfully!");
             } else {
-                global.AlertPopup("error", "Something went wroing while creating record!");
+                global.AlertPopup("error", "Something went wroing while creating Product!");
             }
 
         } else {
             global.Busy(false);
-            global.AlertPopup("error", "Failed uploading image!");
+            global.AlertPopup("error", "Failed uploading Product Image!");
         }
     }
 

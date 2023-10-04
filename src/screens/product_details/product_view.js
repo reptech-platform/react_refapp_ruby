@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Typography, Grid, Stack, Button, Box, Divider } from '@mui/material';
-import { ArrowLeft as ArrowLeftIcon } from '@mui/icons-material';
+import { ArrowLeft as ArrowLeftIcon, Edit as EditIcon } from '@mui/icons-material';
 import { useTheme } from '@mui/material/styles';
 import Container from "screens/container";
 import { useNavigate, useParams } from "react-router-dom";
@@ -77,7 +77,10 @@ const Component = (props) => {
                                 {title}
                             </Typography>
                         </Box>
-                        <Grid container sx={{ justifyContent: 'flex-end' }}>
+                        <Grid container sx={{ alignItems: "center", justifyContent: 'flex-end', gap: 1, pt: 1, pb: 1 }}>
+                            <Button variant="contained" startIcon={<EditIcon />}
+                                onClick={() => NavigateTo(`/products/edit/${id}`)}
+                            >Edit</Button>
                             <Button variant="contained" startIcon={<ArrowLeftIcon />}
                                 onClick={() => NavigateTo("/products")}
                             >Back</Button>

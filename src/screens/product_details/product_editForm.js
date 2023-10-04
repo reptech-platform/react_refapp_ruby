@@ -80,10 +80,10 @@ const Component = (props) => {
         rslt = await PatchProducts(id, data);
         global.Busy(false);
         if (rslt.status) {
-            global.AlertPopup("success", "Record is updated successful!");
-            setNewRow({});
+            NavigateTo("/products");
+            global.AlertPopup("success", "Product is updated successfully!");
         } else {
-            global.AlertPopup("error", "Something went wroing while updating record!");
+            global.AlertPopup("error", "Something went wroing while updating Product!");
         }
     }
 
