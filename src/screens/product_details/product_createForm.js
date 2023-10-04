@@ -64,7 +64,7 @@ const Component = (props) => {
         return new Promise(async (resolve) => {
             const body = newRow.ProductImageData;
             let splits = newRow.ProductProductImage.split(".");
-            const rslt = await SetProductImage(body, { FileType: splits[0], FileName: splits[1] });
+            const rslt = await SetProductImage(body, { FileType: splits[1], FileName: splits[0] });
             return resolve(rslt);
         })
     }
