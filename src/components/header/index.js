@@ -9,7 +9,7 @@ import { Image } from 'components';
 
 const Component = ({ open, onDrawerClicked }) => {
     const [themeType, setThemeType] = React.useState(false);
-    const [themeName, setThemeName] = React.useState("Dark");
+    const [themeName, setThemeName] = React.useState( sessionStorage.getItem('themeName') || "Dark");
 
     const onSwitchChanged = (e) => {
         const tTheme = !themeType;
@@ -18,6 +18,7 @@ const Component = ({ open, onDrawerClicked }) => {
         setThemeType(tTheme);
         setThemeName(tThemeName);
         sessionStorage.setItem('theme', tType);
+        sessionStorage.setItem('themeName', tThemeName);
     }
 
     return (
@@ -37,7 +38,7 @@ const Component = ({ open, onDrawerClicked }) => {
                     <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
                         XYZ Company
                     </Typography>
-                    <Typography noWrap>{themeName}</Typography><Switch onChange={onSwitchChanged} checked={themeType} label="Light"></Switch>
+                    <Typography noWrap>{themeName}</Typography><Switch onChange={onSwitchChanged} checked={sessionStorage.getItem('themeName')} label="Light"></Switch>
                     <Typography variant="avatar" noWrap component="div" sx={{ marginRight: 1 }}>Welcome! User</Typography>
                     <Avatar
                         style={{ cursor: "pointer" }}
