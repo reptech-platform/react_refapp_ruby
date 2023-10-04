@@ -48,7 +48,7 @@ const Component = (props) => {
         reader.onload = (e) => {
             setImageValue(e.target.result);
             if (OnInputChange) {
-                OnInputChange({ name: name, value: e.target.result });
+                OnInputChange({ name: 'ImageData', value: e.target.result });
             }
         };
         reader.readAsDataURL(input);
