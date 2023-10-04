@@ -1,12 +1,8 @@
 import * as React from "react";
-import {
-    TableContainer, Table, TableBody, TableCell, TableRow, Paper,
-    Box, Typography
-} from '@mui/material';
+import { TableContainer, Table, TableBody, TableCell, TableRow, Paper, Typography } from '@mui/material';
 import { TextInput, ColorPicker, FileInput, CheckInput, DropDown, DateTimePicker } from "components";
-import { ValidatorForm } from 'react-material-ui-form-validator';
 
-const RenderFormContols = ({ mode, title, controls, productTypes, onInputChange }) => {
+const Component = ({ mode, title, controls, options, onInputChange }) => {
 
     const paddingTop = mode && mode === 'view' ? undefined : 3;
 
@@ -60,8 +56,8 @@ const RenderFormContols = ({ mode, title, controls, productTypes, onInputChange 
                                                 validationMessages={x.validationMessages} OnInputChange={OnInputChange} />
                                         )}
                                         {x.type === 'dropdown' && (
-                                            <DropDown mode={mode} id={x.key} name={x.key} value={x.value} options={productTypes} valueId="ProductTypeCode" size="small"
-                                                nameId="ProductTypeCode" contentId="ProductTypeDescription" sx={{ width: 250 }} style={{ width: 250 }}
+                                            <DropDown mode={mode} id={x.key} name={x.key} value={x.value} options={options} valueId={x.valueId} size="small"
+                                                nameId={x.nameId} contentId={x.contentId} sx={{ width: 250 }} style={{ width: 250 }}
                                                 validators={x.validators} validationMessages={x.validationMessages} onDropDownChange={OnInputChange} />
                                         )}
                                     </TableCell>
@@ -72,49 +68,6 @@ const RenderFormContols = ({ mode, title, controls, productTypes, onInputChange 
                 </Table>
             </TableContainer>
         </>
-    );
-
-}
-
-const Component = (props) => {
-
-    const { onInputChange, onSubmit } = props;
-    const form = React.useRef(null);
-
-    const handleSubmit = () => {
-        if (onSubmit) onSubmit();
-    }
-
-    const OnInputChange = (e) => {
-        if (onInputChange) onInputChange(e);
-    }
-
-    React.useEffect(() => {
-        if (props.setForm) props.setForm(form);
-    }, [props, form]);
-
-    React.useEffect(() => {
-        ValidatorForm.addValidationRule('isTruthy', value => value);
-    }, []);
-
-    return (
-        <Box sx={{ width: '100%' }}>
-            <ValidatorForm ref={form} onSubmit={handleSubmit}>
-                <Box style={{ display: 'flex', width: '100%' }}>
-                    <Box sx={{ width: "49%", margin: 2 }}>
-                        <RenderFormContols mode={props.mode} title={"Details"} controls={props.controls.details} onInputChange={OnInputChange} />
-                    </Box>
-                    <Box sx={{ width: "49%", margin: 2 }}>
-                        <RenderFormContols mode={props.mode} title={"Others"} controls={props.controls.others} onInputChange={OnInputChange} />
-                    </Box>
-                </Box>
-                <Box style={{ display: 'flex', width: '100%' }}>
-                    <Box sx={{ width: "49%", margin: 2 }}>
-                        <RenderFormContols mode={props.mode} productTypes={props.productTypes} title={"Types"} controls={props.controls.types} onInputChange={OnInputChange} />
-                    </Box>
-                </Box>
-            </ValidatorForm>
-        </Box>
     );
 
 }

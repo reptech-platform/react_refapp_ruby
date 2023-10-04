@@ -6,9 +6,8 @@ import Container from "screens/container";
 import { useNavigate, useParams } from "react-router-dom";
 import { GetProduct, GetProductImage, GetProductTypesApi } from "shared/services";
 import Helper from "shared/helper";
-
 import ProductJsonConfig from "config/productConfig.json";
-import RenderFormContols from "components/formControls/RenderFormContols";
+import RenderFormContols from "./child/formcontrols";
 
 const Component = (props) => {
     const { title } = props;
@@ -53,18 +52,12 @@ const Component = (props) => {
         });
     }
 
-    // if (initialized) {
-    //     setInitialized(false);
-    //     GetProductTypes();
-    //     GetProductDetails();
-    // }
-
     useEffect(() => {
         const fetchData = async () => {
-          if (initialized) {
-            await GetProductTypes();
-            await GetProductDetails();
-          }
+            if (initialized) {
+                await GetProductTypes();
+                await GetProductDetails();
+            }
         };
         fetchData();
     }, [initialized]);
@@ -86,13 +79,6 @@ const Component = (props) => {
                         </Box>
                         <Grid container sx={{ justifyContent: 'flex-end' }}>
                             <Button variant="contained" startIcon={<ArrowLeftIcon />}
-                                sx={{
-                                    color: theme.palette.primary.main,
-                                    backgroundColor: theme.palette.secondary.main,
-                                    '&:hover': {
-                                        backgroundColor: theme.palette.secondary.dark
-                                    },
-                                }}
                                 onClick={() => NavigateTo("/products")}
                             >Back</Button>
                         </Grid>

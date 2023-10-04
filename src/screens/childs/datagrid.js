@@ -17,28 +17,27 @@ const columns = [
 
 const Component = (props) => {
 
-    const { rowsCount, rows, pageInfo, onActionClicked,
-        onPageClicked, onDeleteClicked } = props;
-
+    const { rowsCount, rows, pageInfo, onActionClicked, onPageClicked } = props;
 
     const handleChangePage = (event, newPage) => {
         const _page = { page: newPage, pageSize: pageInfo.pageSize };
-        if (onPageClicked) onPageClicked([_page]);
+        if (onPageClicked) onPageClicked(_page);
     };
 
     const handleChangeRowsPerPage = (event) => {
         /* setPageInfo({ page: 0, pageSize: parseInt(event.target.value, 5) }); */
     };
 
-    React.useEffect(() => {
-        console.log(pageInfo);
-    }, []);
+    const OnActionClicked = (id, type) => {
+        if (onActionClicked) onActionClicked(id, type);
+    };
 
     return (
         <>
             <GridContainer>
-                {rows && rows.splice(pageInfo.page, pageInfo.pageSize).map((x, index) => (
-                    <CardItem key={index} row={x} title={x.ProductName} imgsrc={x.ProductImage} description={x.ProductDescription} width={300}>
+                {rows && rows.map((x, index) => (
+                    <CardItem key={index} keyName="Product_Id" row={x} title={x.ProductName} imgsrc={x.ProductImage} width={300}
+                        description={x.ProductDescription} onActionClicked={OnActionClicked}>
                         <Grid container direction="column">
                             <Typography variant="caption" color="text.secondary">
                                 <strong>Type:</strong>&nbsp;{x.ProductProductType}

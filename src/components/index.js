@@ -13,9 +13,9 @@ import DateTimePicker from "./datetimepicker";
 import GridContainer from "./gridcontainer";
 import CardItem from "./cardview";
 import ToggleButtons from "./togglebutton";
-import ConfirmDialog from "./confirmdlg";
+import CustomDialog from "./dialog";
 
 export {
-    Header, Drawer, Container, Image, FileInput, CheckInput, GridContainer, CardItem, ConfirmDialog,
+    Header, Drawer, Container, Image, FileInput, CheckInput, GridContainer, CardItem, CustomDialog,
     DropDown, SearchInput, TextInput, ColorPicker, AlertMessage, DateTimePicker, ToggleButtons
 };

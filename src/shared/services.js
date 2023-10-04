@@ -67,6 +67,7 @@ const GetProducts = async (query) => {
 
     let url = `http://34.238.241.129:8081/generated_app/Products`;
     if (query) url = `http://34.238.241.129:8081/generated_app/Products?${query}`;
+    //console.log(url);
 
     try {
         const res = await fetch(url, {
@@ -182,6 +183,7 @@ const DeleteProduct = async (id) => {
 const GetProductImage = async (id) => {
 
     let url = `http://34.238.241.129:8081/generated_app/Documents(${id})/$value`;
+    // console.log(url);
 
     try {
         const res = await fetch(url, {

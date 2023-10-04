@@ -138,6 +138,9 @@
             "key": "ProductProductType",
             "label": "Product Type",
             "type": "dropdown",
+            "valueId": "ProductTypeCode",
+            "nameId": "ProductTypeCode",
+            "contentId": "ProductTypeDescription",
             "editable": true,
             "validators": [
                 "required",

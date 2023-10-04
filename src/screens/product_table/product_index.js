@@ -1,17 +1,24 @@
-import { useState, useEffect, useMemo } from "react";
-import { Stack, Box, Grid, Typography, IconButton, Tooltip, TablePagination } from '@mui/material';
+import React, { useState, useEffect } from "react";
+import { Stack, Box, Grid, Typography, IconButton, useTheme } from '@mui/material';
 import { useNavigate } from "react-router-dom";
 import Container from "screens/container";
-import { DataGrid, DataTable } from './childs';
+import { DataGrid, DataTable } from '../childs';
 import { GetProducts, GetProductsCount, DeleteProduct } from "shared/services";
-import { SearchInput, GridContainer, CardItem, ToggleButtons, ConfirmDialog } from "components";
+import { SearchInput, ToggleButtons, CustomDialog } from "components";
 import Helper from "shared/helper";
 import { GetProductTypesApi, GetProductImage } from "shared/services";
 import { Add as AddBoxIcon } from '@mui/icons-material';
-import { ROWSPERPAGE } from "config";
+
+const columns = [
+    { headerName: "Id", field: "Product_Id" },
+    { headerName: "Name", field: "ProductName", flex: 1 },
+    { headerName: "Description", field: "ProductDescription", flex: 1 },
+    { headerName: "Type", field: "ProductProductType", flex: 1 }
+];
 
 const Component = (props) => {
     const { title } = props;
+    const theme = useTheme();
     const [initialize, setInitialize] = useState(false);
     const [refresh, setRefresh] = useState(false);
     const [pageInfo, setPageInfo] = useState({ page: 0, pageSize: 5 });
@@ -23,14 +30,13 @@ const Component = (props) => {
     const [viewType, setViewType] = useState('LIST');
     const [showConfirm, setShowConfirm] = useState(false);
     const [deletedId, setDeletedId] = useState(0);
-    const [dialogInfo, setDialogInfo] = useState({ title: "Confirmation", description: "Are you sure? You want to delete?" });
 
     const NavigateTo = useNavigate();
 
     const LoadData = async (types) => {
 
         let query = null, filters = [];
-        //setRows([]); queryCount = null, 
+        setRows([]);
         setRowsCount(0);
 
         const _types = types || productTypes;
@@ -53,37 +59,18 @@ const Component = (props) => {
             })
             .catch((err) => console.log(err));
 
-<<<<<<< Updated upstream
         if (!Helper.IsJSONEmpty(sortBy)) {
-            console.log(filters)
             filters.push(`$orderby=${sortBy.field} ${sortBy.sort}`);
-            console.log(filters)
         }
 
-        if (pageInfo.page > 0) {
-            const _skip = pageInfo.page * pageInfo.pageSize;
-            console.log(pageInfo)
-            console.log(filters)
-            // filters.push(`$skip=${_skip}`);
-            console.log(filters)
-        }
+        const _top = pageInfo.pageSize;
+        const _skip = pageInfo.page * pageInfo.pageSize;
+        filters.push(`$skip=${_skip}`);
+        filters.push(`$top=${_top}`);
 
         if (!Helper.IsJSONEmpty(filters)) {
             query = filters.join("&");
         }
-
-        await GetProducts(query)
-            .then(async (res) => {
-                if (res) {
-                    let _rows = res.value;
-                    _rows.forEach((e, i) => {
-                        e.id = i + 1;
-                        e.ProductProductType = _types.find((x) => x.ProductTypeCode === e.ProductProductType)?.ProductTypeDescription || 'NA';
-                    });
-                    console.log(_rows)
-=======
-        /* filters.push(`limit=${pageInfo.pageSize}`);
-        query = filters.join("&"); */
 
         let _rows = [];
         await GetProducts(query)
@@ -91,12 +78,12 @@ const Component = (props) => {
                 if (res) {
                     _rows = res.value;
                     for (let i = 0; i < _rows.length; i++) {
-                        _rows[i].id = i + 1;
+                        _rows[i].id = Helper.GetGUID();
                         _rows[i].ProductProductType = _types.find((x) => x.ProductTypeCode === _rows[i].ProductProductType)?.ProductTypeDescription || 'NA';
-                        _rows[i].ProductImage = await GetProductImage(_rows[i].ProductProductImage);
+                        if (viewType === 'GRID') {
+                            _rows[i].ProductImage = await GetProductImage(_rows[i].ProductProductImage);
+                        }
                     }
-                    //console.log(_rows);
->>>>>>> Stashed changes
                     setRows(_rows);
                 }
             })
@@ -131,44 +118,17 @@ const Component = (props) => {
     if (initialize) { setInitialize(false); FetchResults(); }
     if (refresh) { setRefresh(false); LoadData(); }
 
-    useEffect(() => { setRefresh(true); }, [sortBy, pageInfo, searchStr]);
+    useEffect(() => { setRefresh(true); }, [sortBy, pageInfo, searchStr, viewType]);
     useEffect(() => { setInitialize(true); }, []);
-<<<<<<< Updated upstream
+    useEffect(() => { if (deletedId > 0) setShowConfirm(true); }, [deletedId]);
 
-    const handleSortModelChange = (e) => {
-        setSortBy(null); if (e && e.length > 0) setSortBy(e[0]);
-    }
+    const OnViewChanged = (e) => { setViewType(e); }
 
-    const handlePaginationModel = (e) => {
-        setPageInfo({ page: 0, pageSize: 5 });
-        if (e) {
-            console.log(e);
-            setPageInfo(e);
-        }
-    }
-=======
-    useEffect(() => {
-        if (deletedId > 0) setShowConfirm(true);
-    }, [deletedId]);
->>>>>>> Stashed changes
+    const OnSearchChanged = (e) => { setSearchStr(e); }
 
-    const OnSearchChanged = (e) => {
-        setSearchStr(e);
-    }
+    const OnSortClicked = (e) => { setSortBy(e); }
 
-    const handleChangePage = (event, newPage) => {
-        setPageInfo((prev) => ({
-            ...prev,
-            page: newPage
-        }));
-    };
-
-    const handleChangeRowsPerPage = (event) => {
-        setPageInfo({ page: 0, pageSize: parseInt(event.target.value, 5) });
-    };
-    const OnSortClicked = (e) => { setSortBy(null); if (e && e.length > 0) setSortBy(e[0]); }
-
-    const OnPageClicked = (e) => { setPageInfo({ page: 0, pageSize: 5 }); if (e && e.length > 0) setPageInfo(e[0]); }
+    const OnPageClicked = (e) => { setPageInfo({ page: 0, pageSize: 5 }); if (e) setPageInfo(e); }
 
     const OnDeleteClicked = (e) => { setDeletedId(e); }
 
@@ -187,9 +147,12 @@ const Component = (props) => {
         }
     }
 
-    const OnActionClicked = (id, bEdit) => {
-        const _route = bEdit ? `/products/edit/${id}` : `/products/view/${id}`;
-        NavigateTo(_route);
+    const OnActionClicked = (id, type) => {
+        let _route;
+        if (type === 'edit') _route = `/products/edit/${id}`;
+        if (type === 'view') _route = `/products/view/${id}`;
+        if (type === 'delete') setDeletedId(id);;
+        if (_route) NavigateTo(_route);
     }
 
     return (
@@ -203,7 +166,7 @@ const Component = (props) => {
                     <Stack direction="row">
                         <Grid container sx={{ justifyContent: 'flex-end' }}>
                             <SearchInput searchStr={searchStr} onSearchChanged={OnSearchChanged} />
-                            <ToggleButtons OnViewChanged={(e) => setViewType(e)} />
+                            <ToggleButtons OnViewChanged={(e) => OnViewChanged(e)} />
                             <IconButton
                                 size="medium"
                                 edge="start"
@@ -212,7 +175,7 @@ const Component = (props) => {
                                 sx={{
                                     marginLeft: "2px",
                                     borderRadius: "4px",
-                                    border: "1px solid rgba(0, 0, 0, 0.12)",
+                                    border: theme.borderBottom
                                 }}
                                 onClick={() => NavigateTo("/products/create")}
                             >
@@ -222,12 +185,16 @@ const Component = (props) => {
                     </Stack>
                 </Box>
                 <Box style={{ width: '100%' }}>
-                    {viewType === 'LIST' && <DataTable rowsCount={rowsCount} rows={rows} pageInfo={pageInfo} onActionClicked={OnActionClicked}
+                    {viewType === 'LIST' && <DataTable keyId={'Product_Id'} columns={columns} rowsCount={rowsCount} rows={rows} sortBy={sortBy} pageInfo={pageInfo} onActionClicked={OnActionClicked}
+                        onSortClicked={OnSortClicked} onPageClicked={OnPageClicked} />}
+                    {viewType === 'GRID' && <DataGrid rowsCount={rowsCount} rows={rows} sortBy={sortBy} pageInfo={pageInfo} onActionClicked={OnActionClicked}
                         onSortClicked={OnSortClicked} onPageClicked={OnPageClicked} onDeleteClicked={OnDeleteClicked} />}
-                    {viewType === 'GRID' && <DataGrid rowsCount={rowsCount} rows={rows} pageInfo={pageInfo} onActionClicked={OnActionClicked}
-                        onPageClicked={OnPageClicked} onDeleteClicked={OnDeleteClicked} />}
                 </Box>
-                <ConfirmDialog open={showConfirm} {...dialogInfo} onCloseClicked={OnCloseClicked} />
+                <CustomDialog open={showConfirm} title={"Confirmation"} onCloseClicked={OnCloseClicked}>
+                    <Typography gutterBottom>
+                        Are you sure? You want to delete?
+                    </Typography>
+                </CustomDialog>
             </Container>
         </>
 

@@ -73,20 +73,20 @@ const Component = (props) => {
                             mr: open ? 1 : 'auto',
                             justifyContent: 'center',
                         }}>
-                            <Pages sx={{ width: 24, height: 24, mr: 0, color: theme.palette.secondary.main }} />
+                            <Pages sx={{ width: 24, height: 24, mr: 0 }} />
                         </ListItemIcon>
                         <ListItemText primary={"Pages"} sx={{ opacity: open ? 1 : 0 }} />
                     </ListItemButton>
                     {open && <List component="div" disablePadding>
                         <ListItemButton sx={{ pl: 4 }} onClick={() => NavigateTo("/products")}>
                             <ListItemIcon sx={{ minWidth: 30 }}>
-                                <ShoppingBasket sx={{ color: theme.palette.secondary.main }} />
+                                <ShoppingBasket />
                             </ListItemIcon>
                             <ListItemText primary="Products" />
                         </ListItemButton>
                         <ListItemButton sx={{ pl: 4 }} onClick={() => NavigateTo("/producttypes")}>
                             <ListItemIcon sx={{ minWidth: 30 }}>
-                                <Toc sx={{ color: theme.palette.secondary.main }} />
+                                <Toc />
                             </ListItemIcon>
                             <ListItemText primary="Product Types" />
                         </ListItemButton>

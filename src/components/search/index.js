@@ -1,16 +1,12 @@
 import * as React from 'react';
-import { InputBase, IconButton } from '@mui/material';
-import { styled, alpha } from '@mui/material/styles';
+import { InputBase, IconButton, useTheme } from '@mui/material';
+import { styled } from '@mui/material/styles';
 import { Search as SearchIcon, Close as CloseIcon } from '@mui/icons-material';
 import Helper from "shared/helper";
 
 const Search = styled('div')(({ theme }) => ({
     position: 'relative',
     borderRadius: theme.shape.borderRadius,
-    backgroundColor: alpha(theme.palette.common.white, 0.15),
-    '&:hover': {
-        backgroundColor: alpha(theme.palette.common.white, 0.25),
-    },
     marginLeft: 0,
     marginRight: 2,
     width: '100%',
@@ -38,11 +34,11 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
         paddingLeft: `calc(1em + ${theme.spacing(3)})`,
         transition: theme.transitions.create('width'),
         width: '100%',
-        borderBottom: "1px solid rgba(0, 0, 0, 0.42)",
+        borderBottom: theme.borderBottom,
         [theme.breakpoints.up('sm')]: {
             width: '20ch',
             '&:focus': {
-                borderBottom: "1px solid rgba(0, 0, 0, 0.87)",
+                borderBottom: theme.borderBottomFocus
             },
         },
     },
@@ -51,6 +47,7 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 const Component = ({ searchStr, onSearchChanged }) => {
 
     const [value, setValue] = React.useState("");
+    const theme = useTheme();
 
     const OnKeyPressed = (e) => {
         if (e.keyCode === 13 || e.charCode === 13 || e.which === 13) {
@@ -90,6 +87,11 @@ const Component = ({ searchStr, onSearchChanged }) => {
                         edge="start"
                         color="inherit"
                         aria-label="close"
+                        sx={{
+                            marginLeft: "2px",
+                            borderRadius: "4px",
+                            border: theme.borderBottom
+                        }}
                         onClick={(e) => OnClearInput(e)}
                     >
                         <CloseIcon />

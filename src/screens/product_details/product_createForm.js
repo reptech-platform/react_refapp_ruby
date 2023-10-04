@@ -3,7 +3,7 @@ import { Box, Typography, Grid, Stack, Button, Divider } from '@mui/material';
 import Container from "../container";
 import { useTheme } from '@mui/material/styles';
 import ProductJsonConfig from "config/productConfig.json";
-import RenderFormContols from "components/formControls/RenderFormContols";
+import RenderFormContols from "./child/formcontrols";
 import { useNavigate } from "react-router-dom";
 import { SetProductImage, SetProducts, GetProductTypesApi } from "shared/services";
 import { ArrowLeft as ArrowLeftIcon } from '@mui/icons-material';
@@ -114,13 +114,6 @@ const Component = (props) => {
                         </Box>
                         <Grid container sx={{ justifyContent: 'flex-end' }}>
                             <Button variant="contained" startIcon={<ArrowLeftIcon />}
-                                sx={{
-                                    color: theme.palette.primary.main,
-                                    backgroundColor: theme.palette.secondary.main,
-                                    '&:hover': {
-                                        backgroundColor: theme.palette.secondary.dark
-                                    },
-                                }}
                                 onClick={() => NavigateTo("/products")}
                             >Back</Button>
                         </Grid>
@@ -135,13 +128,7 @@ const Component = (props) => {
                         <Box sx={{ width: '100%' }}>
                             <Grid container sx={{ flex: 1, alignItems: "center", justifyContent: 'flex-start', gap: 1, pt: 1, pb: 1 }}>
                                 {showButton && <Button variant="contained" onClick={(e) => OnSubmitForm(e)} >Save</Button>}
-                                <Button variant="contained" onClick={() => NavigateTo("/products")} sx={{
-                                    color: theme.palette.primary.main,
-                                    backgroundColor: theme.palette.secondary.main,
-                                    '&:hover': {
-                                        backgroundColor: theme.palette.secondary.dark
-                                    },
-                                }}>Cancel</Button>
+                                <Button variant="outlined" onClick={() => NavigateTo("/products")}>Cancel</Button>
                             </Grid>
                         </Box>
                     </>

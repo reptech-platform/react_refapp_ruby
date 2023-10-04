@@ -1,7 +1,8 @@
 import * as React from 'react';
-import { Button, Typography, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
+import { Button, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import { Done as DoneIcon, Close as CloseIcon } from '@mui/icons-material';
 import { styled } from '@mui/material/styles';
+import { ValidatorForm } from 'react-material-ui-form-validator';
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
     '& .MuiDialogContent-root': {
@@ -14,7 +15,7 @@ const BootstrapDialog = styled(Dialog)(({ theme }) => ({
 
 const Component = (props) => {
 
-    const { open, width, height, title, description, onCloseClicked } = props;
+    const { open, width, height, title, onCloseClicked, children } = props;
 
     const handleStateChange = (e, bState) => {
         if (onCloseClicked) onCloseClicked(bState);
@@ -34,15 +35,13 @@ const Component = (props) => {
                 {title}
             </DialogTitle>
             <DialogContent dividers sx={{ display: "flex", alignItems: "center" }}>
-                <Typography gutterBottom>
-                    {description}
-                </Typography>
+                {children}
             </DialogContent>
             <DialogActions>
-                <Button variant="contained" startIcon={<DoneIcon sx={{ color: "green" }} />} onClick={(e) => handleStateChange(e, true)}>
+                <Button variant="contained" startIcon={<DoneIcon />} onClick={(e) => handleStateChange(e, true)}>
                     Yes
                 </Button>
-                <Button variant="contained" startIcon={<CloseIcon sx={{ color: "red" }} />} onClick={(e) => handleStateChange(e, false)}>
+                <Button variant="outlined" startIcon={<CloseIcon />} onClick={(e) => handleStateChange(e, false)}>
                     No
                 </Button>
             </DialogActions>

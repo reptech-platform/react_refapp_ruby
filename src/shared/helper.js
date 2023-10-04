@@ -1,4 +1,5 @@
 import moment from "moment";
+import { v4 as uuidv4 } from 'uuid';
 
 var fn = {};
 
@@ -29,5 +30,9 @@ fn.ToDate = (e, format, utc) => {
     if (utc) return moment(dt).utc().format(format);
     return moment(new Date(dt)).format(format);
 };
+
+fn.GetGUID = () => {
+    return uuidv4().replace(/-/g, '');
+}
 
 export default fn;

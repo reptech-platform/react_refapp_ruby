@@ -1,9 +1,13 @@
 import * as React from 'react';
-import { Grid, Card, CardActions, CardContent, CardMedia, CardActionArea } from '@mui/material';
-import { Box, Typography, IconButton } from '@mui/material';
+import { Grid, Card, CardActions, CardContent, CardMedia } from '@mui/material';
+import { Typography, IconButton } from '@mui/material';
 import { Edit as EditIcon, DeleteOutlined as DeleteIcon, Visibility as VisibilityIcon } from '@mui/icons-material';
 
-const Component = ({ row, children, width, sx }) => {
+const Component = ({ row, keyName, children, width, sx, onActionClicked }) => {
+
+    const OnActionClicked = (id, type) => {
+        if (onActionClicked) onActionClicked(id, type);
+    };
 
     return (
         <>
@@ -34,7 +38,8 @@ const Component = ({ row, children, width, sx }) => {
                         <IconButton
                             size="small"
                             color="inherit"
-                            aria-label="Edit"
+                            aria-label="view"
+                            onClick={() => OnActionClicked(row[keyName], 'view')}
                         >
                             <VisibilityIcon />
                         </IconButton>
@@ -42,6 +47,7 @@ const Component = ({ row, children, width, sx }) => {
                             size="small"
                             color="inherit"
                             aria-label="Edit"
+                            onClick={() => OnActionClicked(row[keyName], 'edit')}
                         >
                             <EditIcon />
                         </IconButton>
@@ -49,6 +55,7 @@ const Component = ({ row, children, width, sx }) => {
                             size="small"
                             color="inherit"
                             aria-label="Delete"
+                            onClick={() => OnActionClicked(row[keyName], 'delete')}
                         >
                             <DeleteIcon />
                         </IconButton>
