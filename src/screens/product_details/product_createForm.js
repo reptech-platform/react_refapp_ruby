@@ -27,7 +27,7 @@ const Component = (props) => {
         const { status, Doc_Id } = await UploadImage();
         if (status) {
             OnInputChange('ProductProductImage', Doc_Id);
-            delete data['ProductImageData'];
+            delete data['ImageData'];
             data.ProductProductImage = Doc_Id;
             data.ProductSize = parseFloat(data.ProductSize);
             data.ProductPrice = parseFloat(data.ProductPrice);
@@ -61,9 +61,9 @@ const Component = (props) => {
 
     const UploadImage = async () => {
         return new Promise(async (resolve) => {
-            const body = newRow.ProductImageData;
+            const body = newRow.ImageData;
             let splits = newRow.ProductProductImage.split(".");
-            const rslt = await SetProductImage(body, { FileType: splits[0], FileName: splits[1] });
+            const rslt = await SetProductImage(body, { FileType: splits[1], FileName: splits[0] });
             return resolve(rslt);
         })
     }
