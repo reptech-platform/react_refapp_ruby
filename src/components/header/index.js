@@ -1,8 +1,6 @@
 import * as React from 'react';
 import { IconButton, AppBar, Toolbar, Typography, CssBaseline, Avatar, Switch } from '@mui/material';
-import Person from '@mui/icons-material/Person';
-import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import MenuIcon from '@mui/icons-material/Menu';
+import { ChevronLeft as ChevronLeftIcon, Menu as MenuIcon, Person } from '@mui/icons-material';
 import LogoIcon from "assets/logo.png";
 import { Image } from 'components';
 import TimerSession from 'shared/useTimerSession';
