@@ -6,25 +6,28 @@ import MenuIcon from '@mui/icons-material/Menu';
 import LogoIcon from "assets/logo.png";
 import { Image } from 'components';
 import TimerSession from 'shared/useTimerSession';
+import Session from 'shared/session';
 
 const Component = ({ open, onDrawerClicked }) => {
-    const [themeType, setThemeType] = React.useState(false);
-    const [themeName, setThemeName] = React.useState("Dark");
-    const [newTheme] = TimerSession("themeName");
+    const [themeName, setThemeName] = React.useState("Light");
+    const [themeLabel, setThemeLabel] = React.useState("Dark");
+    const [lastTheme] = TimerSession("theme");
 
     const onSwitchChanged = (e) => {
-        const tTheme = !themeType;
-        const tType = themeType ? "Light" : "Dark";
-        const tThemeName = themeType ? "Dark" : "Light";
-        setThemeType(tTheme);
-        setThemeName(tThemeName);
-        sessionStorage.setItem('theme', tType);
-        sessionStorage.setItem('themeName', tThemeName);
+        let _thName = e.target.checked ? "Dark" : 'Light';
+        let _thLabel = e.target.checked ? 'Light' : "Dark";
+        setThemeLabel(_thLabel);
+        setThemeName(_thName);
+        Session.Store('theme', _thName);
     }
 
     React.useEffect(() => {
-        if (newTheme !== themeName) setThemeName(newTheme);
-    }, [newTheme]);
+        if (lastTheme) {
+            let _thLabel = lastTheme === 'Light' ? "Dark" : 'Light';
+            setThemeName(lastTheme);
+            setThemeLabel(_thLabel);
+        }
+    }, [lastTheme]);
 
     return (
         <>
@@ -43,7 +46,7 @@ const Component = ({ open, onDrawerClicked }) => {
                     <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
                         XYZ Company
                     </Typography>
-                    <Typography noWrap>{themeName}</Typography><Switch onChange={onSwitchChanged} checked={themeName} label="Light"></Switch>
+                    <Typography noWrap>{themeLabel}</Typography><Switch value="active" onChange={onSwitchChanged} checked={themeName === 'Dark'}></Switch>
                     <Typography variant="avatar" noWrap component="div" sx={{ marginRight: 1 }}>Welcome! User</Typography>
                     <Avatar
                         style={{ cursor: "pointer" }}
