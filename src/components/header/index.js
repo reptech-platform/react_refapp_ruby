@@ -1,15 +1,16 @@
 import * as React from 'react';
 import { IconButton, AppBar, Toolbar, Typography, CssBaseline, Avatar, Switch } from '@mui/material';
-import { useTheme } from '@mui/material/styles';
 import Person from '@mui/icons-material/Person';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import MenuIcon from '@mui/icons-material/Menu';
 import LogoIcon from "assets/logo.png";
 import { Image } from 'components';
+import TimerSession from 'shared/useTimerSession';
 
 const Component = ({ open, onDrawerClicked }) => {
     const [themeType, setThemeType] = React.useState(false);
-    const [themeName, setThemeName] = React.useState( sessionStorage.getItem('themeName') || "Dark");
+    const [themeName, setThemeName] = React.useState("Dark");
+    const [newTheme] = TimerSession("themeName");
 
     const onSwitchChanged = (e) => {
         const tTheme = !themeType;
@@ -20,6 +21,10 @@ const Component = ({ open, onDrawerClicked }) => {
         sessionStorage.setItem('theme', tType);
         sessionStorage.setItem('themeName', tThemeName);
     }
+
+    React.useEffect(() => {
+        if (newTheme !== themeName) setThemeName(newTheme);
+    }, [newTheme]);
 
     return (
         <>
@@ -38,7 +43,7 @@ const Component = ({ open, onDrawerClicked }) => {
                     <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
                         XYZ Company
                     </Typography>
-                    <Typography noWrap>{themeName}</Typography><Switch onChange={onSwitchChanged} checked={sessionStorage.getItem('themeName')} label="Light"></Switch>
+                    <Typography noWrap>{themeName}</Typography><Switch onChange={onSwitchChanged} checked={themeName} label="Light"></Switch>
                     <Typography variant="avatar" noWrap component="div" sx={{ marginRight: 1 }}>Welcome! User</Typography>
                     <Avatar
                         style={{ cursor: "pointer" }}
