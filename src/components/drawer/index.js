@@ -2,7 +2,7 @@ import React from 'react';
 import { Toolbar, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import MuiDrawer from '@mui/material/Drawer';
 import { styled, useTheme } from '@mui/material/styles';
-import { Pages, ShoppingBasket, Toc, EditNote } from '@mui/icons-material';
+import { Pages, ShoppingBasket, Toc, EditNote, Checklist } from '@mui/icons-material';
 import { DRAWER_WIDTH } from "config";
 import { useNavigate } from 'react-router-dom';
 
@@ -95,6 +95,12 @@ const Component = (props) => {
                                 <EditNote />
                             </ListItemIcon>
                             <ListItemText primary="Information Form" />
+                        </ListItemButton>
+                        <ListItemButton sx={{ pl: 4 }} onClick={() => NavigateTo("/stepper")}>
+                            <ListItemIcon sx={{ minWidth: 30 }}>
+                                <Checklist />
+                            </ListItemIcon>
+                            <ListItemText primary="Stepper Form" />
                         </ListItemButton>
                     </List>
                     }
