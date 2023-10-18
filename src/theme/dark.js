@@ -7,9 +7,6 @@ const theme = createTheme({
             paper: '#252631'
         }
     },
-    datagrid: {
-        backgroundColor: "#252631"
-    },
     typography: {
         fontFamily: [
             '-apple-system',
@@ -25,6 +22,10 @@ const theme = createTheme({
         ].join(','),
         caption: {
             fontSize: "0.8rem",
+        },
+        colorcaption: {
+            fontSize: "0.8rem",
+            color: "grey"
         },
         avatar: {
             fontSize: "1rem",
@@ -81,10 +82,18 @@ const theme = createTheme({
                     }
                 }
             }
+        },
+        MuiDataGrid: {
+            styleOverrides: {
+                root: {
+                    backgroundColor: "#252631"
+                }
+            }
         }
     },
     borderBottom: "1px solid rgba(255, 255, 255, 0.23)",
     borderBottomFocus: "1px solid rgba(255, 255, 255, 0.87)"
 });
+
 
 export default theme;

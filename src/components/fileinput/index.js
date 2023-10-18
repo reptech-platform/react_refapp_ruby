@@ -7,13 +7,17 @@ import { Image } from "components";
 
 const Component = (props) => {
 
-    const { mode, id, name, value, OnInputChange, style, sx, acceptTypes, fileName,
+    const { mode, id, name, type, value, OnInputChange, style, sx, acceptTypes, fileName,
         validators, validationMessages, alt } = props;
+
+    console.log(acceptTypes);
 
     const [inputValue, setInputValue] = React.useState(value);
     const [imageValue, setImageValue] = React.useState(value);
     const [error, setError] = React.useState(null);
     let fileRef = React.createRef();
+
+    const fType = type || "image";
 
     const OnFileBrowseClicked = () => {
         setError(null);
@@ -93,7 +97,6 @@ const Component = (props) => {
                                 variant="contained"
                                 size="small"
                                 edge="start"
-                                color="secondary"
                                 aria-label="filebrowse"
                                 disabled={mode && mode === 'view' ? true : false}
                                 onClick={OnFileBrowseClicked}>
@@ -107,7 +110,7 @@ const Component = (props) => {
             />
             {error && <div style={{ color: "rgb(211, 47, 47)" }}>{error}</div>}
             {/* {mode && mode !== 'view' && inputValue && <Image sx={{ width: 200, height: 200, m: 2 }} alt={"Product Image"} src={inputValue} />} */}
-            {imageValue &&
+            {fType.toLowerCase() === 'image' && imageValue &&
                 <Image borderRadius="4px" sx={{ width: 300, border: '1px solid #ddd', p: 1, mt: 2 }} alt={alt || "Product Image"} src={imageValue} />
             }
 

@@ -97,7 +97,6 @@ const Component = (props) => {
                 onSortModelChange={handleSortModelChange}
                 onPaginationModelChange={handlePaginationModel}
                 sx={{
-                    backgroundColor: theme.datagrid.backgroundColor,
                     "& .MuiDataGrid-cell:focus-within, & .MuiDataGrid-cell:focus": {
                         outline: "none !important",
                     }

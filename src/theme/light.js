@@ -4,9 +4,6 @@ const theme = createTheme({
     palette: {
         mode: "light"
     },
-    datagrid: {
-        backgroundColor: "#FFFFFF"
-    },
     typography: {
         fontFamily: [
             '-apple-system',
@@ -22,6 +19,10 @@ const theme = createTheme({
         ].join(','),
         caption: {
             fontSize: "0.8rem",
+        },
+        colorcaption: {
+            fontSize: "0.8rem",
+            color: "grey"
         },
         avatar: {
             fontSize: "1rem",
@@ -76,6 +77,13 @@ const theme = createTheme({
                     "& .MuiFormHelperText-root": {
                         marginLeft: "2px"
                     }
+                }
+            }
+        },
+        MuiDataGrid: {
+            styleOverrides: {
+                root: {
+                    backgroundColor: "#FFFFFF"
                 }
             }
         }

@@ -4,7 +4,7 @@ import { TextValidator } from 'react-material-ui-form-validator';
 
 const Component = (props) => {
 
-    const { mode, type, id, name, value, OnInputChange, style, sx, validators, validationMessages } = props;
+    const { mode, type, id, name, placeHolder, value, OnInputChange, style, sx, validators, validationMessages } = props;
 
     const [inputValue, setInputValue] = React.useState(value);
 
@@ -31,6 +31,7 @@ const Component = (props) => {
                 validators={validators}
                 errorMessages={validationMessages}
                 InputLabelProps={{ shrink: false }}
+                placeholder={placeHolder}
                 fullWidth
                 style={{
                     width: "100%",
