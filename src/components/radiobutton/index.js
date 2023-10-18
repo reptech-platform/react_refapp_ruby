@@ -26,7 +26,7 @@ const Component = (props) => {
                 name={name}
             >
                 {options && options.map((x, index) => (
-                    <FormControlLabel key={index} value={x} control={<Radio />} label={x} />
+                    <FormControlLabel key={`opt_${index}`} value={x} control={<Radio />} label={x} />
                 ))}
 
             </RadioGroup>

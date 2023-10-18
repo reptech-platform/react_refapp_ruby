@@ -102,8 +102,8 @@ const Component = (props) => {
                 </Box>
                 <Divider />
                 <ValidatorForm ref={form} onSubmit={handleSubmit}>
-                    {rows.map((x) => (
-                        <InputContainer key={x.key} item={x} />
+                    {rows.map((x, index) => (
+                        <InputContainer key={`info_${index}`} item={x} />
                     ))}
                 </ValidatorForm>
                 <Divider />
