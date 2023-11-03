@@ -3,12 +3,6 @@ pipeline {
         label 'vetpet'
     }
     stages {
-        stage('Checkout') {
-            steps {
-                // Checkout code from Git
-                git credentialsId: 'github1', url: 'https://github.com/reptech-platform/react_refapp_ruby.git', branch: 'main'
-            }
-        }
         stage('build') {
             steps {
                 sh "npm install"
