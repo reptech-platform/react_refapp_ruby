@@ -27,10 +27,10 @@ const Component = ({ row, keyName, children, width, sx, onActionClicked }) => {
                     />
                     <CardContent sx={{ flexGrow: 1 }}>
                         <Typography gutterBottom variant="h5" component="div">
-                            {row.ProductName}
+                            {row.Name}
                         </Typography>
                         <Typography variant="body2" color="text.secondary" component="p">
-                            {row.ProductDescription}
+                            {row.Product_description}
                         </Typography>
                         {children}
                     </CardContent>

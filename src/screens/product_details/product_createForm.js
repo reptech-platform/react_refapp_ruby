@@ -1,57 +1,122 @@
+
 import { useEffect, useState } from "react";
 import { Box, Typography, Grid, Stack, Button, Divider } from '@mui/material';
-import Container from "../container";
+import Container from "screens/container";
 import { useTheme } from '@mui/material/styles';
-import ProductJsonConfig from "config/productConfig.json";
+import ProductJsonConfig from "config/stepperConfig.json";
 import RenderFormContols from "./child/formcontrols";
 import { useNavigate } from "react-router-dom";
-import { SetProductImage, SetProducts, GetProductTypesApi } from "shared/services";
+import * as Api from "shared/services";
+import Support from "shared/support";
 import { ArrowLeft as ArrowLeftIcon } from '@mui/icons-material';
-import Helper from "shared/helper";
+import { GetMetaDataInfo } from "shared/common";
 
 const Component = (props) => {
 
     const [form, setForm] = useState(null);
     const [row, setRow] = useState({});
-    const [newRow, setNewRow] = useState({});
     const [initialized, setInitialized] = useState(false);
     const [showButton, setShowButton] = useState(true);
-    const [productTypes, setProductTypes] = useState([]);
+    const [dropDownOptions, setDropDownOptions] = useState([]);
     const NavigateTo = useNavigate();
     const theme = useTheme();
+    const [showUpdate, setShowUpdate] = useState(false);
     const { title } = props;
 
     const OnSubmit = async () => {
-        let rslt, data = newRow;
-        global.Busy(true);
-        const { status, Doc_Id } = await UploadImage();
-        if (status) {
-            OnInputChange('ProductProductImage', Doc_Id);
-            delete data['ImageData'];
-            data.ProductProductImage = Doc_Id;
-            data.ProductSize = parseFloat(data.ProductSize);
-            data.ProductPrice = parseFloat(data.ProductPrice);
-            console.log(data)
-            rslt = await SetProducts(data);
-            global.Busy(false);
-            if (rslt.status) {
-                NavigateTo("/products");
-                global.AlertPopup("success", "Product is created successfully!");
-            } else {
-                global.AlertPopup("error", "Something went wroing while creating Product!");
-            }
+        let rslt, data;
+        let productId, otherDetailsId, priceId, mainImageId, otherImagesId;
 
-        } else {
-            global.Busy(false);
-            global.AlertPopup("error", "Failed uploading Product Image!");
+        // Add Or Update Product
+        rslt = await Support.AddOrUpdateProduct(row['product']);
+        if (rslt.status) {
+            row['product'].find((x) => x.key === 'Product_id').value = parseInt(rslt.id);
+        } else { return; }
+
+        productId = row['product'].find((x) => x.key === 'Product_id').value || 0;
+
+        // Add or Update Other Details
+        rslt = await Support.AddOrUpdateOtherDetails(row['otherdetails'], dropDownOptions, ['MainImage', 'OtherImages']);
+        if (rslt.status) {
+            row['otherdetails'].find((x) => x.key === 'OtherDetailsId').value = rslt.id;
+        } else { return; }
+
+        otherDetailsId = row['otherdetails'].find((x) => x.key === 'OtherDetailsId').value || 0;
+
+        // Add Or Update Document for Main Image
+        data = row['otherdetails'].find((x) => x.key === 'MainImage');
+        rslt = await Support.AddOrUpdateDocument(data);
+        if (rslt.status) {
+            let newValues = row['otherdetails'].find((x) => x.key === 'MainImage').value;
+            newValues = { ...newValues, DocId: rslt.id };
+            row['otherdetails'].find((x) => x.key === 'MainImage').value = newValues;
+        } else { return; }
+
+        mainImageId = row['otherdetails'].find((x) => x.key === 'MainImage').value?.DocId || 0;
+
+        // Update product with child references
+        data = {
+            Product_id: parseInt(productId),
+            ProductMainImage: parseInt(mainImageId),
+            ProductOtherDetails: parseInt(otherDetailsId)
         }
+        rslt = await Support.AddOrUpdateProduct(data);
+        if (!rslt.status) return;
+
+        // Add Or Update Document for Other Images
+        data = row['otherdetails'].find((x) => x.key === 'OtherImages');
+        rslt = await Support.AddOrUpdateDocument(data);
+        if (rslt.status) {
+            let oldData = row['otherdetails'].find((x) => x.key === 'OtherImages').value;
+            oldData = { ...oldData, DocId: rslt.id };
+            row['otherdetails'].find((x) => x.key === 'OtherImages').value = oldData;
+        } else { return; }
+
+        otherImagesId = row['otherdetails'].find((x) => x.key === 'OtherImages').value?.DocId || 0;
+        let productOtherImagesId = row['otherdetails'].find((x) => x.key === 'ProductOtherImagesId').value || 0;
+
+        // Update product other images with child referenc
+        data = {
+            Id: parseInt(productOtherImagesId),
+            Product_id: parseInt(productId),
+            DocId: parseInt(otherImagesId)
+        };
+
+        rslt = await Support.AddOrUpdateProductOtherImages(data);
+        if (rslt.status) {
+            row['otherdetails'].find((x) => x.key === 'ProductOtherImagesId').value = rslt.id;
+        } else { return; }
+
+        // Add Or Update Product Price
+        rslt = await Support.AddOrUpdatePrice(row['productprice']);
+        if (rslt.status) {
+            row['productprice'].find((x) => x.key === 'PpId').value = rslt.id;
+        } else { return; }
+
+        priceId = row['productprice'].find((x) => x.key === 'PpId').value || 0;
+
+        // Update product with child references
+        data = {
+            Product_id: parseInt(productId),
+            ProductProductPrice: parseInt(priceId)
+        }
+        rslt = await Support.AddOrUpdateProduct(data);
+        if (!rslt.status) return;
+
+        global.AlertPopup("success", "Product is created successfully!");
+        setShowUpdate(false);
+        NavigateTo("/products");
     }
 
     const OnInputChange = (e) => {
-        setNewRow((prev) => ({
-            ...prev,
-            [e.name]: e.value
-        }));
+        const { name, value, location, ...others } = e;
+        let _row = row;
+        let _index = row[location].findIndex((x) => x.key === name);
+        if (_index > -1) {
+            _row[location][_index].value = value;
+            setRow(_row);
+            setShowUpdate(true);
+        }
     }
 
     const OnSubmitForm = (e) => {
@@ -59,25 +124,50 @@ const Component = (props) => {
         form.current.submit();
     }
 
-    const UploadImage = async () => {
-        return new Promise(async (resolve) => {
-            const body = newRow.ImageData;
-            let splits = newRow.ProductProductImage.split(".");
-            const rslt = await SetProductImage(body, { FileType: splits[1], FileName: splits[0] });
-            return resolve(rslt);
-        })
-    }
-
-    const GetProductTypes = async () => {
+    const FetchProductTypes = async () => {
         return new Promise(async (resolve) => {
             global.Busy(true);
-            const productTypes = await GetProductTypesApi();
-            const { value } = productTypes || { value: [] };
-            setProductTypes(value);
-            global.Busy(false);
-            return resolve(true);
+            await Api.GetProductTypes()
+                .then(async (res) => {
+                    if (res.status) {
+                        const pValues = res.values.map((x) => { return { Name: x.ProductTypeName, Value: x.PtId } });
+                        await GetMetaDataInfo()
+                            .then(async (res2) => {
+                                const enums = res2.filter((x) => x.Type === 'Enum') || [];
+                                enums.push({ Name: "ProductTypes", Type: 'Enum', Values: pValues });
+                                setDropDownOptions(enums);
+                                global.Busy(false);
+                                return resolve(true);
+                            });
+
+                    } else {
+                        global.Busy(false);
+                        console.log(res.statusText);
+                        return resolve(true);
+                    }
+                });
+
         });
     }
+
+    const FetchProductDetails = async () => {
+        let item = {};
+        ['product', 'otherdetails', 'productprice'].forEach(elm => {
+            let items = [];
+            for (let prop of ProductJsonConfig[elm]) {
+                items.push({ ...prop, value: null });
+            }
+            item[elm] = items;
+        });
+
+        setRow(item);
+    }
+
+    const fetchData = async () => {
+        await FetchProductTypes().then(async () => {
+            await FetchProductDetails();
+        });
+    };
 
     useEffect(() => {
         setShowButton(true);
@@ -85,15 +175,7 @@ const Component = (props) => {
 
     if (initialized) {
         setInitialized(false);
-        GetProductTypes();
-
-        ['details', 'others', 'types'].forEach(elm => {
-            for (let prop of ProductJsonConfig[elm]) {
-                delete prop['value'];
-            }
-        });
-
-        setRow(ProductJsonConfig);
+        fetchData();
     }
 
     useEffect(() => {
@@ -119,9 +201,9 @@ const Component = (props) => {
                     </Stack>
                 </Box>
                 <Divider />
-                <RenderFormContols {...props} setForm={setForm} onInputChange={OnInputChange} productTypes={productTypes}
-                    controls={row} onSubmit={OnSubmit} />
-                {!Helper.IsJSONEmpty(newRow) && (
+                <RenderFormContols shadow={true} {...props} setForm={setForm} onInputChange={OnInputChange}
+                    controls={row} onSubmit={OnSubmit} options={dropDownOptions} />
+                {showUpdate && (
                     <>
                         <Divider />
                         <Box sx={{ width: '100%' }}>

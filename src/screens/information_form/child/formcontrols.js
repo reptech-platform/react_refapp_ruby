@@ -32,7 +32,12 @@ const Component = (props) => {
             <ValidatorForm ref={form} onSubmit={handleSubmit}>
                 <Box style={{ display: 'flex', width: '100%' }}>
                     <Box sx={{ width: "100%", margin: 2, boxShadow, borderRadius }}>
-                        <RenderFormContols shadow={true} location="product" mode={props.mode} title={"Product"} controls={props.controls.product} options={props.options} onInputChange={OnInputChange} />
+                        <RenderFormContols shadow={true} location="producttype" mode={props.mode} title={"Product Type"} controls={props.controls.producttype} options={props.options} onInputChange={OnInputChange} />
+                    </Box>
+                </Box>
+                <Box style={{ display: 'flex', width: '100%' }}>
+                    <Box sx={{ width: "100%", margin: 2, boxShadow, borderRadius }}>
+                        <RenderFormContols excludestepper={true} shadow={true} location="product" mode={props.mode} title={"Product"} controls={props.controls.product} options={props.options} onInputChange={OnInputChange} />
                     </Box>
                 </Box>
                 <Box style={{ display: 'flex', width: '100%' }}>
@@ -40,12 +45,14 @@ const Component = (props) => {
                         <RenderFormContols shadow={true} location="otherdetails" mode={props.mode} title={"Other Details"} controls={props.controls.otherdetails} options={props.options} onInputChange={OnInputChange} />
                     </Box>
                 </Box>
+                {/* 
+                
                 <Box style={{ display: 'flex', width: '100%' }}>
                     <Box sx={{ width: "100%", margin: 2, boxShadow, borderRadius }}>
                         <RenderFormContols shadow={true} location="productprice" mode={props.mode} title={"Product Price"}
                             controls={props.controls.productprice} options={props.options} onInputChange={OnInputChange} />
                     </Box>
-                </Box>
+                </Box> */}
             </ValidatorForm>
         </Box>
     );

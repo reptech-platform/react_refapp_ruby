@@ -1,23 +1,26 @@
 import * as React from "react";
 import { TextValidator } from 'react-material-ui-form-validator';
-import { InputAdornment, IconButton } from '@mui/material';
+import { InputAdornment, IconButton, Typography } from '@mui/material';
 import { FindInPage } from '@mui/icons-material';
 import Helper from "shared/helper";
 import { Image } from "components";
 
+const Images = ["JPG", "JPEG", "PNG"];
+
 const Component = (props) => {
 
-    const { mode, id, name, type, value, OnInputChange, style, sx, acceptTypes, fileName,
-        validators, validationMessages, alt } = props;
+    const { mode, id, name, type, docName, docType, docData, OnInputChange,
+        style, sx, acceptTypes, validators, validationMessages, alt } = props;
 
-    console.log(acceptTypes);
+    const tValue = docName && docType ? `${docName}.${docType}` : "";
+    const [inputValue, setInputValue] = React.useState(tValue);
 
-    const [inputValue, setInputValue] = React.useState(value);
-    const [imageValue, setImageValue] = React.useState(value);
+    const [iDocType, setIDocType] = React.useState(docType);
+    const [iDocData, setIDocData] = React.useState(docData);
+
     const [error, setError] = React.useState(null);
-    let fileRef = React.createRef();
 
-    const fType = type || "image";
+    let fileRef = React.createRef();
 
     const OnFileBrowseClicked = () => {
         setError(null);
@@ -27,7 +30,7 @@ const Component = (props) => {
     const OnFileInputChanged = (e) => {
         e.preventDefault();
         setError(null);
-        setImageValue(null);
+        setIDocData(null);
         let _file = e.target.files[0];
         if (!Helper.IsNullValue(_file)) {
             let _ext = _file.name.split(".").pop();
@@ -38,80 +41,99 @@ const Component = (props) => {
                 let tmp = `Supported Format: ${acceptTypes.toUpperCase().replace(/\./g, "").replace(/\,/g, ", ")}`;
                 setError(tmp);
             } else {
-                ReadImageFile(_file);
-                setInputValue(_file.name);
-                if (OnInputChange) {
-                    OnInputChange({ name, value: _file.name });
-                }
+                ReadDocument(_file);
             }
         }
     }
 
-    const ReadImageFile = (input) => {
+    const ReadDocument = (input) => {
         var reader = new FileReader();
         reader.onload = (e) => {
-            setImageValue(e.target.result);
+            setIDocData(e.target.result);
+            setInputValue(input.name);
+
+            const iDocName = input.name.split(".")[0];
+            const tDocType = input.type;
+            const iDocExt = input.name.split(".").pop().toUpperCase();
+            const tDocData = e.target.result;
+
             if (OnInputChange) {
-                OnInputChange({ name: 'ImageData', value: e.target.result });
+                OnInputChange({
+                    name, value: {
+                        DocName: iDocName, DocExt: iDocExt,
+                        DocType: tDocType, DocData: tDocData
+                    }, type
+                });
             }
         };
         reader.readAsDataURL(input);
     }
 
     React.useEffect(() => {
-        if (mode && (mode === 'view' || mode === 'edit')) {
-            setInputValue(fileName);
+        setIDocType(null);
+        if (inputValue) {
+            let tmp = inputValue.split(".").pop().toUpperCase(); setIDocType(tmp);
         }
-    }, [mode, fileName]);
+    }, [inputValue]);
 
     return (
         <>
-            <TextValidator
-                autoComplete="off"
-                id={id}
-                size="small"
-                name={name}
-                disabled
-                value={inputValue || ""}
-                validators={validators}
-                errorMessages={validationMessages}
-                InputLabelProps={{ shrink: false }}
-                fullWidth
-                style={{
-                    width: "100%",
-                    ...style
-                }}
-                sx={{
-                    "& .MuiOutlinedInput-root": {
-                        paddingLeft: "1px"
-                    },
-                    "& label": {
-                        display: "none"
-                    },
-                    ...sx
-                }}
-                InputProps={{
-                    startAdornment: (
-                        <InputAdornment position="start">
-                            <IconButton
-                                variant="contained"
-                                size="small"
-                                edge="start"
-                                aria-label="filebrowse"
-                                disabled={mode && mode === 'view' ? true : false}
-                                onClick={OnFileBrowseClicked}>
-                                <FindInPage />
-                                <input type="file" hidden accept={acceptTypes}
-                                    ref={input => fileRef = input} onChange={OnFileInputChanged} />
-                            </IconButton>
-                        </InputAdornment>
-                    ),
-                }}
-            />
-            {error && <div style={{ color: "rgb(211, 47, 47)" }}>{error}</div>}
+            {mode && mode === 'view' ? (
+                <>
+                    <Typography>{inputValue}</Typography>
+                </>
+            ) : (
+                <>
+                    <TextValidator
+                        autoComplete="off"
+                        id={id}
+                        size="small"
+                        name={name}
+                        disabled
+                        value={inputValue || ""}
+                        validators={validators}
+                        errorMessages={validationMessages}
+                        InputLabelProps={{ shrink: false }}
+                        fullWidth
+                        style={{
+                            width: "100%",
+                            ...style
+                        }}
+                        sx={{
+                            "& .MuiOutlinedInput-root": {
+                                paddingLeft: "1px"
+                            },
+                            "& label": {
+                                display: "none"
+                            },
+                            ...sx
+                        }}
+                        InputProps={{
+                            startAdornment: (
+                                <InputAdornment position="start">
+                                    <IconButton
+                                        variant="contained"
+                                        size="small"
+                                        edge="start"
+                                        aria-label="filebrowse"
+                                        disabled={mode && mode === 'view' ? true : false}
+                                        onClick={OnFileBrowseClicked}>
+                                        <FindInPage />
+                                        <input type="file" hidden accept={acceptTypes}
+                                            ref={input => fileRef = input} onChange={OnFileInputChanged} />
+                                    </IconButton>
+                                </InputAdornment>
+                            ),
+                        }}
+                    />
+                    {error && <div style={{ color: "rgb(211, 47, 47)" }}>{error}</div>}
+                </>
+            )}
+
+
             {/* {mode && mode !== 'view' && inputValue && <Image sx={{ width: 200, height: 200, m: 2 }} alt={"Product Image"} src={inputValue} />} */}
-            {fType.toLowerCase() === 'image' && imageValue &&
-                <Image borderRadius="4px" sx={{ width: 300, border: '1px solid #ddd', p: 1, mt: 2 }} alt={alt || "Product Image"} src={imageValue} />
+            {Images.indexOf(iDocType) > -1 && iDocData &&
+                <Image borderRadius="4px" sx={{ width: 300, border: '1px solid #ddd', p: 1, mt: 2 }} alt={alt || "Product Image"} src={iDocData} />
             }
 
         </>

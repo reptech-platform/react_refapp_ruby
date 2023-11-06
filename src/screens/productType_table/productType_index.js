@@ -3,14 +3,14 @@ import { Typography, Grid, Stack, Box, Divider, IconButton, useTheme } from '@mu
 import { Add as AddBoxIcon } from '@mui/icons-material';
 import Container from "screens/container";
 import { SearchInput, CustomDialog, TextInput } from "components";
-import { GetProductTypesApi, SetProductTypesApi, GetProductTypesCount } from "shared/services";
+import { GetProductTypes, GetProductTypesCount, SetProductTypes } from "shared/services";
 import Helper from "shared/helper";
 import { DataTable } from '../childs';
 import { ValidatorForm } from 'react-material-ui-form-validator';
 
 const columns = [
-    { headerName: "Code", field: "ProductTypeCode", flex: 1, editable: false },
-    { headerName: "Description", field: "ProductTypeDescription", flex: 1, editable: true }
+    { headerName: "Name", field: "ProductTypeName", flex: 1, editable: false },
+    { headerName: "Description", field: "ProductTypeDesc", flex: 1, editable: true }
 ];
 
 const httpMethods = { add: 'POST', edit: 'PATCH', delete: 'DELETE' };
@@ -30,7 +30,7 @@ const Component = (props) => {
     const [searchStr, setSearchStr] = useState("");
     const [sortBy, setSortBy] = useState(null);
     const [actions, setActions] = useState({ id: 0, action: null });
-    const [product, setProduct] = useState({ ProductTypeCode: null, ProductTypeDescription: null });
+    const [product, setProduct] = useState({ PtId: null, ProductTypeName: null, ProductTypeDesc: null });
     const form = React.useRef(null);
 
     const LoadData = async () => {
@@ -42,7 +42,7 @@ const Component = (props) => {
         global.Busy(true);
 
         if (!Helper.IsNullValue(searchStr)) {
-            filters.push(`$filter=contains(ProductTypeDescription, '${searchStr}')`);
+            filters.push(`$filter=contains(ProductTypeDesc, '${searchStr}')`);
         }
 
         if (!Helper.IsJSONEmpty(filters)) {
@@ -51,9 +51,12 @@ const Component = (props) => {
 
         await GetProductTypesCount(query)
             .then(async (res) => {
-                if (res) setRowsCount(parseInt(res));
-            })
-            .catch((err) => console.log(err));
+                if (res.status) {
+                    setRowsCount(parseInt(res.values));
+                } else {
+                    console.log(res.statusText);
+                }
+            });
 
         if (!Helper.IsJSONEmpty(sortBy)) {
             filters.push(`$orderby=${sortBy.field} ${sortBy.sort}`);
@@ -68,13 +71,18 @@ const Component = (props) => {
             query = filters.join("&");
         }
 
-        const productTypes = await GetProductTypesApi(query);
-        const { value } = productTypes || { value: [] };
-
-        let _rows = value || [];
-        for (let i = 0; i < _rows.length; i++) {
-            _rows[i].id = Helper.GetGUID();
-        }
+        let _rows = [];
+        await GetProductTypes(query)
+            .then(async (res) => {
+                if (res.status) {
+                    _rows = res.values || [];
+                    for (let i = 0; i < _rows.length; i++) {
+                        _rows[i].id = Helper.GetGUID();
+                    }
+                } else {
+                    console.log(res.statusText);
+                }
+            });
 
         setRows(_rows);
         global.Busy(false);
@@ -89,14 +97,14 @@ const Component = (props) => {
         ClearSettings();
         setActions({ id, action: type });
         if (type === 'edit' || type === 'delete') {
-            const { ProductTypeCode, ProductTypeDescription } = rows.find((x) => x.ProductTypeCode === id);
-            setProduct({ ProductTypeCode, ProductTypeDescription });
+            const { PtId, ProductTypeName, ProductTypeDesc } = rows.find((x) => x.PtId === id);
+            setProduct({ PtId, ProductTypeName, ProductTypeDesc });
         }
     }
 
     const ClearSettings = () => {
         setActions({ id: 0, action: null });
-        setProduct({ ProductTypeCode: null, ProductTypeDescription: null });
+        setProduct({ PtId: null, ProductTypeName: null, ProductTypeDesc: null });
     }
 
     const OnCloseClicked = (e) => {
@@ -127,7 +135,8 @@ const Component = (props) => {
         return new Promise(async (resolve) => {
             const { success, failed } = httpMethodResponse[params.httpMethod];
             global.Busy(true);
-            const { status } = await SetProductTypesApi(params.httpMethod, params.ProductTypeDescription, params.ProductTypeCode);
+            let data = { ...params, Deleted: params.httpMethod === 'DELETE' };
+            const { status } = await SetProductTypes(data);
             if (status) {
                 global.AlertPopup("success", `Record is ${success} successful!`);
             } else {
@@ -171,7 +180,7 @@ const Component = (props) => {
                 </Box>
                 <Divider />
                 <Box style={{ width: '100%' }}>
-                    <DataTable keyId={'ProductTypeCode'} columns={columns} rowsCount={rowsCount} rows={rows} noView={true}
+                    <DataTable keyId={'PtId'} columns={columns} rowsCount={rowsCount} rows={rows} noView={true}
                         sortBy={sortBy} pageInfo={pageInfo} onActionClicked={OnActionClicked}
                         onSortClicked={OnSortClicked} onPageClicked={OnPageClicked} />
                 </Box>
@@ -183,35 +192,44 @@ const Component = (props) => {
                 </CustomDialog>
 
                 <CustomDialog width="auto" open={actions.action == 'add'} title={"Add Product Type"} onCloseClicked={OnCloseClicked}>
-                    <Box sx={{
-                        width: "50%", display: "flex", flexDirection: "column",
-                        justifyContent: "center", alignContent: "center",
-                        justifyItems: "center", alignItems: "center"
-                    }}>
-                        <Typography noWrap gutterBottom>
-                            Enter Product Description
-                        </Typography>
-                    </Box>
                     <ValidatorForm ref={form} onSubmit={handleSubmit}>
-                        <TextInput id={"ProductTypeDescription"} name={"ProductTypeDescription"} value={product.ProductTypeDescription} validators={['required']}
-                            validationMessages={['Description is required']} OnInputChange={OnInputChange} />
+                        <Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
+                            <Grid item xs={6}>
+                                <Typography noWrap gutterBottom>Enter Product Name</Typography>
+                            </Grid>
+                            <Grid item xs={6}>
+                                <TextInput editable={true} id={"ProductTypeName"} name={"ProductTypeName"} value={product.ProductTypeName} validators={['required']}
+                                    validationMessages={['Name is required']} OnInputChange={OnInputChange} />
+                            </Grid>
+                            <Grid item xs={6}>
+                                <Typography noWrap gutterBottom>Enter Product Description</Typography>
+                            </Grid>
+                            <Grid item xs={6}>
+                                <TextInput editable={true} id={"ProductTypeDesc"} name={"ProductTypeDesc"} value={product.ProductTypeDesc} validators={['required']}
+                                    validationMessages={['Description is required']} OnInputChange={OnInputChange} />
+                            </Grid>
+                        </Grid>
                     </ValidatorForm>
-
                 </CustomDialog>
 
                 <CustomDialog width="auto" open={actions.action == 'edit'} title={"Edit Product Type"} onCloseClicked={OnCloseClicked}>
-                    <Box sx={{
-                        width: "50%", display: "flex", flexDirection: "column",
-                        justifyContent: "center", alignContent: "center",
-                        justifyItems: "center", alignItems: "center"
-                    }}>
-                        <Typography noWrap gutterBottom>
-                            Enter Product Description
-                        </Typography>
-                    </Box>
                     <ValidatorForm ref={form} onSubmit={handleSubmit}>
-                        <TextInput id={"ProductTypeDescription"} name={"ProductTypeDescription"} value={product.ProductTypeDescription} validators={['required']}
-                            validationMessages={['Description is required']} OnInputChange={OnInputChange} />
+                        <Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
+                            <Grid item xs={6}>
+                                <Typography noWrap gutterBottom>Enter Product Name</Typography>
+                            </Grid>
+                            <Grid item xs={6}>
+                                <TextInput editable={true} id={"ProductTypeName"} name={"ProductTypeName"} value={product.ProductTypeName} validators={['required']}
+                                    validationMessages={['Name is required']} OnInputChange={OnInputChange} />
+                            </Grid>
+                            <Grid item xs={6}>
+                                <Typography noWrap gutterBottom>Enter Product Description</Typography>
+                            </Grid>
+                            <Grid item xs={6}>
+                                <TextInput editable={true} id={"ProductTypeDesc"} name={"ProductTypeDesc"} value={product.ProductTypeDesc} validators={['required']}
+                                    validationMessages={['Description is required']} OnInputChange={OnInputChange} />
+                            </Grid>
+                        </Grid>
                     </ValidatorForm>
                 </CustomDialog>
 

@@ -16,6 +16,7 @@ const Component = (props) => {
             <Route path="/products/edit/:id" element={<ProductEdit {...props} title={'Edit Product'} />} />
             <Route path="/products/create" element={<ProductCreate {...props} title={'Create Product'} />} />
             <Route path="/products" element={<Products {...props} title={'Products Table'} />} />
+            {/* <Route path="/" element={<StepperForm {...props} title={'Product Wizard'} />} /> */}
             <Route path="/" element={<Products {...props} title={'Products Table'} nolistbar={true} />} />
         </Routes>
     )

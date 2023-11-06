@@ -1,11 +1,10 @@
-import { GetAppInfoApi, GetDocumentsApi } from "./services";
+import { GetMetaData } from "./services";
 
 const ParseValue = (e) => {
     if (!isNaN(e)) return parseInt(e);
     if (e.toLowerCase() === 'true') return true;
     if (e.toLowerCase() === 'false') return false;
     return e;
-
 }
 
 const GetQueryParams = () => {
@@ -39,7 +38,7 @@ const ExtractXml = async (xml) => {
         const entityTypes = xml.getElementsByTagName("EntityType");
         let obj = [];
         for (let type of entityTypes) {
-            const entity = { Name: type.getAttribute("Name"), Properties: [], HasStream: type.getAttribute("HasStream") === 'false' ? false : true };
+            const entity = { Name: type.getAttribute("Name"), Type: "Entity", Properties: [], HasStream: type.getAttribute("HasStream") === 'false' ? false : true };
             entity.PropertyRef = GetPropertyRef(type);
             let props = [];
             const childrens = Object.values(type.children);
@@ -67,28 +66,52 @@ const ExtractXml = async (xml) => {
     });
 }
 
-const GetEntities = async (appId) => {
+const ExtractAttributes = async (item, type) => {
     return new Promise(async (resolve) => {
-        await GetAppInfoApi(appId)
+        const attributes = item.attributes;
+        let obj = type ? { type } : {};
+        for (let i = 0; i < attributes.length; i++) {
+            let { name, value } = attributes[i];
+            obj = { ...obj, [name]: value }
+        }
+        return resolve(obj);
+    });
+}
+
+const ExtractEnums = async (xml) => {
+    return new Promise(async (resolve) => {
+        const items = xml.getElementsByTagName("EnumType");
+        let obj = [];
+        for (let item of items) {
+            let name = item.getAttribute("Name");
+            let childs = [];
+            for (let child of item.children) {
+                const tmp = await ExtractAttributes(child);
+                childs.push(tmp);
+            }
+            const element = { Name: name, Type: "Enum", Values: childs };
+            obj.push(element);
+        }
+        return resolve(obj);
+    });
+}
+
+const GetMetaDataInfo = async () => {
+    return new Promise(async (resolve) => {
+        await GetMetaData()
             .then(async (res) => {
-                if (res && res.AppConfigurationXMLModel) {
-                    await GetDocumentsApi(res.AppConfigurationXMLModel)
-                        .then(async (doc) => {
-                            if (doc) {
-                                const xmlPattern = /<\?xml.*?\?>[\s\S]*?<edmx:Edmx.*?>[\s\S]*?<\/edmx:Edmx>/;
-                                const xmlMatch = doc.match(xmlPattern);
-                                const xmlContent = xmlMatch[0];
-                                const parser = new DOMParser();
-                                const xmlDoc = parser.parseFromString(xmlContent, "application/xml");
-                                const entities = await ExtractXml(xmlDoc);
-                                return resolve(entities);
-                            }
-                        })
-                        .catch((err) => {
-                            console.log(err);
-                            return resolve([]);
-                        })
+                if (res) {
+                    const xmlPattern = /<\?xml.*?\?>[\s\S]*?<edmx:Edmx.*?>[\s\S]*?<\/edmx:Edmx>/;
+                    const xmlMatch = res.match(xmlPattern);
+                    const xmlContent = xmlMatch[0];
+                    const parser = new DOMParser();
+                    const xmlDoc = parser.parseFromString(xmlContent, "application/xml");
+                    const enums = await ExtractEnums(xmlDoc);
+                    const entities = await ExtractXml(xmlDoc);
+                    const collections = [...enums, ...entities];
+                    return resolve(collections);
                 }
+                return resolve([]);
             })
             .catch((err) => {
                 console.log(err);
@@ -97,4 +120,4 @@ const GetEntities = async (appId) => {
     });
 }
 
-export { GetQueryParams, GetEntities };
+export { GetQueryParams, GetMetaDataInfo };

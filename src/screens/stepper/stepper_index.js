@@ -1,119 +1,127 @@
 import React from 'react';
 import Container from "screens/container";
-import { Box, Stepper, Step, StepLabel, Divider, Grid, Button, Typography } from '@mui/material';
+import { GetMetaDataInfo } from "shared/common";
+import { Box, Grid, Stack, Button, Typography } from '@mui/material';
+import { ArrowLeft as ArrowLeftIcon } from '@mui/icons-material';
+import ProductJsonConfig from "config/stepperConfig.json";
+import { ProductDetailsForm, ProductForm, ProductPriceForm, ProductReviewForm, ProductTypesForm } from "./childs";
+import * as Api from "shared/services";
+import Stepper from "components/stepper";
 
-const steps = ['Personal Info', 'Work Info', 'Rating'];
+const steps = ['Product Type', 'Product', 'OtherDetails', 'ProductPrice', "Review"];
 
 const Component = (props) => {
     const { title } = props;
-    const [activeStep, setActiveStep] = React.useState(0);
-    const [skipped, setSkipped] = React.useState(new Set());
+    const [initialize, setInitialize] = React.useState(false);
+    const [isSubmitted, setIsSubmitted] = React.useState(false);
+    const [jumpStep, setJumpStep] = React.useState(0);
+    const [row, setRow] = React.useState({});
+    const [stepperComponents, setStepperComponents] = React.useState([]);
+    const inputRefs = React.useRef({ productForm: null });
 
-    const isStepOptional = (step) => {
-        return step === 1;
-    };
+    const OnStepClicked = (e) => { setJumpStep(e); }
 
-    const isStepSkipped = (step) => {
-        return skipped.has(step);
-    };
+    const PrepareStepperComponents = async (enums) => {
+        return new Promise(async (resolve) => {
 
-    const handleNext = () => {
-        let newSkipped = skipped;
-        if (isStepSkipped(activeStep)) {
-            newSkipped = new Set(newSkipped.values());
-            newSkipped.delete(activeStep);
-        }
+            const _items = [];
 
-        setActiveStep((prevActiveStep) => prevActiveStep + 1);
-        setSkipped(newSkipped);
-    };
+            _items.push(<ProductTypesForm
+                name="productType" tag="producttype" ref={r => inputRefs.current['productType'] = r} setIsSubmitted={setIsSubmitted}
+                row={row} enums={enums} />);
 
-    const handleBack = () => {
-        setActiveStep((prevActiveStep) => prevActiveStep - 1);
-    };
+            _items.push(<ProductForm
+                name="productForm" tag="product" ref={r => inputRefs.current['productForm'] = r} setIsSubmitted={setIsSubmitted}
+                row={row} enums={enums} excludestepper={true} />);
 
-    const handleSkip = () => {
-        if (!isStepOptional(activeStep)) {
-            throw new Error("You can't skip a step that isn't optional.");
-        }
+            _items.push(<ProductDetailsForm
+                name="productDetails" tag="otherdetails" ref={r => inputRefs.current['productDetails'] = r} setIsSubmitted={setIsSubmitted}
+                row={row} enums={enums} />);
 
-        setActiveStep((prevActiveStep) => prevActiveStep + 1);
-        setSkipped((prevSkipped) => {
-            const newSkipped = new Set(prevSkipped.values());
-            newSkipped.add(activeStep);
-            return newSkipped;
+            _items.push(<ProductPriceForm
+                name="productPrice" tag="productprice" ref={r => inputRefs.current['productPrice'] = r} setIsSubmitted={setIsSubmitted}
+                row={row} enums={enums} />);
+
+            _items.push(<ProductReviewForm
+                name="productReview" tag="all" ref={r => inputRefs.current['productReview'] = r} setIsSubmitted={setIsSubmitted}
+                onStepClicked={OnStepClicked} row={row} enums={enums} />);
+
+            setStepperComponents(_items);
+
+            return resolve(true);
+        });
+
+    }
+
+    const FetchProductTypes = async () => {
+        return new Promise(async (resolve) => {
+            global.Busy(true);
+            await Api.GetProductTypes()
+                .then(async (res) => {
+                    if (res.status) {
+                        const pValues = res.values.map((x) => { return { Name: x.ProductTypeName, Value: x.PtId } });
+                        await GetMetaDataInfo()
+                            .then(async (res2) => {
+                                const enums = res2.filter((x) => x.Type === 'Enum') || [];
+                                enums.push({ Name: "ProductTypes", Type: 'Enum', Values: pValues });
+                                setDropDownOptions(enums);
+                                global.Busy(false);
+                                return resolve(enums);
+                            });
+
+                    } else {
+                        global.Busy(false);
+                        console.log(res.statusText);
+                        return resolve([]);
+                    }
+                });
+
+        });
+    }
+
+    const FetchProductDetails = async () => {
+        let item = {};
+        ['product', 'producttype', 'otherdetails', 'productprice'].forEach(elm => {
+            let items = [];
+            for (let prop of ProductJsonConfig[elm]) {
+                items.push({ ...prop, value: null });
+            }
+            item[elm] = items;
+        });
+
+        setRow(item);
+    }
+
+    const fetchData = async () => {
+        await FetchProductTypes().then(async (enums) => {
+            await FetchProductDetails().then(async () => {
+                await PrepareStepperComponents(enums);
+            });
         });
     };
 
-    const handleReset = () => {
-        setActiveStep(0);
-    };
+    if (initialize) { setInitialize(false); fetchData(); }
+    React.useEffect(() => { setInitialize(true); }, []);
 
     return (
         <>
             <Container {...props}>
-                <Box style={{ width: '100%', paddingBottom: 5 }}>
-                    <Typography noWrap variant="subheader" component="div">
-                        {title}
-                    </Typography>
-                </Box>
-                <Divider />
-                <Stepper activeStep={activeStep}>
-                    {steps.map((label, index) => {
-                        const stepProps = {};
-                        if (isStepSkipped(index)) {
-                            stepProps.completed = false;
-                        }
-                        return (
-                            <Step key={label} {...stepProps}>
-                                <StepLabel>{label}</StepLabel>
-                            </Step>
-                        );
-                    })}
-                </Stepper>
-
-                {activeStep === steps.length ? (
-                    <React.Fragment>
-                        <Typography sx={{ mt: 2, mb: 1 }}>
-                            All steps completed - you&apos;re finished
-                        </Typography>
-                        <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>
-                            <Box sx={{ flex: '1 1 auto' }} />
-                            <Button onClick={handleReset}>Reset</Button>
+                <Box sx={{ width: '100%', height: 50 }}>
+                    <Stack direction="row" sx={{ display: "flex", alignItems: "center" }}>
+                        <Box sx={{ width: "100%" }}>
+                            <Typography noWrap variant="subheader" component="div">
+                                {title}
+                            </Typography>
                         </Box>
-                    </React.Fragment>
-                ) : (
-                    <React.Fragment>
-                        <Typography sx={{ mt: 2, mb: 1 }}>Step {activeStep + 1}</Typography>
-                        <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>
-                            <Button
-                                color="inherit"
-                                disabled={activeStep === 0}
-                                onClick={handleBack}
-                                sx={{ mr: 1 }}
-                            >
-                                Back
-                            </Button>
-                            <Box sx={{ flex: '1 1 auto' }} />
-                            {isStepOptional(activeStep) && (
-                                <Button color="inherit" onClick={handleSkip} sx={{ mr: 1 }}>
-                                    Skip
-                                </Button>
-                            )}
-
-                            <Button onClick={handleNext}>
-                                {activeStep === steps.length - 1 ? 'Submit' : 'Next'}
-                            </Button>
-                        </Box>
-                    </React.Fragment>
-                )}
-
-                <Divider />
-                <Box sx={{ width: '100%' }}>
-                    <Grid container sx={{ flex: 1, alignItems: "center", justifyContent: 'flex-start', gap: 1, pt: 1, pb: 1 }}>
-                        <Button variant="contained" onClick={(e) => OnSubmitForm(e)} >Save</Button>
-                    </Grid>
+                        <Grid container sx={{ justifyContent: 'flex-end' }}>
+                            <Button variant="contained" startIcon={<ArrowLeftIcon />}
+                                onClick={() => NavigateTo("/products")}
+                            >Back</Button>
+                        </Grid>
+                    </Stack>
                 </Box>
+                <Stepper requiredSubmit={true} inputRefs={inputRefs.current} isSubmitted={isSubmitted} setIsSubmitted={setIsSubmitted}
+                    steps={steps} step={jumpStep} stepComponents={stepperComponents} />
             </Container>
         </>
     )

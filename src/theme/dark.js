@@ -40,6 +40,17 @@ const theme = createTheme({
             fontWeight: 'bold',
             margin: "5px 0px 5px 0px"
         },
+        subheadercenter: {
+            fontSize: "1rem",
+            fontWeight: 'bold',
+            padding: "5px",
+            backgroundColor: "#F9F9F9",
+            display: "block",
+            borderBottom: "1px solid rgba(0,0,0,.05)",
+            color: "#000000",
+            borderTopLeftRadius: "3px",
+            borderTopRightRadius: "3px"
+        },
         cardheader: {
             fontSize: "1rem",
             fontWeight: 'bold'

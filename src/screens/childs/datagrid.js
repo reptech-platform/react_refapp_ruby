@@ -10,9 +10,13 @@ import { GridContainer, CardItem } from "components";
 
 const columns = [
     { headerName: "Id", field: "Product_Id" },
-    { headerName: "Name", field: "ProductName", flex: 1 },
-    { headerName: "Description", field: "ProductDescription", flex: 1 },
-    { headerName: "Type", field: "ProductProductType", flex: 1 }
+    { headerName: "Name", field: "Name", flex: 1 },
+    { headerName: "Description", field: "Product_description", flex: 1 },
+    { headerName: "Manufacturer", field: "Manufacturer", flex: 1 },
+    { headerName: "UOM", field: "UnitOfMeasurement", flex: 1 },
+    { headerName: "Weight", field: "Weight", flex: 1 },
+    { headerName: "Size", field: "Size", flex: 1 },
+    { headerName: "Color", field: "Color", flex: 1 }
 ];
 
 const Component = (props) => {
@@ -36,7 +40,7 @@ const Component = (props) => {
         <>
             <GridContainer>
                 {rows && rows.map((x, index) => (
-                    <CardItem key={index} keyName="Product_Id" row={x} title={x.ProductName} imgsrc={x.ProductImage} width={300}
+                    <CardItem key={index} keyName="Product_Id" row={x} title={x.Name} imgsrc={x.ProductImage} width={300}
                         description={x.ProductDescription} onActionClicked={OnActionClicked}>
                         <Grid container direction="column">
                             <Typography variant="caption" color="text.secondary">

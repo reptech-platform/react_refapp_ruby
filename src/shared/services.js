@@ -1,284 +1,536 @@
 
-//const serverApi = "http:/34.238.241.129:8082/";
-const serverApi = "http://3.133.64.67:8138/ecom/";
+//const serverApi = "http:/34.238.241.129:8081/";
+const serverApi = "http://3.133.64.67:8140/ecom/";
 
-const GetProductTypesApi = async (query) => {
-    let url = `${serverApi}generated_app/ProductTypes`;
-    if (query) url = `${serverApi}generated_app/ProductTypes?${query}`;
-
-    try {
-        const res = await fetch(url, {
-            method: "GET",
-            headers: {
-                "Content-type": "application/json"
-            }
-        });
-        if (res.status === 200) {
-            return await res.json();
-        }
-        return null;
-
-    } catch (err) {
-        return err;
-    }
-}
-
+/* Product Types */
 const GetProductTypesCount = async (query) => {
-    let url = `${serverApi}generated_app/ProductTypes/$count`;
-    if (query) url = `${serverApi}generated_app/ProductTypes/$count?${query}`;
+    return new Promise(async (resolve) => {
+        let url = `${serverApi}ProductTypes/$count`;
+        if (query) url = `${serverApi}ProductTypes/$count?${query}`;
 
-    try {
-        const res = await fetch(url, {
-            method: "GET",
-            headers: {
-                "Content-type": "application/json"
+        try {
+            const res = await fetch(url, {
+                method: "GET",
+                headers: {
+                    "Content-type": "application/json"
+                }
+            });
+
+            const json = await res.json();
+            if (res.status === 200) {
+                return resolve({ status: res.ok, values: json || 0 });
             }
-        });
-        if (res.status === 200) {
-            return await res.json();
-        }
-        return null;
 
-    } catch (err) {
-        return err;
-    }
+            return resolve({ status: false, statusText: json.error.message });
+
+        } catch (error) {
+            console.log(error);
+            return resolve({ status: false, statusText: error.message });
+        }
+    })
 }
 
-const GetProductsCount = async (query) => {
+const GetProductTypes = async (query) => {
+    return new Promise(async (resolve) => {
 
-    let url = `${serverApi}generated_app/Products/$count`;
-    if (query) url = `${serverApi}generated_app/Products/$count?${query}`;
+        let url = `${serverApi}ProductTypes`;
+        if (query) url = `${serverApi}ProductTypes?${query}`;
 
-    try {
-        const res = await fetch(url, {
-            method: "GET",
-            headers: {
-                "Content-type": "application/json"
+        try {
+            const res = await fetch(url, {
+                method: "GET",
+                headers: {
+                    "Content-type": "application/json"
+                }
+            });
+
+            const json = await res.json();
+            if (res.status === 200) {
+                return resolve({ status: res.ok, values: json.value || [] });
             }
-        });
-        if (res.status === 200) {
-            return await res.json();
-        }
-        return null;
 
-    } catch (err) {
-        return err;
-    }
+            return resolve({ status: false, statusText: json.error.message });
+
+        } catch (error) {
+            console.log(error);
+            return resolve({ status: false, statusText: error.message });
+        }
+    });
+}
+
+const SetProductTypes = async (input) => {
+    return new Promise(async (resolve) => {
+        let id = input.PtId;
+        let method = "POST";
+        let url = `${serverApi}ProductTypes`;
+        if (input.PtId && !input.Deleted) {
+            method = "PATCH";
+            url = `${serverApi}ProductTypes(${input.PtId})`;
+        } else if (input.PtId && input.Deleted) {
+            method = "DELETE";
+            url = `${serverApi}ProductTypes(${input.PtId})`;
+        }
+
+        delete input['PtId'];
+        delete input['Deleted'];
+
+        try {
+            const res = await fetch(url, {
+                method, body: JSON.stringify(input),
+                headers: {
+                    "Content-type": "application/json"
+                }
+            });
+
+            if (res.status === 201) {
+                const json = await res.json();
+                return resolve({ status: res.ok, id: json.PtId });
+            } else if (res.status === 200 || res.status === 204) {
+                return resolve({ status: res.ok, id });
+            } else {
+                const json = await res.json();
+                return resolve({ status: false, statusText: json.error.message });
+            }
+
+        } catch (error) {
+            console.log(error);
+            return resolve({ status: false, statusText: error.message });
+        }
+    });
+}
+
+/* Product */
+const GetProductsCount = async (query) => {
+    return new Promise(async (resolve) => {
+        let url = `${serverApi}Products/$count`;
+        if (query) url = `${serverApi}Products/$count?${query}`;
+
+        try {
+            const res = await fetch(url, {
+                method: "GET",
+                headers: {
+                    "Content-type": "application/json"
+                }
+            });
+
+            const json = await res.json();
+            if (res.status === 200) {
+                return resolve({ status: res.ok, values: json || 0 });
+            }
+
+            return resolve({ status: false, statusText: json.error.message });
+
+        } catch (error) {
+            console.log(error);
+            return resolve({ status: false, statusText: error.message });
+        }
+    })
 }
 
 const GetProducts = async (query) => {
+    return new Promise(async (resolve) => {
+        let url = `${serverApi}Products`;
+        if (query) url = `${serverApi}Products?${query}`;
 
-    let url = `${serverApi}generated_app/Products`;
-    if (query) url = `${serverApi}generated_app/Products?${query}`;
-    //console.log(url);
+        try {
+            const res = await fetch(url, {
+                method: "GET",
+                headers: {
+                    "Content-type": "application/json"
+                }
+            });
 
-    try {
-        const res = await fetch(url, {
-            method: "GET",
-            headers: {
-                "Content-type": "application/json"
+            const json = await res.json();
+            if (res.status === 200) {
+                return resolve({ status: res.ok, values: json.value || [] });
             }
-        });
-        if (res.status === 200) {
-            return await res.json();
-        }
-        return null;
 
-    } catch (err) {
-        return err;
-    }
+            return resolve({ status: false, statusText: json.error.message });
+
+        } catch (error) {
+            console.log(error);
+            return resolve({ status: false, statusText: error.message });
+        }
+    });
 }
 
-const SetProducts = async (data) => {
-
-    let url = `${serverApi}generated_app/Products`;
-
-    try {
-        const res = await fetch(url, {
-            method: "POST",
-            body: JSON.stringify(data),
-            headers: {
-                "Content-type": "application/json"
-            }
-        });
-
-        if (res.status === 201) {
-            const data = await res.json();
-            return { status: res.ok, data };
+const GetProduct = async (id, params) => {
+    return new Promise(async (resolve) => {
+        let url = `${serverApi}Products(${id})`;
+        if (params) {
+            url = `${serverApi}Products(${id})?${params}`;
         }
 
-        return { status: false };
+        try {
+            const res = await fetch(url, {
+                method: "GET",
+                headers: {
+                    "Content-type": "application/json"
+                }
+            });
+            const json = await res.json();
+            if (res.status === 200) {
+                return resolve({ status: res.ok, values: json || {} });
+            }
 
-    } catch (err) {
-        console.log(err);
-        return { status: false };
-    }
+            return resolve({ status: false, statusText: json.error.message });
+
+        } catch (error) {
+            console.log(error);
+            return resolve({ status: false, statusText: error.message });
+        }
+    });
 }
 
-const PatchProducts = async (id, data) => {
-
-    let url = `${serverApi}generated_app/Products(${id})`;
-
-    try {
-        const res = await fetch(url, {
-            method: "PATCH",
-            body: JSON.stringify(data),
-            headers: {
-                "Content-type": "application/json"
-            }
-        });
-        if (res.status === 200) {
-            return { status: res.ok };
+const SetProduct = async (input) => {
+    return new Promise(async (resolve) => {
+        let id = input.Product_id;
+        let method = "POST";
+        let url = `${serverApi}Products`;
+        if (input.Product_id && !input.Deleted) {
+            method = "PATCH";
+            url = `${serverApi}Products(${input.Product_id})`;
+        } else if (input.Product_id && input.Deleted) {
+            method = "DELETE";
+            url = `${serverApi}ProductTypes(${input.Product_id})`;
         }
 
-        return { status: false };
+        delete input['Product_id'];
+        delete input['Deleted'];
 
-    } catch (err) {
-        console.log(err);
-        return { status: false };
-    }
-}
+        try {
+            const res = await fetch(url, {
+                method, body: JSON.stringify(input),
+                headers: {
+                    "Content-type": "application/json"
+                }
+            });
 
-const GetProduct = async (id) => {
-
-    let url = `${serverApi}generated_app/Products(${id})?$expand=ProductImage`;
-
-    try {
-        const res = await fetch(url, {
-            method: "GET",
-            headers: {
-                "Content-type": "application/json"
+            if (res.status === 201) {
+                const json = await res.json();
+                return resolve({ status: res.ok, id: json.Product_id });
+            } else if (res.status === 200 || res.status === 204) {
+                return resolve({ status: res.ok, id });
+            } else {
+                const json = await res.json();
+                return resolve({ status: false, statusText: json.error.message });
             }
-        });
-        if (res.status === 200) {
-            return await res.json();
+
+        } catch (error) {
+            console.log(error);
+            return resolve({ status: false, statusText: error.message });
         }
-        return null;
-
-    } catch (err) {
-        return err;
-    }
+    });
 }
 
-const DeleteProduct = async (id) => {
-
-    let url = `${serverApi}generated_app/Products(${id})`;
-
-    try {
-        const res = await fetch(url, {
-            method: "DELETE",
-            headers: {
-                "Content-type": "application/json"
-            }
-        });
-
-        if (res.status === 204) {
-            return { status: res.ok };
+/* Document */
+const SetDocument = async (input, headers) => {
+    return new Promise(async (resolve) => {
+        let id = headers.DocId;
+        let method = "POST";
+        let url = `${serverApi}Documents`;
+        if (headers.DocId && !input.Deleted) {
+            method = "PATCH";
+            url = `${serverApi}Documents(${headers.DocId})`;
+        } else if (headers.DocId && input.Deleted) {
+            method = "DELETE";
+            url = `${serverApi}Documents(${headers.DocId})`;
         }
-        return { status: false };
+        delete input['DocId'];
+        delete input['Deleted'];
 
-    } catch (err) {
-        console.log(err);
-        return { status: false };
-    }
-}
+        try {
+            const res = await fetch(url, {
+                method, input,
+                headers: {
+                    "Content-type": "application/json",
+                    ...headers
+                }
+            });
 
-const GetProductImage = async (id) => {
-
-    let url = `${serverApi}generated_app/Documents(${id})/$value`;
-    // console.log(url);
-
-    try {
-        const res = await fetch(url, {
-            method: "GET",
-            headers: {
-                "Content-type": "application/json"
+            if (res.status === 201) {
+                const json = await res.json();
+                return resolve({ status: res.ok, id: json.DocId });
+            } else if (res.status === 200 || res.status === 204) {
+                return resolve({ status: res.ok, id });
+            } else {
+                const json = await res.json();
+                return resolve({ status: false, statusText: json.error.message });
             }
-        });
-        if (res.status === 200) {
-            return await res.text();
+
+        } catch (error) {
+            console.log(error);
+            return resolve({ status: false, statusText: error.message });
         }
-        return null;
-
-    } catch (err) {
-        return err;
-    }
+    });
 }
 
-const DeleteProductImage = async (id) => {
+const GetDocument = async (id, value, type) => {
+    return new Promise(async (resolve) => {
+        let headers = { "Content-type": "application/json" };
 
-    let url = `${serverApi}generated_app/Documents(${id})/$value`;
-
-    try {
-        const res = await fetch(url, {
-            method: "GET",
-            headers: {
-                "Content-type": "application/json"
+        let url = `${serverApi}Documents(${id})`;
+        if (value) {
+            url = `${serverApi}Documents(${id})/$value`;
+            if (type) {
+                headers = { "Content-type": type };
             }
-        });
-
-        if (res.status === 200) {
-            return await res.text();
-        }
-        return null;
-
-    } catch (err) {
-        return err;
-    }
-}
-
-const SetProductImage = async (body, headers) => {
-
-    let url = `${serverApi}generated_app/Documents`;
-
-    try {
-        const res = await fetch(url, {
-            method: "POST",
-            body,
-            headers: {
-                "Content-type": "application/json",
-                ...headers
-            }
-        });
-        if (res.status === 201) {
-            const { Doc_Id } = await res.json();
-            return { status: res.ok, Doc_Id };
         }
 
-        return { status: false };
+        try {
+            const res = await fetch(url, {
+                method: "GET", headers
+            });
 
-    } catch (err) {
-        console.log(err);
-        return { status: false };
-    }
+            if (res.status === 200) {
+                if (value) {
+                    return resolve({ status: res.ok, values: res.text() });
+                }
+                return resolve({ status: res.ok, values: res.json() });
+            }
+            return resolve({ status: false, statusText: "Failed fetching data" });
+
+        } catch (error) {
+            console.log(error);
+            return resolve({ status: false, statusText: error.message });
+        }
+    });
 }
 
-const SetProductTypesApi = async (httpMethod, description, productType) => {
-    let url = `${serverApi}generated_app/ProductTypes`;
-    if (productType) url = `${serverApi}generated_app/ProductTypes(${productType})`;
-    try {
-        const res = await fetch(url, {
-            method: httpMethod,
-            body: JSON.stringify({ ProductTypeDescription: description }),
-            headers: {
-                "Content-type": "application/json"
-            }
-        });
-
-        if (res.status === 200 || res.status === 201 || res.status === 204) {
-            return { status: res.ok };
+/* Other Details */
+const SetOtherDetails = async (input) => {
+    return new Promise(async (resolve) => {
+        let id = input.OtherDetailsId;
+        let method = "POST";
+        let url = `${serverApi}OtherDetailss`;
+        if (input.OtherDetailsId && !input.Deleted) {
+            method = "PATCH";
+            url = `${serverApi}OtherDetailss(${input.OtherDetailsId})`;
+        } else if (input.OtherDetailsId && input.Deleted) {
+            method = "DELETE";
+            url = `${serverApi}OtherDetailss(${input.OtherDetailsId})`;
         }
 
-        return { status: false };
+        delete input['OtherDetailsId'];
+        delete input['Deleted'];
 
-    } catch (err) {
-        console.log(err);
-        return { status: false };
-    }
+        try {
+            const res = await fetch(url, {
+                method, body: JSON.stringify(input),
+                headers: {
+                    "Content-type": "application/json"
+                }
+            });
+
+            if (res.status === 201) {
+                const json = await res.json();
+                return resolve({ status: res.ok, id: json.OtherDetailsId });
+            } else if (res.status === 200 || res.status === 204) {
+                return resolve({ status: res.ok, id });
+            } else {
+                const json = await res.json();
+                return resolve({ status: false, statusText: json.error.message });
+            }
+
+        } catch (error) {
+            console.log(error);
+            return resolve({ status: false, statusText: error.message });
+        }
+    });
 }
 
+const GetOtherDetails = async (id) => {
+    return new Promise(async (resolve) => {
+        let url = `${serverApi}OtherDetailss(${id})`;
+
+        try {
+            const res = await fetch(url, {
+                method: "GET",
+                headers: {
+                    "Content-type": "application/json"
+                }
+            });
+            const json = await res.json();
+            if (res.status === 200) {
+                return resolve({ status: res.ok, values: json || {} });
+            }
+
+            return resolve({ status: false, statusText: json.error.message });
+
+        } catch (error) {
+            console.log(error);
+            return resolve({ status: false, statusText: error.message });
+        }
+    });
+}
+
+/* Product Other Images */
+const SetProductOtherImages = async (input) => {
+    return new Promise(async (resolve) => {
+        let id = input.Id;
+        let method = "POST";
+        let url = `${serverApi}ProductOtherImagess`;
+        if (input.Id && !input.Deleted) {
+            method = "PATCH";
+            url = `${serverApi}ProductOtherImagess(${input.Id})`;
+        } else if (input.Id && input.Deleted) {
+            method = "DELETE";
+            url = `${serverApi}ProductOtherImagess(${input.Id})`;
+        }
+
+        delete input['Id'];
+        delete input['Deleted'];
+
+        try {
+            const res = await fetch(url, {
+                method, body: JSON.stringify(input),
+                headers: {
+                    "Content-type": "application/json"
+                }
+            });
+
+            if (res.status === 201) {
+                const json = await res.json();
+                return resolve({ status: res.ok, id: json.Id });
+            } else if (res.status === 200 || res.status === 204) {
+                return resolve({ status: res.ok, id });
+            } else {
+                const json = await res.json();
+                return resolve({ status: false, statusText: json.error.message });
+            }
+
+        } catch (error) {
+            console.log(error);
+            return resolve({ status: false, statusText: error.message });
+        }
+    });
+}
+
+const GetProductOtherImages = async (id, filter) => {
+    return new Promise(async (resolve) => {
+        let url = `${serverApi}ProductOtherImagess(${id})`;
+        if (filter) {
+            url = `${serverApi}ProductOtherImagess?$filter=${filter}`;
+        }
+
+        try {
+            const res = await fetch(url, {
+                method: "GET",
+                headers: {
+                    "Content-type": "application/json"
+                }
+            });
+            const json = await res.json();
+            if (res.status === 200) {
+                return resolve({ status: res.ok, values: json || {} });
+            }
+
+            return resolve({ status: false, statusText: json.error.message });
+
+        } catch (error) {
+            console.log(error);
+            return resolve({ status: false, statusText: error.message });
+        }
+    });
+}
+
+/* Product Price */
+const SetProductPrice = async (input) => {
+    return new Promise(async (resolve) => {
+        let PpId = input.PpId;
+        let method = "POST";
+        let url = `${serverApi}ProductPrices`;
+        if (input.PpId && !input.Deleted) {
+            method = "PATCH";
+            url = `${serverApi}ProductPrices(${input.PpId})`;
+        } else if (input.PpId && input.Deleted) {
+            method = "DELETE";
+            url = `${serverApi}ProductPrices(${input.PpId})`;
+        }
+
+        delete input['PpId'];
+        delete input['Deleted'];
+
+        try {
+            const res = await fetch(url, {
+                method, body: JSON.stringify(input),
+                headers: {
+                    "Content-type": "application/json"
+                }
+            });
+
+            if (res.status === 201) {
+                const json = await res.json();
+                return resolve({ status: res.ok, PpId: json.PpId });
+            } else if (res.status === 200 || res.status === 204) {
+                return resolve({ status: res.ok, PpId });
+            } else {
+                const json = await res.json();
+                return resolve({ status: false, statusText: json.error.message });
+            }
+
+        } catch (error) {
+            console.log(error);
+            return resolve({ status: false, statusText: error.message });
+        }
+    });
+}
+
+const GetProductPrice = async (id) => {
+    return new Promise(async (resolve) => {
+        let url = `${serverApi}ProductPrices(${id})`;
+
+        try {
+            const res = await fetch(url, {
+                method: "GET",
+                headers: {
+                    "Content-type": "application/json"
+                }
+            });
+            const json = await res.json();
+            if (res.status === 200) {
+                return resolve({ status: res.ok, values: json || {} });
+            }
+
+            return resolve({ status: false, statusText: json.error.message });
+
+        } catch (error) {
+            console.log(error);
+            return resolve({ status: false, statusText: error.message });
+        }
+    });
+}
+
+const GetMetaData = async () => {
+    return new Promise(async (resolve) => {
+        let url = `${serverApi}$metadata`;
+
+        try {
+            const res = await fetch(url, {
+                method: "GET",
+                headers: {
+                    "Content-type": "application/json"
+                }
+            });
+            if (res.status === 200) {
+                return resolve({ status: res.ok, values: res.text() });
+            }
+
+            return resolve({ status: false, statusText: "Failed fetching data" });
+
+        } catch (error) {
+            console.log(error);
+            return resolve({ status: false, statusText: error.message });
+        }
+    });
+}
 
 export {
-    GetProducts, SetProducts, PatchProducts, GetProduct, GetProductsCount, GetProductTypesApi, GetProductTypesCount,
-    DeleteProductImage, GetProductImage, SetProductImage, DeleteProduct, SetProductTypesApi
+    GetMetaData,
+    GetProductTypesCount, GetProductTypes, SetProductTypes,
+    GetDocument, SetDocument,
+    GetProductsCount, GetProducts, GetProduct, SetProduct,
+    GetOtherDetails, SetOtherDetails,
+    GetProductOtherImages, SetProductOtherImages,
+    GetProductPrice, SetProductPrice
 };

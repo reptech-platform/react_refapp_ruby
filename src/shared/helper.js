@@ -35,4 +35,16 @@ fn.GetGUID = () => {
     return uuidv4().replace(/-/g, '');
 }
 
+fn.CopyObject = (source) => {
+    let items = [];
+    for (let prop of source) {
+        let item = {};
+        for (let keys in prop) {
+            item[keys] = prop[keys];
+        }
+        items.push(item);
+    }
+    return items;
+}
+
 export default fn;

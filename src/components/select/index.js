@@ -1,7 +1,5 @@
 import * as React from "react";
-import { SelectValidator } from 'react-material-ui-form-validator';
-import { MenuItem, Typography } from "@mui/material";
-import Helper from "shared/helper";
+import { MenuItem, Typography, Select } from "@mui/material";
 
 const Component = (props) => {
 
@@ -31,19 +29,9 @@ const Component = (props) => {
         )
     }
 
-    React.useEffect(() => { setInputValue(value); }, [value]);
-
-    const ParseValue = () => {
-        let tValue = "NONE";
-        if (options && options.length > 0 && !Helper.IsNull(inputValue)) {
-            tValue = inputValue;
-        }
-        return tValue;
-    }
-
     return (
         <>
-            <SelectValidator
+            <Select
                 onChange={handleChange}
                 onBlur={(e) => e.stopPropagation()}
                 onClick={(e) => e.stopPropagation()}
@@ -52,10 +40,8 @@ const Component = (props) => {
                 id={id}
                 size="small"
                 name={name}
-                value={ParseValue()}
-                validators={validators}
-                errorMessages={validationMessages}
-                InputLabelProps={{ shrink: false }}
+                value={(options && options.length > 0 && inputValue) || "NONE"}
+                inputlabelprops={{ shrink: false }}
                 fullWidth
                 style={{
                     width: "100%",
@@ -79,7 +65,7 @@ const Component = (props) => {
                         {x[contentId]}
                     </MenuItem>
                 ))}
-            </SelectValidator>
+            </Select>
         </>
     );
 }

@@ -126,7 +126,7 @@ main,
   display: flex;
   flex-direction: row;
   margin: 0px;
-  padding: 0px;
+  padding: 15px;
   height: calc(100% - 65px);
 }
 

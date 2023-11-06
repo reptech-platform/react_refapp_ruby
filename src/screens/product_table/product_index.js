@@ -3,18 +3,22 @@ import { Stack, Box, Grid, Typography, IconButton, useTheme } from '@mui/materia
 import { useNavigate } from "react-router-dom";
 import Container from "screens/container";
 import { DataGrid, DataTable } from '../childs';
-import { GetProducts, GetProductsCount, DeleteProduct } from "shared/services";
+import { GetProducts, GetProductsCount, SetProduct, GetProductTypes, GetProductImage } from "shared/services";
 import { SearchInput, ToggleButtons, CustomDialog } from "components";
 import Helper from "shared/helper";
-import { GetProductTypesApi, GetProductImage } from "shared/services";
 import { Add as AddBoxIcon } from '@mui/icons-material';
 
 const columns = [
-    { headerName: "Id", field: "Product_Id" },
-    { headerName: "Name", field: "ProductName", flex: 1 },
-    { headerName: "Description", field: "ProductDescription", flex: 1 },
-    { headerName: "Type", field: "ProductProductType", flex: 1 }
+    { headerName: "Name", field: "Name", flex: 1 },
+    { headerName: "Description", field: "Product_description", flex: 1 },
+    { headerName: "Manufacturer", field: "Manufacturer", flex: 1 },
+    { headerName: "UOM", field: "UnitOfMeasurement", flex: 1 },
+    { headerName: "Weight", field: "Weight", flex: 1 },
+    { headerName: "Size", field: "Size", flex: 1 },
+    { headerName: "Color", field: "Color", flex: 1 }
 ];
+
+const defaultError = "Something went wroing while creating record!";
 
 const Component = (props) => {
     const { title } = props;
@@ -39,8 +43,6 @@ const Component = (props) => {
         setRows([]);
         setRowsCount(0);
 
-        const _types = types || productTypes;
-
         global.Busy(true);
 
         if (!Helper.IsNullValue(searchStr)) {
@@ -53,11 +55,12 @@ const Component = (props) => {
 
         await GetProductsCount(query)
             .then(async (res) => {
-                if (res) {
-                    setRowsCount(parseInt(res));
+                if (res.status) {
+                    setRowsCount(parseInt(res.values));
+                } else {
+                    console.log(res.statusText);
                 }
-            })
-            .catch((err) => console.log(err));
+            });
 
         if (!Helper.IsJSONEmpty(sortBy)) {
             filters.push(`$orderby=${sortBy.field} ${sortBy.sort}`);
@@ -75,42 +78,44 @@ const Component = (props) => {
         let _rows = [];
         await GetProducts(query)
             .then(async (res) => {
-                if (res) {
-                    _rows = res.value;
+                if (res.status) {
+                    _rows = res.values || [];
                     for (let i = 0; i < _rows.length; i++) {
                         _rows[i].id = Helper.GetGUID();
-                        _rows[i].ProductProductType = _types.find((x) => x.ProductTypeCode === _rows[i].ProductProductType)?.ProductTypeDescription || 'NA';
+                        /* _rows[i].ProductProductType = _types.find((x) => x.ProductTypeCode === _rows[i].ProductProductType)?.ProductTypeDescription || 'NA';
                         if (viewType === 'GRID') {
                             _rows[i].ProductImage = await GetProductImage(_rows[i].ProductProductImage);
-                        }
+                        } */
                     }
-                    setRows(_rows);
+                } else {
+                    console.log(res.statusText);
                 }
-            })
-            .catch((err) => console.log(err));
+            });
 
+        setRows(_rows);
         global.Busy(false);
 
         return _rows;
     }
 
-    const GetProductTypes = async () => {
+    const FetchProductTypes = async () => {
         return new Promise(async (resolve) => {
+            let values = [];
             global.Busy(true);
-            const productTypes = await GetProductTypesApi();
-            const { value } = productTypes || { value: [] };
-            setProductTypes(value);
-            global.Busy(false);
-            return resolve(value);
+            const rslt = await GetProductTypes();
+            if (rslt.status) {
+                values = rslt.values;
+                setProductTypes(values);
+                global.Busy(false);
+            }
+            return resolve(values);
         });
     }
 
     const FetchResults = async () => {
-
         setDeletedId(0);
         setShowConfirm(false);
-
-        await GetProductTypes().then(async (types) => {
+        await FetchProductTypes().then(async (types) => {
             await LoadData(types);
         });
     }
@@ -134,12 +139,13 @@ const Component = (props) => {
 
     const OnCloseClicked = async (e) => {
         if (e) {
-            const rslt = await DeleteProduct(deletedId);
+            const rslt = await SetProduct({ Product_id: deletedId, Deleted: true });
             if (rslt.status) {
                 setInitialize(true);
                 global.AlertPopup("success", "Record is deleted successful.!");
             } else {
-                global.AlertPopup("error", "Something went wroing while creating record!");
+                const msg = rslt.statusText || defaultError;
+                global.AlertPopup("error", msg);
             }
         } else {
             setDeletedId(0);
@@ -185,9 +191,9 @@ const Component = (props) => {
                     </Stack>
                 </Box>
                 <Box style={{ width: '100%' }}>
-                    {viewType === 'LIST' && <DataTable keyId={'Product_Id'} columns={columns} rowsCount={rowsCount} rows={rows} sortBy={sortBy} pageInfo={pageInfo} onActionClicked={OnActionClicked}
+                    {viewType === 'LIST' && <DataTable keyId={'Product_id'} columns={columns} rowsCount={rowsCount} rows={rows} sortBy={sortBy} pageInfo={pageInfo} onActionClicked={OnActionClicked}
                         onSortClicked={OnSortClicked} onPageClicked={OnPageClicked} />}
-                    {viewType === 'GRID' && <DataGrid rowsCount={rowsCount} rows={rows} sortBy={sortBy} pageInfo={pageInfo} onActionClicked={OnActionClicked}
+                    {viewType === 'GRID' && <DataGrid keyId={'Product_id'} rowsCount={rowsCount} rows={rows} sortBy={sortBy} pageInfo={pageInfo} onActionClicked={OnActionClicked}
                         onSortClicked={OnSortClicked} onPageClicked={OnPageClicked} onDeleteClicked={OnDeleteClicked} />}
                 </Box>
                 <CustomDialog open={showConfirm} title={"Confirmation"} onCloseClicked={OnCloseClicked}>
