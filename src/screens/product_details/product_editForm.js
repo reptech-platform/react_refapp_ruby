@@ -7,7 +7,7 @@ import Container from "screens/container";
 import { useNavigate, useParams } from "react-router-dom";
 import * as Api from "shared/services";
 import { GetMetaDataInfo } from "shared/common";
-import ProductJsonConfig from "config/stepperConfig.json";
+import ProductJsonConfig from "config/productConfig.json";
 import RenderFormContols from "./child/formcontrols";
 import Support from "shared/support";
 import Helper from "shared/helper";
@@ -31,11 +31,11 @@ const Component = (props) => {
 
         let changes = [];
         for (let prop of source) {
-            let value1 = source.find((x) => x.key === prop.key).value;
-            let value2 = target.find((x) => x.key === prop.key).value;
+            let value1 = source.find((x) => x.key === prop.key).value ?? "";
+            let value2 = target.find((x) => x.key === prop.key).value ?? "";
             if (['MainImage', 'OtherImages'].indexOf(prop.key) > -1) {
-                value1 = value1.DocName;
-                value2 = value2.DocName;
+                value1 = value1.DocName ?? "";
+                value2 = value2.DocName ?? "";
             }
             if (value1.toString() !== value2.toString()) {
                 changes.push(prop.key);
@@ -75,31 +75,35 @@ const Component = (props) => {
                         }
                     }
                 }
-                const _document = await Support.ExtractDocument(product.MainImage);
-                item['otherdetails'].find((x) => x.key === "MainImage").value = _document;
+                if (product.MainImage) {
+                    const _document = await Support.ExtractDocument(product.MainImage, product.MainImage.DocId);
+                    item['otherdetails'].find((x) => x.key === "MainImage").value = _document;
+                }
             }
 
             // Get Product Other Details
-            rslt = await Api.GetOtherDetails(product.ProductOtherDetails);
-            //console.log(rslt);
-            if (rslt.status) {
-                tmp = rslt.values;
-                for (let prop in tmp) {
-                    const tItem = item['otherdetails'].find((x) => x.key === prop);
-                    if (tItem) {
-                        if (prop === 'UnitOfMeasurement') {
-                            const dpItems = enums.find((z) => z.Name === tItem.source).Values;
-                            const _value = dpItems.find((m) => m.Name === tmp[prop]).Value;
-                            item['otherdetails'].find((x) => x.key === prop).value = parseInt(_value);
-                        } else if (prop === 'AvailabilityStatus') {
-                            const dpItems = enums.find((z) => z.Name === tItem.source).Values;
-                            const _value = dpItems.find((m) => m.Name === tmp[prop]).Value;
-                            item['otherdetails'].find((x) => x.key === prop).value = parseInt(_value);
-                        } else if (prop === 'ManufacturingDate') {
-                            let tmpDate = tmp[prop].split('T');
-                            item['otherdetails'].find((x) => x.key === prop).value = tmpDate[0];
-                        } else {
-                            item['otherdetails'].find((x) => x.key === prop).value = tmp[prop];
+            if (product.ProductOtherDetails) {
+                rslt = await Api.GetOtherDetails(product.ProductOtherDetails);
+                //console.log(rslt);
+                if (rslt.status) {
+                    tmp = rslt.values;
+                    for (let prop in tmp) {
+                        const tItem = item['otherdetails'].find((x) => x.key === prop);
+                        if (tItem) {
+                            if (prop === 'UnitOfMeasurement') {
+                                const dpItems = enums.find((z) => z.Name === tItem.source).Values;
+                                const _value = dpItems.find((m) => m.Name === tmp[prop]).Value;
+                                item['otherdetails'].find((x) => x.key === prop).value = parseInt(_value);
+                            } else if (prop === 'AvailabilityStatus') {
+                                const dpItems = enums.find((z) => z.Name === tItem.source).Values;
+                                const _value = dpItems.find((m) => m.Name === tmp[prop]).Value;
+                                item['otherdetails'].find((x) => x.key === prop).value = parseInt(_value);
+                            } else if (prop === 'ManufacturingDate') {
+                                let tmpDate = tmp[prop].split('T');
+                                item['otherdetails'].find((x) => x.key === prop).value = tmpDate[0];
+                            } else {
+                                item['otherdetails'].find((x) => x.key === prop).value = tmp[prop];
+                            }
                         }
                     }
                 }
@@ -108,20 +112,24 @@ const Component = (props) => {
             // Get Product Other Images
             rslt = await Api.GetProductOtherImages(null, `Product_id eq ${product.Product_id}`);
             if (rslt.status) {
-                const { DocId, Id } = rslt.values.value[0];
-                let _document = await Support.ExtractDocument(null, DocId);
-                item['otherdetails'].find((x) => x.key === "OtherImages").ProductOtherImagesId = Id;
-                item['otherdetails'].find((x) => x.key === "OtherImages").value = _document;
+                const { DocId, Id } = rslt.values && rslt.values.length > 0 && rslt.values[0] || { DocId: 0, Id: 0 };
+                if (DocId > 0) {
+                    let _document = await Support.ExtractDocument(null, DocId);
+                    item['otherdetails'].find((x) => x.key === "OtherImages").ProductOtherImagesId = Id;
+                    item['otherdetails'].find((x) => x.key === "OtherImages").value = _document;
+                }
             }
 
             // Get Product Price Details
-            rslt = await Api.GetProductPrice(product.ProductProductPrice);
-            if (rslt.status) {
-                tmp = rslt.values;
-                for (let prop in tmp) {
-                    const tItem = item['productprice'].find((x) => x.key === prop);
-                    if (tItem) {
-                        item['productprice'].find((x) => x.key === prop).value = tmp[prop];
+            if (product.ProductProductPrice) {
+                rslt = await Api.GetProductPrice(product.ProductProductPrice);
+                if (rslt.status) {
+                    tmp = rslt.values;
+                    for (let prop in tmp) {
+                        const tItem = item['productprice'].find((x) => x.key === prop);
+                        if (tItem) {
+                            item['productprice'].find((x) => x.key === prop).value = tmp[prop];
+                        }
                     }
                 }
             }
@@ -177,9 +185,10 @@ const Component = (props) => {
 
         changes = TrackChanges('product');
         if (changes.length > 0) {
-            rslt = await Support.AddOrUpdateProduct(row['product']);
+            rslt = await Support.AddOrUpdateProduct(row['product'], dropDownOptions);
             if (rslt.status) {
-                UpdateBackUp('product', Support.CopyObject(row['product']));
+                row['product'].find((x) => x.key === 'Product_id').value = rslt.id;
+                UpdateBackUp('product', Helper.CopyObject(row['product']));
             } else { return; }
         }
 
@@ -188,19 +197,22 @@ const Component = (props) => {
         changes = TrackChanges('otherdetails');
         if (changes.length > 0) {
 
-            if (changes.indexOf('MainImage') === -1 && changes.indexOf('OtherImages') === -1) {
+            const filters = ['MainImage', 'OtherImages'];
+            let tmp = changes.filter((x) => filters.indexOf(x) === -1);
+            if (tmp.length > 0) {
                 rslt = await Support.AddOrUpdateOtherDetails(row['otherdetails'], dropDownOptions, ['MainImage', 'OtherImages']);
                 if (rslt.status) {
+                    row['otherdetails'].find((x) => x.key === 'OtherDetailsId').value = rslt.id;
                     UpdateBackUp('otherdetails', Helper.CopyObject(row['otherdetails']));
                 } else { return; }
 
                 // Update product with child references
                 otherDetailsId = row['otherdetails'].find((x) => x.key === 'OtherDetailsId').value || 0;
-                data = {
-                    Product_id: parseInt(productId),
-                    ProductOtherDetails: parseInt(otherDetailsId)
-                }
-                rslt = await Support.AddOrUpdateProduct(data);
+                data = [
+                    { key: "Product_id", value: parseInt(productId) },
+                    { key: "ProductOtherDetails", value: parseInt(otherDetailsId) }
+                ];
+                rslt = await Support.AddOrUpdateProduct(data, dropDownOptions);
                 if (!rslt.status) return;
                 row['product'].find((x) => x.key === 'ProductOtherDetails').value = otherDetailsId;
             }
@@ -217,11 +229,11 @@ const Component = (props) => {
 
                 // Update product with child references
                 mainImageId = row['otherdetails'].find((x) => x.key === 'MainImage').value?.DocId || 0;
-                data = {
-                    Product_id: parseInt(productId),
-                    ProductMainImage: parseInt(mainImageId)
-                }
-                rslt = await Support.AddOrUpdateProduct(data);
+                data = [
+                    { key: "Product_id", value: parseInt(productId) },
+                    { key: "ProductMainImage", value: parseInt(mainImageId) }
+                ];
+                rslt = await Support.AddOrUpdateProduct(data, dropDownOptions);
                 if (!rslt.status) return;
                 row['product'].find((x) => x.key === 'ProductMainImage').value = mainImageId;
             }
@@ -237,18 +249,18 @@ const Component = (props) => {
                 } else { return; }
 
                 otherImagesId = row['otherdetails'].find((x) => x.key === 'OtherImages').value?.DocId || 0;
-                let productOtherImagesId = row['otherdetails'].find((x) => x.key === 'ProductOtherImagesId').value || 0;
-
+                let productOtherImagesId = row['otherdetails'].find((x) => x.key === 'OtherImages').ProductOtherImagesId || 0;
+                productOtherImagesId = parseInt(productOtherImagesId);
                 // Update product other images with child referenc
-                data = {
-                    Id: parseInt(productOtherImagesId),
-                    Product_id: parseInt(productId),
-                    DocId: parseInt(otherImagesId)
-                };
+                data = [
+                    { key: "Product_id", value: parseInt(productId) },
+                    { key: "Id", value: productOtherImagesId > 0 ? productOtherImagesId : null },
+                    { key: "DocId", value: parseInt(otherImagesId) }
+                ];
 
                 rslt = await Support.AddOrUpdateProductOtherImages(data);
                 if (rslt.status) {
-                    row['otherdetails'].find((x) => x.key === 'ProductOtherImagesId').value = rslt.id;
+                    row['otherdetails'].find((x) => x.key === 'OtherImages').ProductOtherImagesId = rslt.id;
                 } else { return; }
             }
 
@@ -258,16 +270,18 @@ const Component = (props) => {
         if (changes.length > 0) {
             rslt = await Support.AddOrUpdatePrice(row['productprice']);
             if (rslt.status) {
+                row['productprice'].find((x) => x.key === 'PpId').value = rslt.id;
                 UpdateBackUp('productprice', Helper.CopyObject(row['productprice']));
             } else { return; }
 
             // Update product with child references
             priceId = row['productprice'].find((x) => x.key === 'PpId').value || 0;
-            data = {
-                Product_id: parseInt(productId),
-                ProductProductPrice: parseInt(priceId)
-            }
-            rslt = await Support.AddOrUpdateProduct(data);
+            data = [
+                { key: "Product_id", value: parseInt(productId) },
+                { key: "ProductProductPrice", value: parseInt(priceId) }
+            ];
+
+            rslt = await Support.AddOrUpdateProduct(data, dropDownOptions);
             if (!rslt.status) return;
             row['product'].find((x) => x.key === 'ProductProductPrice').value = priceId;
         }

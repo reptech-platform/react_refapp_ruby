@@ -1,20 +1,93 @@
 {
-    "details": [
+    "producttype": [
         {
-            "key": "Product_Id",
+            "key": "PtId",
             "label": "ID",
             "type": "text",
             "editable": false,
+            "nocreate": true,
+            "validators": [],
+            "validationMessages": []
+        },
+        {
+            "key": "ProductOptionType",
+            "label": "Product Type",
+            "type": "dropdown",
+            "valueId": "Value",
+            "nameId": "Name",
+            "contentId": "Name",
+            "source": "ProductTypes",
+            "TargetTypeName": "ProductTypeName",
+            "TargetTypeDesc": "ProductTypeDesc",
+            "TargetTypeId": "PtId",
+            "editable": true,
+            "validators": [],
+            "validationMessages": []
+        },
+        {
+            "key": "ProductTypeName",
+            "label": "Type",
+            "type": "text",
+            "editable": true,
             "validators": [
                 "required"
             ],
             "validationMessages": [
-                "Product id is required"
+                "Product type is required"
+            ]
+        },
+        {
+            "key": "ProductTypeDesc",
+            "label": "Description",
+            "type": "text",
+            "width": "30%",
+            "editable": true,
+            "validators": [
+                "required"
             ],
+            "validationMessages": [
+                "Description is required"
+            ]
+        }
+    ],
+    "product": [
+        {
+            "key": "Product_id",
             "nocreate": true
         },
         {
-            "key": "ProductName",
+            "key": "ProductOtherDetails",
+            "nocreate": true
+        },
+        {
+            "key": "ProductProductPrice",
+            "nocreate": true
+        },
+        {
+            "key": "ProductMainImage",
+            "nocreate": true
+        },
+        {
+            "key": "ProductProductType",
+            "label": "Product Type",
+            "type": "dropdown",
+            "valueId": "Value",
+            "nameId": "Name",
+            "contentId": "Name",
+            "source": "ProductTypes",
+            "editable": true,
+            "nostepper": true,
+            "validators": [
+                "required",
+                "isNumber"
+            ],
+            "validationMessages": [
+                "Product type is required",
+                "Product type is required"
+            ]
+        },
+        {
+            "key": "Name",
             "label": "Name",
             "type": "text",
             "editable": true,
@@ -26,46 +99,148 @@
             ]
         },
         {
-            "key": "ProductDescription",
+            "key": "Product_description",
             "label": "Description",
             "type": "text",
             "editable": true,
-            "validators": [],
-            "validationMessages": []
+            "width": "30%",
+            "validators": [
+                "required"
+            ],
+            "validationMessages": [
+                "Product description is required"
+            ]
         },
         {
-            "key": "ProductProductImage",
-            "label": "Image",
-            "type": "file",
+            "key": "Manufacturer",
+            "label": "Manufacturer",
+            "type": "text",
             "editable": true,
-            "fileName": "",
             "validators": [
                 "required"
             ],
             "validationMessages": [
                 "Product image is required"
             ]
-        }
-    ],
-    "others": [
+        },
         {
-            "key": "ProductPrice",
-            "label": "Price",
+            "key": "UnitOfMeasurement",
+            "label": "Unit Of Measurement",
+            "type": "dropdown",
+            "valueId": "Value",
+            "nameId": "Name",
+            "contentId": "Name",
+            "source": "Weight",
+            "editable": true,
+            "validators": [
+                "required",
+                "isNumber"
+            ],
+            "validationMessages": [
+                "Unit Of Measurement is required",
+                "Unit Of Measurement is required"
+            ]
+        },
+        {
+            "key": "Weight",
+            "label": "Weight",
             "type": "text",
             "editable": true,
             "validators": [
                 "required",
-                "isNumber",
+                "isFloat",
                 "isPositive"
             ],
             "validationMessages": [
-                "Product price is required",
-                "Product Price must be a number",
-                "Product Price must be a pasitive number"
+                "Product weight is required",
+                "Product weight should be number",
+                "Product weight should be positive number"
             ]
         },
         {
-            "key": "ProductSize",
+            "key": "Color",
+            "label": "Color",
+            "type": "color",
+            "editable": true,
+            "validators": [
+                "required"
+            ],
+            "validationMessages": [
+                "Product color is required"
+            ]
+        }
+    ],
+    "otherdetails": [
+        {
+            "key": "OtherDetailsId",
+            "label": "ID",
+            "type": "text",
+            "editable": false,
+            "validators": [],
+            "validationMessages": [],
+            "nocreate": true
+        },
+        {
+            "key": "MainImage",
+            "label": "MainImage",
+            "width": "30%",
+            "type": "doc",
+            "accept": ".JPG,.JPEG,.PNG",
+            "editable": true,
+            "validators": [
+                "required"
+            ],
+            "validationMessages": [
+                "Product main image is required"
+            ]
+        },
+        {
+            "key": "OtherImages",
+            "label": "OtherImages",
+            "type": "doc",
+            "width": "30%",
+            "accept": ".JPG,.JPEG,.PNG",
+            "editable": true,
+            "ProductOtherImagesId": 0,
+            "validators": [
+                "required"
+            ],
+            "validationMessages": [
+                "Product other image is required"
+            ]
+        },
+        {
+            "key": "ManufacturingDate",
+            "label": "ManufacturingDate",
+            "type": "date",
+            "editable": true,
+            "validators": [
+                "required"
+            ],
+            "validationMessages": [
+                "Product manufacturing date is required"
+            ]
+        },
+        {
+            "key": "AvailabilityStatus",
+            "label": "Availability Status",
+            "type": "dropdown",
+            "valueId": "Value",
+            "nameId": "Name",
+            "contentId": "Name",
+            "source": "AvailabilityStatus",
+            "editable": true,
+            "validators": [
+                "required",
+                "isNumber"
+            ],
+            "validationMessages": [
+                "Availability status is required",
+                "Availability status is required"
+            ]
+        },
+        {
+            "key": "Size",
             "label": "Size",
             "type": "text",
             "editable": true,
@@ -75,27 +250,71 @@
                 "isPositive"
             ],
             "validationMessages": [
-                "Product price is required",
-                "Product Price must be a number",
-                "Product Price must be a pasitive number"
+                "Size is required",
+                "Size must be a number",
+                "Size must be a pasitive number"
             ]
         },
         {
-            "key": "ProductColor",
-            "label": "Color",
-            "type": "color",
+            "key": "UnitOfMeasurement",
+            "label": "Unit Of Measurement",
+            "type": "dropdown",
+            "valueId": "Value",
+            "nameId": "Name",
+            "contentId": "Name",
+            "source": "Size",
+            "editable": true,
+            "validators": [
+                "required",
+                "isNumber"
+            ],
+            "validationMessages": [
+                "Unit Of Measurement is required",
+                "Unit Of Measurement is required"
+            ]
+        }
+    ],
+    "productprice": [
+        {
+            "key": "PpId",
+            "label": "ID",
+            "type": "text",
+            "editable": false,
+            "validators": [],
+            "validationMessages": [],
+            "nocreate": true
+        },
+        {
+            "key": "Price",
+            "label": "Price",
+            "type": "text",
+            "editable": true,
+            "validators": [
+                "required",
+                "isFloat",
+                "isPositive"
+            ],
+            "validationMessages": [
+                "Product price is required",
+                "Product price must be a number",
+                "Product price must be a pasitive number"
+            ]
+        },
+        {
+            "key": "DiscountGroup",
+            "label": "DiscountGroup",
+            "type": "text",
             "editable": true,
             "validators": [
                 "required"
             ],
             "validationMessages": [
-                "Product color is required"
-            ],
-            "value": "#922c88"
+                "Product discount group is required"
+            ]
         },
         {
-            "key": "ReturnMerchandiseAuthNotRequired",
-            "label": "Return Merch Auth Not Required",
+            "key": "IsVatIncluded",
+            "label": "IsVatIncluded",
             "type": "check",
             "editable": true,
             "default": false,
@@ -103,52 +322,7 @@
                 "isTruthy"
             ],
             "validationMessages": [
-                "Return Authorization is required"
-            ]
-        },
-        {
-            "key": "CreatedDate",
-            "label": "Created Date",
-            "type": "datetime",
-            "editable": false,
-            "default": true,
-            "validators": [
-                "required"
-            ],
-            "validationMessages": [
-                "Date and Time is required"
-            ]
-        },
-        {
-            "key": "LastModifiedDate",
-            "label": "Last Modified Date",
-            "type": "datetime",
-            "editable": false,
-            "default": true,
-            "validators": [
-                "required"
-            ],
-            "validationMessages": [
-                "Date and Time is required"
-            ]
-        }
-    ],
-    "types": [
-        {
-            "key": "ProductProductType",
-            "label": "Product Type",
-            "type": "dropdown",
-            "valueId": "ProductTypeCode",
-            "nameId": "ProductTypeCode",
-            "contentId": "ProductTypeDescription",
-            "editable": true,
-            "validators": [
-                "required",
-                "isNumber"
-            ],
-            "validationMessages": [
-                "Product type is required",
-                "Product type is required"
+                "Is product vat included?"
             ]
         }
     ]

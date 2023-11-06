@@ -36,10 +36,9 @@ const Component = (props) => {
                 errorMessages={validationMessages}
                 InputLabelProps={{ shrink: false }}
                 placeholder={placeHolder}
-                fullWidth
                 disabled={!editable ? true : false}
                 style={{
-                    width: "100%",
+                    minWidth: 250,
                     ...style
                 }}
                 sx={{

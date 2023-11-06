@@ -1,6 +1,6 @@
 
 //const serverApi = "http:/34.238.241.129:8081/";
-const serverApi = "http://3.133.64.67:8140/ecom/";
+const serverApi = "http://3.27.56.31:8081/ecom/";
 
 /* Product Types */
 const GetProductTypesCount = async (query) => {
@@ -283,10 +283,13 @@ const GetDocument = async (id, value, type) => {
             });
 
             if (res.status === 200) {
+                let data = null;
                 if (value) {
-                    return resolve({ status: res.ok, values: res.text() });
+                    data = await res.text();
+                    return resolve({ status: res.ok, values: data });
                 }
-                return resolve({ status: res.ok, values: res.json() });
+                data = await res.json();
+                return resolve({ status: res.ok, values: data });
             }
             return resolve({ status: false, statusText: "Failed fetching data" });
 
@@ -422,7 +425,7 @@ const GetProductOtherImages = async (id, filter) => {
             });
             const json = await res.json();
             if (res.status === 200) {
-                return resolve({ status: res.ok, values: json || {} });
+                return resolve({ status: res.ok, values: json?.value || [] });
             }
 
             return resolve({ status: false, statusText: json.error.message });
@@ -437,7 +440,7 @@ const GetProductOtherImages = async (id, filter) => {
 /* Product Price */
 const SetProductPrice = async (input) => {
     return new Promise(async (resolve) => {
-        let PpId = input.PpId;
+        let id = input.PpId;
         let method = "POST";
         let url = `${serverApi}ProductPrices`;
         if (input.PpId && !input.Deleted) {
@@ -461,9 +464,9 @@ const SetProductPrice = async (input) => {
 
             if (res.status === 201) {
                 const json = await res.json();
-                return resolve({ status: res.ok, PpId: json.PpId });
+                return resolve({ status: res.ok, id: json.PpId });
             } else if (res.status === 200 || res.status === 204) {
-                return resolve({ status: res.ok, PpId });
+                return resolve({ status: res.ok, id });
             } else {
                 const json = await res.json();
                 return resolve({ status: false, statusText: json.error.message });
@@ -513,7 +516,8 @@ const GetMetaData = async () => {
                 }
             });
             if (res.status === 200) {
-                return resolve({ status: res.ok, values: res.text() });
+                const values = await res.text();
+                return resolve({ status: res.ok, values });
             }
 
             return resolve({ status: false, statusText: "Failed fetching data" });

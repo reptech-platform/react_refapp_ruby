@@ -100,9 +100,10 @@ const GetMetaDataInfo = async () => {
     return new Promise(async (resolve) => {
         await GetMetaData()
             .then(async (res) => {
-                if (res) {
+                const { status, values } = res;
+                if (status) {
                     const xmlPattern = /<\?xml.*?\?>[\s\S]*?<edmx:Edmx.*?>[\s\S]*?<\/edmx:Edmx>/;
-                    const xmlMatch = res.match(xmlPattern);
+                    const xmlMatch = values.match(xmlPattern);
                     const xmlContent = xmlMatch[0];
                     const parser = new DOMParser();
                     const xmlDoc = parser.parseFromString(xmlContent, "application/xml");

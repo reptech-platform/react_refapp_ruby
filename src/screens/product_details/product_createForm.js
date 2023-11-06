@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { Box, Typography, Grid, Stack, Button, Divider } from '@mui/material';
 import Container from "screens/container";
 import { useTheme } from '@mui/material/styles';
-import ProductJsonConfig from "config/stepperConfig.json";
+import ProductJsonConfig from "config/productConfig.json";
 import RenderFormContols from "./child/formcontrols";
 import { useNavigate } from "react-router-dom";
 import * as Api from "shared/services";
@@ -28,7 +28,7 @@ const Component = (props) => {
         let productId, otherDetailsId, priceId, mainImageId, otherImagesId;
 
         // Add Or Update Product
-        rslt = await Support.AddOrUpdateProduct(row['product']);
+        rslt = await Support.AddOrUpdateProduct(row['product'], dropDownOptions);
         if (rslt.status) {
             row['product'].find((x) => x.key === 'Product_id').value = parseInt(rslt.id);
         } else { return; }
@@ -55,13 +55,15 @@ const Component = (props) => {
         mainImageId = row['otherdetails'].find((x) => x.key === 'MainImage').value?.DocId || 0;
 
         // Update product with child references
-        data = {
-            Product_id: parseInt(productId),
-            ProductMainImage: parseInt(mainImageId),
-            ProductOtherDetails: parseInt(otherDetailsId)
-        }
-        rslt = await Support.AddOrUpdateProduct(data);
+        data = [
+            { key: "Product_id", value: parseInt(productId) },
+            { key: "ProductMainImage", value: parseInt(mainImageId) },
+            { key: "ProductOtherDetails", value: parseInt(otherDetailsId) }
+        ];
+
+        rslt = await Support.AddOrUpdateProduct(data, dropDownOptions);
         if (!rslt.status) return;
+        row['product'].find((x) => x.key === 'ProductMainImage').value = mainImageId;
 
         // Add Or Update Document for Other Images
         data = row['otherdetails'].find((x) => x.key === 'OtherImages');
@@ -73,18 +75,20 @@ const Component = (props) => {
         } else { return; }
 
         otherImagesId = row['otherdetails'].find((x) => x.key === 'OtherImages').value?.DocId || 0;
-        let productOtherImagesId = row['otherdetails'].find((x) => x.key === 'ProductOtherImagesId').value || 0;
+        let productOtherImagesId = row['otherdetails'].find((x) => x.key === 'OtherImages').ProductOtherImagesId || 0;
+        productOtherImagesId = parseInt(productOtherImagesId);
 
         // Update product other images with child referenc
-        data = {
-            Id: parseInt(productOtherImagesId),
-            Product_id: parseInt(productId),
-            DocId: parseInt(otherImagesId)
-        };
+
+        data = [
+            { key: "Product_id", value: parseInt(productId) },
+            { key: "Id", value: productOtherImagesId > 0 ? productOtherImagesId : null },
+            { key: "DocId", value: parseInt(otherImagesId) }
+        ];
 
         rslt = await Support.AddOrUpdateProductOtherImages(data);
         if (rslt.status) {
-            row['otherdetails'].find((x) => x.key === 'ProductOtherImagesId').value = rslt.id;
+            row['otherdetails'].find((x) => x.key === 'OtherImages').ProductOtherImagesId = rslt.id;
         } else { return; }
 
         // Add Or Update Product Price
@@ -96,12 +100,14 @@ const Component = (props) => {
         priceId = row['productprice'].find((x) => x.key === 'PpId').value || 0;
 
         // Update product with child references
-        data = {
-            Product_id: parseInt(productId),
-            ProductProductPrice: parseInt(priceId)
-        }
+        data = [
+            { key: "Product_id", value: parseInt(productId) },
+            { key: "ProductProductPrice", value: parseInt(priceId) }
+        ];
+
         rslt = await Support.AddOrUpdateProduct(data);
         if (!rslt.status) return;
+        row['product'].find((x) => x.key === 'ProductProductPrice').value = priceId;
 
         global.AlertPopup("success", "Product is created successfully!");
         setShowUpdate(false);

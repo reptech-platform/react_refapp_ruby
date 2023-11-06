@@ -74,32 +74,32 @@ const Component = (props) => {
                                     <TableCell sx={{ border: 0, width: "100%" }}>
                                         {x.type === 'text' && (
                                             <TextInput mode={mode} id={x.key} name={x.key} value={x.value} validators={x.validators} editable={x.editable}
-                                                validationMessages={x.validationMessages} OnInputChange={OnInputChange} />
+                                                validationMessages={x.validationMessages} OnInputChange={OnInputChange} sx={{ width: x.width }} />
                                         )}
                                         {x.type === 'check' && (
                                             <CheckInput mode={mode} label={x.label} id={x.key} name={x.key} value={x.value || x.default}
-                                                validationMessages={x.validationMessages} OnInputChange={OnInputChange} />
+                                                validationMessages={x.validationMessages} OnInputChange={OnInputChange} sx={{ width: x.width }} />
                                         )}
 
                                         {x.type === 'color' && (
-                                            <ColorPicker mode={mode} id={x.key} name={x.key} value={x.value} OnInputChange={OnInputChange} />
+                                            <ColorPicker mode={mode} id={x.key} name={x.key} value={x.value} OnInputChange={OnInputChange} sx={{ width: x.width }} />
                                         )}
                                         {x.type === 'doc' && (
                                             <FileInput mode={mode} id={x.key} name={x.key} type={x.type} docName={x.value?.DocName} docType={x.value?.DocExt} docData={x.value?.DocData}
-                                                validators={x.validators} validationMessages={x.validationMessages}
+                                                validators={x.validators} validationMessages={x.validationMessages} sx={{ width: x.width }}
                                                 acceptTypes={x.accept} OnInputChange={OnInputChange} />
                                         )}
                                         {x.type === 'date' && (
                                             <TextInput type="date" mode={mode} id={x.key} name={x.key} value={x.value} validators={x.validators} editable={x.editable}
-                                                validationMessages={x.validationMessages} OnInputChange={OnInputChange} />
+                                                validationMessages={x.validationMessages} OnInputChange={OnInputChange} sx={{ width: x.width }} />
                                         )}
                                         {x.type === 'datetime' && (
                                             <DateTimePicker mode={mode} id={x.key} name={x.key} value={x.value} validators={x.validators}
-                                                validationMessages={x.validationMessages} OnInputChange={OnInputChange} />
+                                                validationMessages={x.validationMessages} OnInputChange={OnInputChange} sx={{ width: x.width }} />
                                         )}
                                         {x.type === 'dropdown' && (
                                             <DropDown mode={mode} id={x.key} name={x.key} value={x.value} options={GetDropDownOptions(x.source)} valueId={x.valueId} size="small"
-                                                nameId={x.nameId} contentId={x.contentId} defaultLabel={`Select ${x.label}`}
+                                                nameId={x.nameId} contentId={x.contentId} defaultLabel={`Select ${x.label}`} sx={{ width: x.width }}
                                                 validators={x.validators} validationMessages={x.validationMessages} onDropDownChange={OnInputChange} />
                                         )}
                                     </TableCell>

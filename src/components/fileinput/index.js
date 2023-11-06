@@ -94,9 +94,8 @@ const Component = (props) => {
                         validators={validators}
                         errorMessages={validationMessages}
                         InputLabelProps={{ shrink: false }}
-                        fullWidth
                         style={{
-                            width: "100%",
+                            minWidth: 250,
                             ...style
                         }}
                         sx={{

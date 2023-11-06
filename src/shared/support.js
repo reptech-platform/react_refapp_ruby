@@ -2,11 +2,12 @@ import {
     SetProduct, SetProductPrice, SetProductOtherImages,
     SetOtherDetails, SetDocument, GetDocument, SetProductTypes
 } from "./services";
+import Helper from "shared/helper";
 
 var fn = {};
 
 const numberItems = ['Price', 'Size', 'ProductOtherDetails', 'ProductProductType', 'Weight',
-    'ProductProductPrice', 'Product_id', 'ProductMainImage'];
+    'ProductProductPrice', 'Product_id', 'ProductMainImage', 'DocId', 'Id'];
 const defaultError = "Something went wroing while processing request!";
 
 
@@ -170,7 +171,10 @@ fn.ExtractDocument = async (input, docId) => {
     return new Promise(async (resolve) => {
         let rslt;
 
-        if (docId) input = await GetDocument(docId);
+        if (docId) {
+            rslt = await GetDocument(docId);
+            input = rslt.values || { DocId: 0, DocName: null, DocType: null, DocExt: null };
+        }
         rslt = {
             DocData: null, DocId: input.DocId, DocName: input.DocName,
             DocType: input.DocType, DocExt: input.DocExt
@@ -178,7 +182,8 @@ fn.ExtractDocument = async (input, docId) => {
 
         if (rslt.DocId > 0) {
             global.Busy(true);
-            rslt.DocData = await GetDocument(rslt.id, true, rslt.DocType);
+            const { values } = await GetDocument(rslt.DocId, true, rslt.DocType);
+            rslt.DocData = !Helper.IsNullValue(values) ? values : null;
             global.Busy(false);
         }
 
@@ -186,11 +191,25 @@ fn.ExtractDocument = async (input, docId) => {
     });
 };
 
-fn.AddOrUpdateProductOtherImages = async (input) => {
+fn.AddOrUpdateProductOtherImages = async (input, excludesItems) => {
     return new Promise(async (resolve) => {
-        let status = false, id = null;
+        let data = {}, status = false, id = null;
         global.Busy(true);
-        let rslt = await SetProductOtherImages(input);
+        let excludes = excludesItems || [];
+        debugger;
+
+        const tmp = Object.values(input);
+        tmp.filter((x) => x.value).map((x) => {
+            if (excludes.indexOf(x.key) === -1) {
+                if (numberItems.indexOf(x.key) > -1) {
+                    if (x.value) data[x.key] = parseFloat(x.value);
+                } else {
+                    data[x.key] = x.value;
+                }
+            }
+        });
+
+        let rslt = await SetProductOtherImages(data);
         global.Busy(false);
         if (rslt.status) {
             id = rslt.id;

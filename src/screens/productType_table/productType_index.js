@@ -136,6 +136,7 @@ const Component = (props) => {
             const { success, failed } = httpMethodResponse[params.httpMethod];
             global.Busy(true);
             let data = { ...params, Deleted: params.httpMethod === 'DELETE' };
+            delete data["httpMethod"];
             const { status } = await SetProductTypes(data);
             if (status) {
                 global.AlertPopup("success", `Record is ${success} successful!`);
