@@ -41,7 +41,7 @@ const Component = (props) => {
         row['product'].find((x) => x.key === 'ProductProductType').value = productTypeId;
 
         // Add Or Update Product
-        rslt = await Support.AddOrUpdateProduct(row['product']);
+        rslt = await Support.AddOrUpdateProduct(row['product'], dropDownOptions);
         if (rslt.status) {
             row['product'].find((x) => x.key === 'Product_id').value = parseInt(rslt.id);
         } else { return; }
@@ -56,7 +56,6 @@ const Component = (props) => {
 
         otherDetailsId = row['otherdetails'].find((x) => x.key === 'OtherDetailsId').value || 0;
 
-
         // Add Or Update Document for Main Image
         data = row['otherdetails'].find((x) => x.key === 'MainImage');
         rslt = await Support.AddOrUpdateDocument(data);
@@ -69,13 +68,15 @@ const Component = (props) => {
         mainImageId = row['otherdetails'].find((x) => x.key === 'MainImage').value?.DocId || 0;
 
         // Update product with child references
-        data = {
-            Product_id: parseInt(productId),
-            ProductMainImage: parseInt(mainImageId),
-            ProductOtherDetails: parseInt(otherDetailsId)
-        }
-        rslt = await Support.AddOrUpdateProduct(data);
+        data = [
+            { key: "Product_id", value: parseInt(productId) },
+            { key: "ProductMainImage", value: parseInt(mainImageId) },
+            { key: "ProductOtherDetails", value: parseInt(otherDetailsId) }
+        ];
+
+        rslt = await Support.AddOrUpdateProduct(data, dropDownOptions);
         if (!rslt.status) return;
+        row['product'].find((x) => x.key === 'ProductMainImage').value = mainImageId;
 
         // Add Or Update Document for Other Images
         data = row['otherdetails'].find((x) => x.key === 'OtherImages');
@@ -87,18 +88,19 @@ const Component = (props) => {
         } else { return; }
 
         otherImagesId = row['otherdetails'].find((x) => x.key === 'OtherImages').value?.DocId || 0;
-        let productOtherImagesId = row['otherdetails'].find((x) => x.key === 'ProductOtherImagesId').value || 0;
+        let productOtherImagesId = row['otherdetails'].find((x) => x.key === 'OtherImages').ProductOtherImagesId || 0;
+        productOtherImagesId = parseInt(productOtherImagesId);
 
-        // Update product other images with child referenc
-        data = {
-            Id: parseInt(productOtherImagesId),
-            Product_id: parseInt(productId),
-            DocId: parseInt(otherImagesId)
-        };
+        // Update product other images with child reference
+        data = [
+            { key: "Product_id", value: parseInt(productId) },
+            { key: "Id", value: productOtherImagesId > 0 ? productOtherImagesId : null },
+            { key: "DocId", value: parseInt(otherImagesId) }
+        ];
 
         rslt = await Support.AddOrUpdateProductOtherImages(data);
         if (rslt.status) {
-            row['otherdetails'].find((x) => x.key === 'ProductOtherImagesId').value = rslt.id;
+            row['otherdetails'].find((x) => x.key === 'OtherImages').ProductOtherImagesId = rslt.id;
         } else { return; }
 
         // Add Or Update Product Price
@@ -110,12 +112,14 @@ const Component = (props) => {
         priceId = row['productprice'].find((x) => x.key === 'PpId').value || 0;
 
         // Update product with child references
-        data = {
-            Product_id: parseInt(productId),
-            ProductProductPrice: parseInt(priceId)
-        }
-        rslt = await Support.AddOrUpdateProduct(data);
+        data = [
+            { key: "Product_id", value: parseInt(productId) },
+            { key: "ProductProductPrice", value: parseInt(priceId) }
+        ];
+
+        rslt = await Support.AddOrUpdateProduct(data, dropDownOptions);
         if (!rslt.status) return;
+        row['product'].find((x) => x.key === 'ProductProductPrice').value = priceId;
 
         global.AlertPopup("success", "Product is created successfully!");
         setShowUpdate(false);
@@ -123,7 +127,7 @@ const Component = (props) => {
     }
 
     const OnInputChange = (e) => {
-        const { name, value, location, ...others } = e;
+        const { name, value, location } = e;
         if (name === "ProductOptionType") {
             OnProductTypeChanged(e);
         }
@@ -159,6 +163,7 @@ const Component = (props) => {
 
         if (!Helper.IsNullValue(value)) {
             const { Name, Desc, Value } = dropDownOptions.find((x) => x.Name === 'ProductTypes').Values.find((x) => x.Value === value);
+            console.log(dropDownOptions);
             _row[location].find((x) => x.key == TargetTypeId).value = Value;
             _row[location].find((x) => x.key == TargetTypeName).value = Name;
             _row[location].find((x) => x.key == TargetTypeName).editable = false;
@@ -169,6 +174,7 @@ const Component = (props) => {
             _row[location].find((x) => x.key == name).editable = true;
             _row[location].find((x) => x.key == name).value = null;
         }
+        setShowUpdate(true);
         setRow(_row);
         setState(!state);
     }
@@ -184,7 +190,7 @@ const Component = (props) => {
             await Api.GetProductTypes()
                 .then(async (res) => {
                     if (res.status) {
-                        const pValues = res.values.map((x) => { return { Name: x.ProductTypeName, Value: x.PtId } });
+                        const pValues = res.values.map((x) => { return { Name: x.ProductTypeName, Value: x.PtId, Desc: x.ProductTypeDesc } });
                         await GetMetaDataInfo()
                             .then(async (res2) => {
                                 const enums = res2.filter((x) => x.Type === 'Enum') || [];

@@ -2,10 +2,11 @@ import React from 'react';
 import Container from "screens/container";
 import { GetMetaDataInfo } from "shared/common";
 import { Box, Grid, Stack, Button, Typography } from '@mui/material';
-import { ArrowLeft as ArrowLeftIcon } from '@mui/icons-material';
-import ProductJsonConfig from "config/stepperConfig.json";
+import { ArrowLeft as ArrowLeftIcon, HelpOutlineRounded } from '@mui/icons-material';
+import ProductJsonConfig from "config/productConfig.json";
 import { ProductDetailsForm, ProductForm, ProductPriceForm, ProductReviewForm, ProductTypesForm } from "./childs";
 import * as Api from "shared/services";
+import Helper from "shared/helper";
 import Stepper from "components/stepper";
 
 const steps = ['Product Type', 'Product', 'OtherDetails', 'ProductPrice', "Review"];
@@ -18,33 +19,34 @@ const Component = (props) => {
     const [row, setRow] = React.useState({});
     const [stepperComponents, setStepperComponents] = React.useState([]);
     const inputRefs = React.useRef({ productForm: null });
+    const [state, setState] = React.useState(false);
 
     const OnStepClicked = (e) => { setJumpStep(e); }
 
-    const PrepareStepperComponents = async (enums) => {
+    const PrepareStepperComponents = async (item, enums) => {
         return new Promise(async (resolve) => {
 
             const _items = [];
 
             _items.push(<ProductTypesForm
                 name="productType" tag="producttype" ref={r => inputRefs.current['productType'] = r} setIsSubmitted={setIsSubmitted}
-                row={row} enums={enums} />);
+                row={item} enums={enums} />);
 
             _items.push(<ProductForm
                 name="productForm" tag="product" ref={r => inputRefs.current['productForm'] = r} setIsSubmitted={setIsSubmitted}
-                row={row} enums={enums} excludestepper={true} />);
+                row={item} enums={enums} excludestepper={true} />);
 
             _items.push(<ProductDetailsForm
                 name="productDetails" tag="otherdetails" ref={r => inputRefs.current['productDetails'] = r} setIsSubmitted={setIsSubmitted}
-                row={row} enums={enums} />);
+                row={item} enums={enums} />);
 
             _items.push(<ProductPriceForm
                 name="productPrice" tag="productprice" ref={r => inputRefs.current['productPrice'] = r} setIsSubmitted={setIsSubmitted}
-                row={row} enums={enums} />);
+                row={item} enums={enums} />);
 
             _items.push(<ProductReviewForm
                 name="productReview" tag="all" ref={r => inputRefs.current['productReview'] = r} setIsSubmitted={setIsSubmitted}
-                onStepClicked={OnStepClicked} row={row} enums={enums} />);
+                onStepClicked={OnStepClicked} row={item} enums={enums} />);
 
             setStepperComponents(_items);
 
@@ -59,12 +61,11 @@ const Component = (props) => {
             await Api.GetProductTypes()
                 .then(async (res) => {
                     if (res.status) {
-                        const pValues = res.values.map((x) => { return { Name: x.ProductTypeName, Value: x.PtId } });
+                        const pValues = res.values.map((x) => { return { Name: x.ProductTypeName, Value: x.PtId, Desc: x.ProductTypeDesc } });
                         await GetMetaDataInfo()
                             .then(async (res2) => {
                                 const enums = res2.filter((x) => x.Type === 'Enum') || [];
                                 enums.push({ Name: "ProductTypes", Type: 'Enum', Values: pValues });
-                                setDropDownOptions(enums);
                                 global.Busy(false);
                                 return resolve(enums);
                             });
@@ -80,22 +81,25 @@ const Component = (props) => {
     }
 
     const FetchProductDetails = async () => {
-        let item = {};
-        ['product', 'producttype', 'otherdetails', 'productprice'].forEach(elm => {
-            let items = [];
-            for (let prop of ProductJsonConfig[elm]) {
-                items.push({ ...prop, value: null });
-            }
-            item[elm] = items;
+        return new Promise(async (resolve) => {
+            let item = {};
+            ['product', 'producttype', 'otherdetails', 'productprice'].forEach(elm => {
+                let items = [];
+                for (let prop of ProductJsonConfig[elm]) {
+                    items.push({ ...prop, value: null });
+                }
+                item[elm] = items;
+            });
+            setRow(item);
+            setState(!state);
+            return resolve(item);
         });
-
-        setRow(item);
     }
 
     const fetchData = async () => {
         await FetchProductTypes().then(async (enums) => {
-            await FetchProductDetails().then(async () => {
-                await PrepareStepperComponents(enums);
+            await FetchProductDetails().then(async (item) => {
+                await PrepareStepperComponents(item, enums);
             });
         });
     };

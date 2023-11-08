@@ -80,6 +80,7 @@ const Component = (props) => {
             .then(async (res) => {
                 if (res.status) {
                     _rows = res.values || [];
+                    console.log(_rows);
                     for (let i = 0; i < _rows.length; i++) {
                         _rows[i].id = Helper.GetGUID();
                         /* _rows[i].ProductProductType = _types.find((x) => x.ProductTypeCode === _rows[i].ProductProductType)?.ProductTypeDescription || 'NA';

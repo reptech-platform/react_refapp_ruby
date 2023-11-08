@@ -1,10 +1,9 @@
 import React from 'react';
-//import RenderFormContols from "./formcontrols";
-import { Box, Grid } from '@mui/material';
-import { SetProductTypes } from "shared/services";
+import { Box } from '@mui/material';
 import Helper from "shared/helper";
 import { ValidatorForm } from 'react-material-ui-form-validator';
 import RenderFormContols from "components/formControls/RenderFormContols";
+import Support from "shared/support";
 
 const Component = React.forwardRef((props, ref) => {
 
@@ -23,32 +22,23 @@ const Component = React.forwardRef((props, ref) => {
     const OnSubmit = async (e) => {
         if (e) e.preventDefault();
 
-        let rslt, data = {};
+        let rslt, productTypeId;
 
-        const products = Object.values(props.row[tag]);
-        products.filter((x) => x.value).map((x) => {
-            if (x.key !== 'ProductOptionType') {
-                data[x.key] = x.value;
-            }
-        });
+        productTypeId = props.row['producttype'].find((x) => x.key === 'PtId').value || 0;
+        productTypeId = parseInt(productTypeId);
 
-        if (Helper.IsNullValue(data.PtId)) {
-            global.Busy(true);
-            rslt = await SetProductTypes(data);
-            global.Busy(false);
+        if (productTypeId === 0) {
+            rslt = await Support.AddOrUpdateProductType(props.row['producttype'], ["ProductOptionType"]);
             if (rslt.status) {
-                products.find((x) => x.key === 'PtId').value = rslt.PtId;
-                props.row['product'].find((x) => x.key === 'ProductProductType').value = rlst.PtId;
-                global.AlertPopup("success", "Product type is created successfully!");
-                setIsSubmitted(true);
-            } else {
-                const msg = rslt.statusText || "Something went wroing while creating Product type!";
-                global.AlertPopup("error", msg);
-            }
-        } else {
-            props.row['product'].find((x) => x.key === 'ProductProductType').value = data.PtId;
-            setIsSubmitted(true);
+                productTypeId = parseInt(rslt.id);
+                props.row['producttype'].find((x) => x.key === 'PtId').value = rslt.id;
+            } else { return; }
         }
+
+        props.row['product'].find((x) => x.key === 'ProductProductType').value = productTypeId;
+
+        global.AlertPopup("success", "Product type is created successfully!");
+        setIsSubmitted(true);
     }
 
     const ResetValues = (name, items) => {
@@ -97,6 +87,7 @@ const Component = React.forwardRef((props, ref) => {
             _prop.find((x) => x.key == TargetTypeDesc).value = Desc;
             _prop.find((x) => x.key == TargetTypeDesc).editable = false;
             props.row[tag] = _prop;
+            setRows(props.row[tag]);
             setState(!state);
         }
     }, [props]);

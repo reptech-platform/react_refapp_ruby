@@ -3,7 +3,7 @@ import RenderFormContols from "./formcontrols";
 import Support from "shared/support";
 
 const Component = React.forwardRef((props, ref) => {
-    const { setIsSubmitted, tag } = props;
+    const { enums, setIsSubmitted, tag } = props;
     const [form, setForm] = React.useState(null);
 
     React.useImperativeHandle(ref, () => ({
@@ -14,25 +14,11 @@ const Component = React.forwardRef((props, ref) => {
     const OnSubmit = async (e) => {
         if (e) e.preventDefault();
 
-        let rslt, data = {};
-
-        const products = Object.values(props.row[tag]);
-        products.filter((x) => x.value).map((x) => {
-            if (x.key === 'UnitOfMeasurement') {
-                data[x.key] = props.enums.find((z) => z.Name === x.source).Values.find((m) => parseInt(m.Value) === parseInt(x.value)).Name;
-            } else if (x.key === 'Weight') {
-                data[x.key] = parseFloat(x.value);
-            } else {
-                data[x.key] = x.value;
-            }
-        });
-
-        rslt = await Support.AddOrUpdateProduct(data);
-        if (rslt.status) {
-            products.find((x) => x.key === 'Product_id').value = rslt.id;
-            global.AlertPopup("success", "Product is created successfully!");
-            setIsSubmitted(true);
-        }
+        let rslt = await Support.AddOrUpdateProduct(props.row[tag], enums);
+        if (!rslt.status) return;
+        props.row['product'].find((x) => x.key === 'Product_id').value = parseInt(rslt.id);
+        global.AlertPopup("success", "Product is created successfully!");
+        setIsSubmitted(true);
     }
 
     const OnInputChange = async (e) => {

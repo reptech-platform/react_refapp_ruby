@@ -3,128 +3,95 @@ import RenderFormContols from "./formcontrols";
 import Support from "shared/support";
 
 const Component = React.forwardRef((props, ref) => {
-    const { setIsSubmitted, tag } = props;
+    const { enums, setIsSubmitted, tag } = props;
     const [form, setForm] = React.useState(null);
-
-    const [updates, setUpdates] = React.useState({
-        MainImage: false, OtherImages: false,
-        OtherDetails: false, ProductOtherImages: false
-    });
 
     React.useImperativeHandle(ref, () => ({ submit: () => form.current.submit() }));
 
-    const AddOrUpdateDocument = async (productId, items, tagName) => {
+    const AddOrUpdateDocument = async () => {
 
-        let status = false;
-        const input = items.find((x) => x.key === tagName);
+        return new Promise(async (resolve) => {
 
-        let rslt = await Support.AddOrUpdateDocument(input);
-        if (rslt.status) {
-            if (tagName === 'MainImage') {
+            let rslt, data;
+            let productId, otherDetailsId, mainImageId, otherImagesId;
 
-                let newValues = items['otherdetails'].find((x) => x.key === 'MainImage').value;
-                newValues = { ...newValues, DocId: rslt.id };
-                items['otherdetails'].find((x) => x.key === 'MainImage').value = newValues;
+            productId = props.row['product'].find((x) => x.key === 'Product_id').value || 0;
 
-                // Update product with child references
-                data = {
-                    Product_id: parseInt(productId),
-                    ProductMainImage: parseInt(rslt.id)
-                }
-                rslt = await Support.AddOrUpdateProduct(data);
-            } else if (tagName === 'OtherImages') {
-                let newValues = items['otherdetails'].find((x) => x.key === 'OtherImages').value;
-                newValues = { ...newValues, DocId: rslt.id };
-                items['otherdetails'].find((x) => x.key === 'OtherImages').value = newValues;
+            // Add or Update Other Details
+            rslt = await Support.AddOrUpdateOtherDetails(props.row['otherdetails'], enums, ['MainImage', 'OtherImages']);
+            if (!rslt.status) return resolve(false);
+            props.row['otherdetails'].find((x) => x.key === 'OtherDetailsId').value = parseInt(rslt.id);
+            otherDetailsId = parseInt(rslt.id);
 
-                let productOtherImagesId = row['otherdetails'].find((x) => x.key === 'ProductOtherImagesId').value || 0;
-                // Update product with child references
-                data = {
-                    Product_id: parseInt(productId),
-                    DocId: parseInt(rslt.id),
-                    Id: parseInt(productOtherImagesId)
-                }
-                rslt = await Support.AddOrUpdateProductOtherImages(data);
-                if (rslt.status) {
-                    row['otherdetails'].find((x) => x.key === 'ProductOtherImagesId').value = rslt.id;
-                }
-            }
-            status = rslt.status;
-        }
 
-        return { status };
-    }
+            // Add Or Update Document for Main Image
+            data = props.row['otherdetails'].find((x) => x.key === 'MainImage');
+            rslt = await Support.AddOrUpdateDocument(data);
+            if (!rslt.status) return resolve(false);
+            let newValues = props.row['otherdetails'].find((x) => x.key === 'MainImage').value;
+            newValues = { ...newValues, DocId: rslt.id };
+            props.row['otherdetails'].find((x) => x.key === 'MainImage').value = newValues;
 
-    const AddOrUpdateOtherDetails = async (productId, items) => {
-
-        let data = {}, status = false;
-
-        let rslt = await Support.AddOrUpdateOtherDetails(data, props.enums, ['MainImage', 'OtherImages']);
-        if (rslt.status) {
-            items.find((x) => x.key === 'OtherDetailsId')['value'] = rslt.id;
+            mainImageId = props.row['otherdetails'].find((x) => x.key === 'MainImage').value?.DocId || 0;
 
             // Update product with child references
-            data = {
-                Product_id: parseInt(productId),
-                ProductOtherDetails: parseInt(rslt.id)
-            }
-            rslt = await Support.AddOrUpdateProduct(data);
-            status = rslt.status;
+            data = [
+                { key: "Product_id", value: parseInt(productId) },
+                { key: "ProductMainImage", value: parseInt(mainImageId) },
+                { key: "ProductOtherDetails", value: parseInt(otherDetailsId) }
+            ];
 
-        }
+            rslt = await Support.AddOrUpdateProduct(data, enums);
+            if (!rslt.status) return resolve(false);
+            props.row['product'].find((x) => x.key === 'ProductMainImage').value = mainImageId;
 
-        return { status };
-    }
+            // Add Or Update Document for Other Images
+            data = props.row['otherdetails'].find((x) => x.key === 'OtherImages');
+            rslt = await Support.AddOrUpdateDocument(data);
+            if (!rslt.status) return resolve(false);
+            let oldData = props.row['otherdetails'].find((x) => x.key === 'OtherImages').value;
+            oldData = { ...oldData, DocId: rslt.id };
+            props.row['otherdetails'].find((x) => x.key === 'OtherImages').value = oldData;
 
-    const AddOrUpdatePrice = async (productId, items) => {
+            otherImagesId = props.row['otherdetails'].find((x) => x.key === 'OtherImages').value?.DocId || 0;
+            let productOtherImagesId = props.row['otherdetails'].find((x) => x.key === 'OtherImages').ProductOtherImagesId || 0;
+            productOtherImagesId = parseInt(productOtherImagesId);
 
-        let data = {}, status = false;
+            // Update product other images with child reference
+            data = [
+                { key: "Product_id", value: parseInt(productId) },
+                { key: "Id", value: productOtherImagesId > 0 ? productOtherImagesId : null },
+                { key: "DocId", value: parseInt(otherImagesId) }
+            ];
 
-        let rslt = await Support.AddOrUpdatePrice(items);
-        if (rslt.status) {
-            items.find((x) => x.key === 'PpId').value = rslt.id;
+            rslt = await Support.AddOrUpdateProductOtherImages(data);
+            if (!rslt.status) return resolve(false);
 
-            // Update product with child references
-            data = {
-                Product_id: parseInt(productId),
-                ProductProductPrice: parseInt(rslt.id)
-            }
-            rslt = await Support.AddOrUpdateProduct(data);
-            status = rslt.status;
+            props.row['otherdetails'].find((x) => x.key === 'OtherImages').ProductOtherImagesId = rslt.id;
 
-        }
-
-        return { status };
+            return resolve(true);
+        });
     }
 
     const OnSubmit = async (e) => {
         if (e) e.preventDefault();
-
-        let rslt, products = props.row[tag];
-
-        const productId = row['product'].find((x) => x.key === 'Product_id').value;
-
-        // Add Or Update Documents
-        rslt = await AddOrUpdateDocument(productId, products, 'MainImage'); if (!rslt) return;
-        rslt = await AddOrUpdateDocument(productId, products, 'OtherImages'); if (!rslt) return;
-        rslt = await AddOrUpdateOtherDetails(productId, products); if (!rslt) return;
-
-        global.AlertPopup("success", "Other Details are updated successfully!");
-        setIsSubmitted(true);
+        await AddOrUpdateDocument().then((status) => {
+            if (status) {
+                global.AlertPopup("success", "Other Details are updated successfully!");
+                setIsSubmitted(true);
+            }
+        })
     }
 
     const OnInputChange = async (e) => {
-        const { name, value, type } = e;
+        const { name, value } = e;
         let products = props.row[tag];
-        if (type) {
-            products.find((x) => x.key == name)['value'] = value.DocName;
-            products.find((x) => x.key == name)['DocType'] = value.DocType;
-            products.find((x) => x.key == name)['DocData'] = value.DocData;
-            products.find((x) => x.key == name)['docExt'] = value.DocExt;
-        } else {
-            products.find((x) => x.key == name).value = value;
+        let _index = products.findIndex((x) => x.key === name);
+        if (_index > -1) {
+            products[_index].value = value;
+            props.row[tag] = products;
+            setShowUpdate(true);
         }
-        props.row[tag] = products;
     }
 
     return (

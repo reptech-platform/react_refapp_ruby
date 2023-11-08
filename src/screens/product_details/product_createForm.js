@@ -78,7 +78,7 @@ const Component = (props) => {
         let productOtherImagesId = row['otherdetails'].find((x) => x.key === 'OtherImages').ProductOtherImagesId || 0;
         productOtherImagesId = parseInt(productOtherImagesId);
 
-        // Update product other images with child referenc
+        // Update product other images with child reference
 
         data = [
             { key: "Product_id", value: parseInt(productId) },

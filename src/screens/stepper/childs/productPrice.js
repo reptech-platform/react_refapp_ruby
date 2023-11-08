@@ -4,44 +4,55 @@ import Support from "shared/support";
 
 const Component = React.forwardRef((props, ref) => {
 
-    const { setIsSubmitted, tag } = props;
+    const { enums, setIsSubmitted, tag } = props;
     const [form, setForm] = React.useState(null);
 
     React.useImperativeHandle(ref, () => ({
         submit: () => form.current.submit()
     }));
 
-    const AddOrUpdatePrice = async (items) => {
+    const AddOrUpdatePrice = async () => {
 
-        let data = {}, status = false;
+        return new Promise(async (resolve) => {
 
-        const productId = props.row['product'].find((x) => x.key === 'Product_id').value;
+            let rslt, data;
+            let productId, priceId;
 
-        let rslt = await Support.AddOrUpdatePrice(items);
-        if (rslt.status) {
-            items.find((x) => x.key === 'PpId').value = rslt.id;
+            productId = props.row['product'].find((x) => x.key === 'Product_id').value || 0;
+
+            // Add Or Update Product Price
+            rslt = await Support.AddOrUpdatePrice(props.row['productprice']);
+            if (!rslt.status) return resolve(false);
+            props.row['productprice'].find((x) => x.key === 'PpId').value = rslt.id;
+
+            priceId = props.row['productprice'].find((x) => x.key === 'PpId').value || 0;
 
             // Update product with child references
-            data = {
-                Product_id: parseInt(productId),
-                ProductProductPrice: parseInt(rslt.id)
-            }
-            rslt = await Support.AddOrUpdateProduct(data);
-            status = rslt.status;
+            data = [
+                { key: "Product_id", value: parseInt(productId) },
+                { key: "ProductProductPrice", value: parseInt(priceId) }
+            ];
 
-        }
+            rslt = await Support.AddOrUpdateProduct(data, enums);
+            if (!rslt.status) return resolve(false);
+            row['product'].find((x) => x.key === 'ProductProductPrice').value = priceId;
 
-        return { status };
+            return resolve(true);
+
+        });
     }
 
     const OnSubmit = async (e) => {
 
         if (e) e.preventDefault();
-        let rslt, products = props.row[tag];
 
-        rslt = await AddOrUpdatePrice(products); if (!rslt) return;
-        global.AlertPopup("success", "Produce price is updated successfully!");
-        setIsSubmitted(true);
+        await AddOrUpdatePrice().then((status) => {
+            if (status) {
+                global.AlertPopup("success", "Produce price is updated successfully!");
+                setIsSubmitted(true);
+            }
+        });
+
     }
 
     const OnInputChange = async (e) => {

@@ -14,6 +14,7 @@ const StepperContainer = styled(Box)(({ theme }) => ({
 
 const Component = (props) => {
     const { steps, step, stepComponents, isSubmitted, setIsSubmitted, requiredSubmit, inputRefs } = props;
+
     const stepItems = steps || [];
     const stepsCount = stepItems.length - 1;
 
