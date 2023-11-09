@@ -1,4 +1,4 @@
-
+import Helper from "shared/helper";
 //const serverApi = "http:/34.238.241.129:8081/";
 const serverApi = "http://3.136.86.6:8081/ecom/";
 
@@ -232,18 +232,23 @@ const SetDocument = async (input, headers) => {
         if (headers.DocId && !input.Deleted) {
             method = "PATCH";
             url = `${serverApi}Documents(${headers.DocId})`;
+
+            method = "POST";
+            url = `${serverApi}Documents`;
         } else if (headers.DocId && input.Deleted) {
             method = "DELETE";
             url = `${serverApi}Documents(${headers.DocId})`;
         }
-        delete input['DocId'];
-        delete input['Deleted'];
+        delete headers['DocId'];
+        delete headers['Deleted'];
+
+        const formData = new FormData();
+        formData.append('file', input);
 
         try {
             const res = await fetch(url, {
-                method, input,
+                method, body: formData,
                 headers: {
-                    "Content-type": "application/json",
                     ...headers
                 }
             });
@@ -268,10 +273,10 @@ const SetDocument = async (input, headers) => {
 const GetDocument = async (id, value, type) => {
     return new Promise(async (resolve) => {
         let headers = { "Content-type": "application/json" };
-
         let url = `${serverApi}Documents(${id})`;
         if (value) {
             url = `${serverApi}Documents(${id})/$value`;
+            headers = null;
             if (type) {
                 headers = { "Content-type": type };
             }
@@ -286,6 +291,16 @@ const GetDocument = async (id, value, type) => {
                 let data = null;
                 if (value) {
                     data = await res.text();
+                    if (!Helper.IsNullValue(data)) {
+                        if (data.startsWith("data:")) {
+                            data = data.substring(data.indexOf('data:'));
+                        } else {
+                            let tmp = data.split('\r\n');
+                            for (let img of tmp) {
+                                if (img.startsWith("data:")) data = img;
+                            }
+                        }
+                    }
                     return resolve({ status: res.ok, values: data });
                 }
                 data = await res.json();

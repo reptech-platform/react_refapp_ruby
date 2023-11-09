@@ -151,9 +151,9 @@ fn.AddOrUpdateOtherDetails = async (input, enums, excludesItems) => {
 fn.AddOrUpdateDocument = async (input) => {
     return new Promise(async (resolve) => {
         let status = false, id = null;
-        const { DocName, DocType, DocData, DocExt, docId } = input.value;
+        const { DocName, DocType, DocData, DocExt, DocId } = input.value;
         global.Busy(true);
-        let rslt = await SetDocument(DocData, { DocType, DocExt, DocName, DocId: null });
+        let rslt = await SetDocument(DocData, { DocType, DocExt, DocName, DocId: DocId });
         global.Busy(false);
         if (rslt.status) {
             id = rslt.id;

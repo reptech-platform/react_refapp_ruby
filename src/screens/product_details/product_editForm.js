@@ -65,7 +65,7 @@ const Component = (props) => {
             if (rslt.status) {
                 for (let prop in product) {
                     const tItem = item['product'].find((x) => x.key === prop);
-                    if (tItem) {
+                    if (tItem && !Helper.IsNullValue(product[prop])) {
                         if (prop === 'UnitOfMeasurement') {
                             const dpItems = enums.find((z) => z.Name === tItem.source).Values;
                             const _value = dpItems.find((m) => m.Name === product[prop]).Value;

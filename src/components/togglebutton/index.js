@@ -7,8 +7,9 @@ const Component = (props) => {
     const [alignment, setAlignment] = React.useState('LIST');
 
     const handleAlignment = (event, newAlignment) => {
-        setAlignment(newAlignment);
-        if (OnViewChanged) OnViewChanged(newAlignment);
+        const nAlign = newAlignment || alignment;
+        setAlignment(nAlign);
+        if (OnViewChanged) OnViewChanged(nAlign);
     };
 
     return (

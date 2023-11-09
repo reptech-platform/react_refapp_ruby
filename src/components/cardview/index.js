@@ -1,9 +1,9 @@
 import * as React from 'react';
 import { Grid, Card, CardActions, CardContent, CardMedia } from '@mui/material';
 import { Typography, IconButton } from '@mui/material';
-import { Edit as EditIcon, DeleteOutlined as DeleteIcon, Visibility as VisibilityIcon } from '@mui/icons-material';
+import { Inventory as InventoryIcon, Edit as EditIcon, DeleteOutlined as DeleteIcon, Visibility as VisibilityIcon } from '@mui/icons-material';
 
-const Component = ({ row, keyName, children, width, sx, onActionClicked }) => {
+const Component = ({ title, keyid, description, imgsrc, children, width, sx, onActionClicked }) => {
 
     const OnActionClicked = (id, type) => {
         if (onActionClicked) onActionClicked(id, type);
@@ -20,17 +20,28 @@ const Component = ({ row, keyName, children, width, sx, onActionClicked }) => {
                     flexDirection: "column",
                     ...sx
                 }}>
-                    <CardMedia
-                        component="img"
-                        sx={{ height: 140 }}
-                        src={row.ProductImage}
-                    />
+                    {imgsrc ? (
+                        <CardMedia
+                            component="img"
+                            sx={{ height: 140 }}
+                            src={imgsrc}
+                        />
+                    ) : (
+                        <CardMedia sx={{
+                            height: 140, backgroundColor: "#8c92ac",
+                            textAlign: "center",
+                            verticalAlign: "bottom",
+                            paddingTop: 5
+                        }}>
+                            Preview <br /> Not Available
+                        </CardMedia>
+                    )}
                     <CardContent sx={{ flexGrow: 1 }}>
                         <Typography gutterBottom variant="h5" component="div">
-                            {row.Name}
+                            {title}
                         </Typography>
                         <Typography variant="body2" color="text.secondary" component="p">
-                            {row.Product_description}
+                            {description}
                         </Typography>
                         {children}
                     </CardContent>
@@ -39,7 +50,7 @@ const Component = ({ row, keyName, children, width, sx, onActionClicked }) => {
                             size="small"
                             color="inherit"
                             aria-label="view"
-                            onClick={() => OnActionClicked(row[keyName], 'view')}
+                            onClick={() => OnActionClicked(keyid, 'view')}
                         >
                             <VisibilityIcon />
                         </IconButton>
@@ -47,7 +58,7 @@ const Component = ({ row, keyName, children, width, sx, onActionClicked }) => {
                             size="small"
                             color="inherit"
                             aria-label="Edit"
-                            onClick={() => OnActionClicked(row[keyName], 'edit')}
+                            onClick={() => OnActionClicked(keyid, 'edit')}
                         >
                             <EditIcon />
                         </IconButton>
@@ -55,7 +66,7 @@ const Component = ({ row, keyName, children, width, sx, onActionClicked }) => {
                             size="small"
                             color="inherit"
                             aria-label="Delete"
-                            onClick={() => OnActionClicked(row[keyName], 'delete')}
+                            onClick={() => OnActionClicked(keyid, 'delete')}
                         >
                             <DeleteIcon />
                         </IconButton>

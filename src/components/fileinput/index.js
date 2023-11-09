@@ -9,7 +9,7 @@ const Images = ["JPG", "JPEG", "PNG"];
 
 const Component = (props) => {
 
-    const { mode, id, name, type, docName, docType, docData, OnInputChange,
+    const { mode, id, name, type, docName, docType, docData, docId, OnInputChange,
         style, sx, acceptTypes, validators, validationMessages, alt } = props;
 
     const tValue = docName && docType ? `${docName}.${docType}` : "";
@@ -60,7 +60,7 @@ const Component = (props) => {
             if (OnInputChange) {
                 OnInputChange({
                     name, value: {
-                        DocName: iDocName, DocExt: iDocExt,
+                        DocId: docId, DocName: iDocName, DocExt: iDocExt,
                         DocType: tDocType, DocData: tDocData
                     }, type
                 });
@@ -128,10 +128,8 @@ const Component = (props) => {
                     {error && <div style={{ color: "rgb(211, 47, 47)" }}>{error}</div>}
                 </>
             )}
-
-
             {/* {mode && mode !== 'view' && inputValue && <Image sx={{ width: 200, height: 200, m: 2 }} alt={"Product Image"} src={inputValue} />} */}
-            {Images.indexOf(iDocType) > -1 && iDocData &&
+            {Images.indexOf(iDocType) > -1 && iDocData && !Helper.IsNullValue(iDocData) &&
                 <Image borderRadius="4px" sx={{ width: 300, border: '1px solid #ddd', p: 1, mt: 2 }} alt={alt || "Product Image"} src={iDocData} />
             }
 

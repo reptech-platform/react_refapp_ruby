@@ -8,17 +8,6 @@ import { ROWSPERPAGE } from "config";
 
 import { GridContainer, CardItem } from "components";
 
-const columns = [
-    { headerName: "Id", field: "Product_Id" },
-    { headerName: "Name", field: "Name", flex: 1 },
-    { headerName: "Description", field: "Product_description", flex: 1 },
-    { headerName: "Manufacturer", field: "Manufacturer", flex: 1 },
-    { headerName: "UOM", field: "UnitOfMeasurement", flex: 1 },
-    { headerName: "Weight", field: "Weight", flex: 1 },
-    { headerName: "Size", field: "Size", flex: 1 },
-    { headerName: "Color", field: "Color", flex: 1 }
-];
-
 const Component = (props) => {
 
     const { rowsCount, rows, pageInfo, onActionClicked, onPageClicked } = props;
@@ -40,14 +29,14 @@ const Component = (props) => {
         <>
             <GridContainer>
                 {rows && rows.map((x, index) => (
-                    <CardItem key={index} keyName="Product_Id" row={x} title={x.Name} imgsrc={x.ProductImage} width={300}
-                        description={x.ProductDescription} onActionClicked={OnActionClicked}>
+                    <CardItem key={index} keyid={x.Product_id} title={x.Name} imgsrc={x.ProductMainImageData} width={300}
+                        description={x.Product_description} onActionClicked={OnActionClicked}>
                         <Grid container direction="column">
                             <Typography variant="caption" color="text.secondary">
-                                <strong>Type:</strong>&nbsp;{x.ProductProductType}
+                                <strong>Type:</strong>&nbsp;{x.ProductTypeName}
                             </Typography>
                             <Typography variant="caption" color="text.secondary">
-                                <strong>Price:</strong>&nbsp;{x.ProductPrice}
+                                <strong>Price:</strong>&nbsp;₹{x.ProductPrice}
                             </Typography>
                         </Grid>
                     </CardItem>

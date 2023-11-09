@@ -85,7 +85,7 @@ const Component = (props) => {
                                             <ColorPicker mode={mode} id={x.key} name={x.key} value={x.value} OnInputChange={OnInputChange} sx={{ width: x.width }} />
                                         )}
                                         {x.type === 'doc' && (
-                                            <FileInput mode={mode} id={x.key} name={x.key} type={x.type} docName={x.value?.DocName} docType={x.value?.DocExt} docData={x.value?.DocData}
+                                            <FileInput mode={mode} id={x.key} name={x.key} type={x.type} docName={x.value?.DocName} docId={x.value?.DocId} docType={x.value?.DocExt} docData={x.value?.DocData}
                                                 validators={x.validators} validationMessages={x.validationMessages} sx={{ width: x.width }}
                                                 acceptTypes={x.accept} OnInputChange={OnInputChange} />
                                         )}

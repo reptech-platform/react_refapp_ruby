@@ -3,13 +3,15 @@ import { Stack, Box, Grid, Typography, IconButton, useTheme } from '@mui/materia
 import { useNavigate } from "react-router-dom";
 import Container from "screens/container";
 import { DataGrid, DataTable } from '../childs';
-import { GetProducts, GetProductsCount, SetProduct, GetProductTypes, GetProductImage } from "shared/services";
+import * as Api from "shared/services";
+
 import { SearchInput, ToggleButtons, CustomDialog } from "components";
 import Helper from "shared/helper";
 import { Add as AddBoxIcon } from '@mui/icons-material';
 
 const columns = [
     { headerName: "Name", field: "Name", flex: 1 },
+    { headerName: "Type", field: "ProductTypeName", flex: 1 },
     { headerName: "Description", field: "Product_description", flex: 1 },
     { headerName: "Manufacturer", field: "Manufacturer", flex: 1 },
     { headerName: "UOM", field: "UnitOfMeasurement", flex: 1 },
@@ -37,7 +39,7 @@ const Component = (props) => {
 
     const NavigateTo = useNavigate();
 
-    const LoadData = async (types) => {
+    const LoadData = async (enums) => {
 
         let query = null, filters = [];
         setRows([]);
@@ -53,7 +55,7 @@ const Component = (props) => {
             query = filters.join("&");
         }
 
-        await GetProductsCount(query)
+        await Api.GetProductsCount(query)
             .then(async (res) => {
                 if (res.status) {
                     setRowsCount(parseInt(res.values));
@@ -76,16 +78,34 @@ const Component = (props) => {
         }
 
         let _rows = [];
-        await GetProducts(query)
+        await Api.GetProducts(query)
             .then(async (res) => {
                 if (res.status) {
                     _rows = res.values || [];
                     for (let i = 0; i < _rows.length; i++) {
+                        let keyId = 0;
                         _rows[i].id = Helper.GetGUID();
-                        /* _rows[i].ProductProductType = _types.find((x) => x.ProductTypeCode === _rows[i].ProductProductType)?.ProductTypeDescription || 'NA';
+
+                        keyId = _rows[i].ProductProductType || 0;
+                        _rows[i].ProductTypeName = enums && enums.find((x) => parseInt(x.PtId) === parseInt(keyId))?.ProductTypeDesc || 'NA';
+
+                        _rows[i].ProductMainImageData = null;
                         if (viewType === 'GRID') {
-                            _rows[i].ProductImage = await GetProductImage(_rows[i].ProductProductImage);
-                        } */
+                            let keyId = _rows[i].ProductMainImage || 0;
+                            if (keyId > 0) {
+                                await Api.GetDocument(keyId, true, "image/jpeg").then((rslt) => {
+                                    _rows[i].ProductMainImageData = rslt.values;
+                                })
+                            }
+
+                            _rows[i].ProductPrice = 0;
+                            keyId = _rows[i].ProductProductPrice || 0;
+                            if (keyId > 0) {
+                                await Api.GetProductPrice(keyId).then((rslt) => {
+                                    _rows[i].ProductPrice = rslt.status && rslt.values?.Price || 0;
+                                })
+                            }
+                        }
                     }
                 } else {
                     console.log(res.statusText);
@@ -94,7 +114,6 @@ const Component = (props) => {
 
         setRows(_rows);
         global.Busy(false);
-
         return _rows;
     }
 
@@ -102,7 +121,7 @@ const Component = (props) => {
         return new Promise(async (resolve) => {
             let values = [];
             global.Busy(true);
-            const rslt = await GetProductTypes();
+            const rslt = await Api.GetProductTypes();
             if (rslt.status) {
                 values = rslt.values;
                 setProductTypes(values);
@@ -115,15 +134,19 @@ const Component = (props) => {
     const FetchResults = async () => {
         setDeletedId(0);
         setShowConfirm(false);
-        await FetchProductTypes().then(async (types) => {
-            await LoadData(types);
+        await FetchProductTypes().then(async (values) => {
+            await LoadData(values);
         });
     }
 
+    if (refresh) {
+        setRefresh(false);
+        LoadData(productTypes);
+    }
     if (initialize) { setInitialize(false); FetchResults(); }
-    if (refresh) { setRefresh(false); LoadData(); }
 
     useEffect(() => { setRefresh(true); }, [sortBy, pageInfo, searchStr, viewType]);
+
     useEffect(() => { setInitialize(true); }, []);
     useEffect(() => { if (deletedId > 0) setShowConfirm(true); }, [deletedId]);
 
@@ -139,7 +162,7 @@ const Component = (props) => {
 
     const OnCloseClicked = async (e) => {
         if (e) {
-            const rslt = await SetProduct({ Product_id: deletedId, Deleted: true });
+            const rslt = await Api.SetProduct({ Product_id: deletedId, Deleted: true });
             if (rslt.status) {
                 setInitialize(true);
                 global.AlertPopup("success", "Record is deleted successful.!");
