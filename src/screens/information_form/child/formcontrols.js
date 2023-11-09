@@ -45,14 +45,12 @@ const Component = (props) => {
                         <RenderFormContols shadow={true} location="otherdetails" mode={props.mode} title={"Other Details"} controls={props.controls.otherdetails} options={props.options} onInputChange={OnInputChange} />
                     </Box>
                 </Box>
-                {/* 
-                
                 <Box style={{ display: 'flex', width: '100%' }}>
                     <Box sx={{ width: "100%", margin: 2, boxShadow, borderRadius }}>
                         <RenderFormContols shadow={true} location="productprice" mode={props.mode} title={"Product Price"}
                             controls={props.controls.productprice} options={props.options} onInputChange={OnInputChange} />
                     </Box>
-                </Box> */}
+                </Box>
             </ValidatorForm>
         </Box>
     );

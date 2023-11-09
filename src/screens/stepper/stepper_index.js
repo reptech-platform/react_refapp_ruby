@@ -2,7 +2,7 @@ import React from 'react';
 import Container from "screens/container";
 import { GetMetaDataInfo } from "shared/common";
 import { Box, Grid, Stack, Button, Typography } from '@mui/material';
-import { ArrowLeft as ArrowLeftIcon, HelpOutlineRounded } from '@mui/icons-material';
+import { ArrowLeft as ArrowLeftIcon } from '@mui/icons-material';
 import ProductJsonConfig from "config/productConfig.json";
 import { ProductDetailsForm, ProductForm, ProductPriceForm, ProductReviewForm, ProductTypesForm } from "./childs";
 import * as Api from "shared/services";

@@ -196,7 +196,6 @@ fn.AddOrUpdateProductOtherImages = async (input, excludesItems) => {
         let data = {}, status = false, id = null;
         global.Busy(true);
         let excludes = excludesItems || [];
-        debugger;
 
         const tmp = Object.values(input);
         tmp.filter((x) => x.value).map((x) => {

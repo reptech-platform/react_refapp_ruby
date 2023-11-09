@@ -158,6 +158,22 @@
             ]
         },
         {
+            "key": "Size",
+            "label": "Size",
+            "type": "text",
+            "editable": true,
+            "validators": [
+                "required",
+                "isNumber",
+                "isPositive"
+            ],
+            "validationMessages": [
+                "Size is required",
+                "Size must be a number",
+                "Size must be a pasitive number"
+            ]
+        },
+        {
             "key": "Color",
             "label": "Color",
             "type": "color",

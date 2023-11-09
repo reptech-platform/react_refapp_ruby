@@ -1,6 +1,6 @@
 
 //const serverApi = "http:/34.238.241.129:8081/";
-const serverApi = "http://3.27.56.31:8081/ecom/";
+const serverApi = "http://3.136.86.6:8081/ecom/";
 
 /* Product Types */
 const GetProductTypesCount = async (query) => {
