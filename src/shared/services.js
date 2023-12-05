@@ -1,7 +1,7 @@
 
 const GetProductTypesApi = async (query) => {
-    let url = `http://34.238.241.129:8081/generated_app/ProductTypes`;
-    if (query) url = `http://34.238.241.129:8081/generated_app/ProductTypes?${query}`;
+    let url = `http://52.15.220.173:8081/ecom/ProductTypes`;
+    if (query) url = `http://52.15.220.173:8081/ecom/ProductTypes?${query}`;
 
     try {
         const res = await fetch(url, {
@@ -21,8 +21,8 @@ const GetProductTypesApi = async (query) => {
 }
 
 const GetProductTypesCount = async (query) => {
-    let url = `http://34.238.241.129:8081/generated_app/ProductTypes/$count`;
-    if (query) url = `http://34.238.241.129:8081/generated_app/ProductTypes/$count?${query}`;
+    let url = `http://52.15.220.173:8081/ecom/ProductTypes/$count`;
+    if (query) url = `http://52.15.220.173:8081/ecom/ProductTypes/$count?${query}`;
 
     try {
         const res = await fetch(url, {
@@ -43,8 +43,8 @@ const GetProductTypesCount = async (query) => {
 
 const GetProductsCount = async (query) => {
 
-    let url = `http://34.238.241.129:8081/generated_app/Products/$count`;
-    if (query) url = `http://34.238.241.129:8081/generated_app/Products/$count?${query}`;
+    let url = `http://52.15.220.173:8081/ecom/Products/$count`;
+    if (query) url = `http://52.15.220.173:8081/ecom/Products/$count?${query}`;
 
     try {
         const res = await fetch(url, {
@@ -65,8 +65,8 @@ const GetProductsCount = async (query) => {
 
 const GetProducts = async (query) => {
 
-    let url = `http://34.238.241.129:8081/generated_app/Products`;
-    if (query) url = `http://34.238.241.129:8081/generated_app/Products?${query}`;
+    let url = `http://52.15.220.173:8081/ecom/Products`;
+    if (query) url = `http://52.15.220.173:8081/ecom/Products?${query}`;
 
     try {
         const res = await fetch(url, {
@@ -87,7 +87,7 @@ const GetProducts = async (query) => {
 
 const SetProducts = async (data) => {
 
-    let url = `http://34.238.241.129:8081/generated_app/Products`;
+    let url = `http://52.15.220.173:8081/ecom/Products`;
 
     try {
         const res = await fetch(url, {
@@ -113,7 +113,7 @@ const SetProducts = async (data) => {
 
 const PatchProducts = async (id, data) => {
 
-    let url = `http://34.238.241.129:8081/generated_app/Products(${id})`;
+    let url = `http://52.15.220.173:8081/ecom/Products(${id})`;
 
     try {
         const res = await fetch(url, {
@@ -137,7 +137,7 @@ const PatchProducts = async (id, data) => {
 
 const GetProduct = async (id) => {
 
-    let url = `http://34.238.241.129:8081/generated_app/Products(${id})?$expand=ProductImage`;
+    let url = `http://52.15.220.173:8081/ecom/Products(${id})?$expand=ProductImage`;
 
     try {
         const res = await fetch(url, {
@@ -158,7 +158,7 @@ const GetProduct = async (id) => {
 
 const DeleteProduct = async (id) => {
 
-    let url = `http://34.238.241.129:8081/generated_app/Products(${id})`;
+    let url = `http://52.15.220.173:8081/ecom/Products(${id})`;
 
     try {
         const res = await fetch(url, {
@@ -181,7 +181,7 @@ const DeleteProduct = async (id) => {
 
 const GetProductImage = async (id) => {
 
-    let url = `http://34.238.241.129:8081/generated_app/Documents(${id})/$value`;
+    let url = `http://52.15.220.173:8081/ecom/Documents(${id})/$value`;
 
     try {
         const res = await fetch(url, {
@@ -202,7 +202,7 @@ const GetProductImage = async (id) => {
 
 const DeleteProductImage = async (id) => {
 
-    let url = `http://34.238.241.129:8081/generated_app/Documents(${id})/$value`;
+    let url = `http://52.15.220.173:8081/ecom/Documents(${id})/$value`;
 
     try {
         const res = await fetch(url, {
@@ -224,7 +224,7 @@ const DeleteProductImage = async (id) => {
 
 const SetProductImage = async (body, headers) => {
 
-    let url = `http://34.238.241.129:8081/generated_app/Documents`;
+    let url = `http://52.15.220.173:8081/ecom/Documents`;
 
     try {
         const res = await fetch(url, {
@@ -249,8 +249,8 @@ const SetProductImage = async (body, headers) => {
 }
 
 const SetProductTypesApi = async (httpMethod, description, productType) => {
-    let url = `http://34.238.241.129:8081/generated_app/ProductTypes`;
-    if (productType) url = `http://34.238.241.129:8081/generated_app/ProductTypes(${productType})`;
+    let url = `http://52.15.220.173:8081/ecom/ProductTypes`;
+    if (productType) url = `http://52.15.220.173:8081/ecom/ProductTypes(${productType})`;
     try {
         const res = await fetch(url, {
             method: httpMethod,
