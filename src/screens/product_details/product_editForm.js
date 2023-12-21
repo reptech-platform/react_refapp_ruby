@@ -49,7 +49,7 @@ const Component = (props) => {
 
         let item = {}, tmp;
 
-        ['product', 'otherdetails', 'productprice'].forEach(elm => {
+        ['producttype', 'product', 'otherdetails', 'productprice'].forEach(elm => {
             let items = [];
             for (let prop of ProductJsonConfig[elm]) {
                 items.push({ ...prop, value: null });
@@ -77,7 +77,7 @@ const Component = (props) => {
                 }
                 if (product.MainImage) {
                     const _document = await Support.ExtractDocument(product.MainImage, product.MainImage.DocId);
-                    item['otherdetails'].find((x) => x.key === "MainImage").value = _document;
+                    item['product'].find((x) => x.key === "MainImage").value = _document;
                 }
             }
 
@@ -115,8 +115,8 @@ const Component = (props) => {
                 const { DocId, Id } = rslt.values && rslt.values.length > 0 && rslt.values[0] || { DocId: 0, Id: 0 };
                 if (DocId > 0) {
                     let _document = await Support.ExtractDocument(null, DocId);
-                    item['otherdetails'].find((x) => x.key === "OtherImages").ProductOtherImagesId = Id;
-                    item['otherdetails'].find((x) => x.key === "OtherImages").value = _document;
+                    item['product'].find((x) => x.key === "OtherImages").ProductOtherImagesId = Id;
+                    item['product'].find((x) => x.key === "OtherImages").value = _document;
                 }
             }
 

@@ -24,16 +24,11 @@ const Component = React.forwardRef((props, ref) => {
 
         let rslt, productTypeId;
 
-        productTypeId = props.row['producttype'].find((x) => x.key === 'PtId').value || 0;
-        productTypeId = parseInt(productTypeId);
-
-        if (productTypeId === 0) {
-            rslt = await Support.AddOrUpdateProductType(props.row['producttype'], ["ProductOptionType"]);
-            if (rslt.status) {
-                productTypeId = parseInt(rslt.id);
-                props.row['producttype'].find((x) => x.key === 'PtId').value = rslt.id;
-            } else { return; }
-        }
+        rslt = await Support.AddOrUpdateProductType(props.row['producttype'], ["ProductOptionType"]);
+        if (rslt.status) {
+            productTypeId = parseInt(rslt.id);
+            props.row['producttype'].find((x) => x.key === 'PtId').value = rslt.id;
+        } else { return; }
 
         props.row['product'].find((x) => x.key === 'ProductProductType').value = productTypeId;
 

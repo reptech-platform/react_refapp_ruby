@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Stack, Box, Grid, Typography, IconButton, useTheme } from '@mui/material';
 import { useNavigate } from "react-router-dom";
 import Container from "screens/container";
-import { DataTable } from '../childs';
+import { DataGrid } from '../childs';
 import * as Api from "shared/services";
 
 import { SearchInput, ToggleButtons, CustomDialog } from "components";
@@ -90,6 +90,29 @@ const Component = (props) => {
                         _rows[i].ProductTypeName = enums && enums.find((x) => parseInt(x.PtId) === parseInt(keyId))?.ProductTypeDesc || 'NA';
 
                         _rows[i].ProductMainImageData = null;
+
+                        keyId = _rows[i].ProductMainImage || 0;
+                        if (keyId > 0) {
+                            await Api.GetDocument(keyId, true, "image/jpeg").then((rslt) => {
+                                _rows[i].ProductMainImageData = rslt.values;
+                            })
+                        }
+
+                        keyId = _rows[i].Product_id || 0;
+                        if (keyId > 0) {
+                            await Api.GetProductStatus(keyId).then((rslt) => {
+                                _rows[i].ProductStatus = rslt.values.Status;
+                            })
+                        }
+
+                        _rows[i].ProductPrice = 0;
+                        keyId = _rows[i].ProductProductPrice || 0;
+                        if (keyId > 0) {
+                            await Api.GetProductPrice(keyId).then((rslt) => {
+                                _rows[i].ProductPrice = rslt.status && rslt.values?.Price || 0;
+                            })
+                        }
+
                     }
                 } else {
                     console.log(res.statusText);
@@ -186,7 +209,7 @@ const Component = (props) => {
                     <Stack direction="row">
                         <Grid container sx={{ justifyContent: 'flex-end' }}>
                             <SearchInput searchStr={searchStr} onSearchChanged={OnSearchChanged} />
-                            <ToggleButtons viewName='DETAILS' OnViewChanged={(e) => OnViewChanged(e)} />
+                            <ToggleButtons viewName='TILES' OnViewChanged={(e) => OnViewChanged(e)} />
                             <IconButton
                                 size="medium"
                                 edge="start"
@@ -205,8 +228,8 @@ const Component = (props) => {
                     </Stack>
                 </Box>
                 <Box style={{ width: '100%' }}>
-                    <DataTable keyId={'Product_id'} columns={columns} rowsCount={rowsCount} rows={rows} sortBy={sortBy} pageInfo={pageInfo} onActionClicked={OnActionClicked}
-                        onSortClicked={OnSortClicked} onPageClicked={OnPageClicked} />
+                    <DataGrid keyId={'Product_id'} rowsCount={rowsCount} rows={rows} sortBy={sortBy} pageInfo={pageInfo} onActionClicked={OnActionClicked}
+                        onSortClicked={OnSortClicked} onPageClicked={OnPageClicked} onDeleteClicked={OnDeleteClicked} />
                 </Box>
                 <CustomDialog open={showConfirm} title={"Confirmation"} onCloseClicked={OnCloseClicked}>
                     <Typography gutterBottom>

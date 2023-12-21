@@ -2,28 +2,7 @@
     "producttype": [
         {
             "key": "PtId",
-            "label": "ID",
-            "type": "text",
-            "editable": false,
-            "nocreate": true,
-            "validators": [],
-            "validationMessages": []
-        },
-        {
-            "key": "ProductOptionType",
-            "label": "Product Type",
-            "type": "dropdown",
-            "valueId": "Value",
-            "nameId": "Name",
-            "contentId": "Name",
-            "source": "ProductTypes",
-            "TargetTypeName": "ProductTypeName",
-            "TargetTypeDesc": "ProductTypeDesc",
-            "TargetTypeId": "PtId",
-            "editable": true,
-            "validators": [],
-            "validationMessages": [],
-            "nocreate": true
+            "type": "keyid"
         },
         {
             "key": "ProductTypeName",
@@ -35,58 +14,44 @@
             ],
             "validationMessages": [
                 "Product type is required"
-            ]
+            ],
+            "value": "Test 002"
         },
         {
             "key": "ProductTypeDesc",
             "label": "Description",
             "type": "text",
-            "width": "30%",
             "editable": true,
+            "width": "30%",
             "validators": [
                 "required"
             ],
             "validationMessages": [
                 "Description is required"
-            ]
+            ],
+            "value": "Test 002 Description"
         }
     ],
     "product": [
         {
             "key": "Product_id",
-            "nocreate": true
+            "type": "keyid"
         },
         {
             "key": "ProductOtherDetails",
-            "nocreate": true
+            "type": "keyid"
         },
         {
             "key": "ProductProductPrice",
-            "nocreate": true
+            "type": "keyid"
         },
         {
             "key": "ProductMainImage",
-            "nocreate": true
+            "type": "keyid"
         },
         {
             "key": "ProductProductType",
-            "label": "Product Type",
-            "type": "dropdown",
-            "valueId": "Value",
-            "nameId": "Name",
-            "contentId": "Name",
-            "source": "ProductTypes",
-            "editable": true,
-            "nostepper": true,
-            "validators": [
-                "required",
-                "isNumber"
-            ],
-            "validationMessages": [
-                "Product type is required",
-                "Product type is required"
-            ],
-            "nocreate": true
+            "type": "keyid"
         },
         {
             "key": "Name",
@@ -98,7 +63,8 @@
             ],
             "validationMessages": [
                 "Product name is required"
-            ]
+            ],
+            "value": "Product 002"
         },
         {
             "key": "Product_description",
@@ -111,7 +77,8 @@
             ],
             "validationMessages": [
                 "Product description is required"
-            ]
+            ],
+            "value": "Product 002 Description"
         },
         {
             "key": "Manufacturer",
@@ -123,7 +90,8 @@
             ],
             "validationMessages": [
                 "Product image is required"
-            ]
+            ],
+            "value": "Product 002 Manufacturer"
         },
         {
             "key": "UnitOfMeasurement",
@@ -141,7 +109,8 @@
             "validationMessages": [
                 "Unit Of Measurement is required",
                 "Unit Of Measurement is required"
-            ]
+            ],
+            "value": 2
         },
         {
             "key": "Weight",
@@ -157,7 +126,8 @@
                 "Product weight is required",
                 "Product weight should be number",
                 "Product weight should be positive number"
-            ]
+            ],
+            "value": 10.25
         },
         {
             "key": "Size",
@@ -173,7 +143,8 @@
                 "Size is required",
                 "Size must be a number",
                 "Size must be a pasitive number"
-            ]
+            ],
+            "value": 10
         },
         {
             "key": "Color",
@@ -185,7 +156,8 @@
             ],
             "validationMessages": [
                 "Product color is required"
-            ]
+            ],
+            "value": "#7e2020"
         },
         {
             "key": "MainImage",
@@ -208,7 +180,7 @@
             "width": "30%",
             "accept": ".JPG,.JPEG,.PNG",
             "editable": true,
-            "ProductOtherImagesId": 0,
+            "multiple": true,
             "validators": [
                 "required"
             ],
@@ -220,12 +192,7 @@
     "otherdetails": [
         {
             "key": "OtherDetailsId",
-            "label": "ID",
-            "type": "text",
-            "editable": false,
-            "validators": [],
-            "validationMessages": [],
-            "nocreate": true
+            "type": "keyid"
         },
         {
             "key": "ManufacturingDate",
@@ -255,7 +222,8 @@
             "validationMessages": [
                 "Availability status is required",
                 "Availability status is required"
-            ]
+            ],
+            "value": 2
         },
         {
             "key": "Size",
@@ -271,7 +239,8 @@
                 "Size is required",
                 "Size must be a number",
                 "Size must be a pasitive number"
-            ]
+            ],
+            "value": 10
         },
         {
             "key": "UnitOfMeasurement",
@@ -289,18 +258,14 @@
             "validationMessages": [
                 "Unit Of Measurement is required",
                 "Unit Of Measurement is required"
-            ]
+            ],
+            "value": 2
         }
     ],
     "productprice": [
         {
             "key": "PpId",
-            "label": "ID",
-            "type": "text",
-            "editable": false,
-            "validators": [],
-            "validationMessages": [],
-            "nocreate": true
+            "type": "keyid"
         },
         {
             "key": "Price",
@@ -316,7 +281,8 @@
                 "Product price is required",
                 "Product price must be a number",
                 "Product price must be a pasitive number"
-            ]
+            ],
+            "value": 25
         },
         {
             "key": "DiscountGroup",
@@ -328,7 +294,8 @@
             ],
             "validationMessages": [
                 "Product discount group is required"
-            ]
+            ],
+            "value": "NoDiscount"
         },
         {
             "key": "IsVatIncluded",
@@ -341,7 +308,8 @@
             ],
             "validationMessages": [
                 "Is product vat included?"
-            ]
+            ],
+            "value": true
         }
     ]
 }

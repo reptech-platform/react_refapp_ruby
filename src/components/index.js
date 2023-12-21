@@ -12,6 +12,7 @@ import AlertMessage from "./msgalert";
 import DateTimePicker from "./datetimepicker";
 import GridContainer from "./gridcontainer";
 import CardItem from "./cardview";
+import CardView from "./cardtitle";
 import ToggleButtons from "./togglebutton";
 import CustomDialog from "./dialog";
 import RadioGroup from "./radiobutton";
@@ -21,5 +22,5 @@ import Select from "./select";
 
 export {
     Header, Drawer, Container, Image, FileInput, CheckInput, GridContainer, CardItem, CustomDialog, RatingGroup, Select,
-    DropDown, SearchInput, TextInput, ColorPicker, AlertMessage, DateTimePicker, ToggleButtons, RadioGroup, Stepper
+    DropDown, SearchInput, TextInput, ColorPicker, AlertMessage, DateTimePicker, ToggleButtons, RadioGroup, Stepper, CardView
 };

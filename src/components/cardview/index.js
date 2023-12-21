@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Grid, Card, CardActions, CardContent, CardMedia } from '@mui/material';
 import { Typography, IconButton } from '@mui/material';
-import { Inventory as InventoryIcon, Edit as EditIcon, DeleteOutlined as DeleteIcon, Visibility as VisibilityIcon } from '@mui/icons-material';
+import { Edit as EditIcon, DeleteOutlined as DeleteIcon, Visibility as VisibilityIcon } from '@mui/icons-material';
 
 const Component = ({ title, keyid, description, imgsrc, children, width, sx, onActionClicked }) => {
 
@@ -23,15 +23,17 @@ const Component = ({ title, keyid, description, imgsrc, children, width, sx, onA
                     {imgsrc ? (
                         <CardMedia
                             component="img"
-                            sx={{ height: 140 }}
+                            sx={{ height: 140, objectFit: "contain" }}
                             src={imgsrc}
                         />
                     ) : (
                         <CardMedia sx={{
-                            height: 140, backgroundColor: "#8c92ac",
-                            textAlign: "center",
-                            verticalAlign: "bottom",
-                            paddingTop: 5
+                            height: 140,
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            backgroundColor: "#8c92ac",
+                            textAlign: "center"
                         }}>
                             Preview <br /> Not Available
                         </CardMedia>

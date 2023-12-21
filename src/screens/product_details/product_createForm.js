@@ -3,13 +3,14 @@ import { useEffect, useState } from "react";
 import { Box, Typography, Grid, Stack, Button, Divider } from '@mui/material';
 import Container from "screens/container";
 import { useTheme } from '@mui/material/styles';
-import ProductJsonConfig from "config/productConfig.json";
+import ProductJsonConfig from "config/product_config.json";
 import RenderFormContols from "./child/formcontrols";
 import { useNavigate } from "react-router-dom";
 import * as Api from "shared/services";
 import Support from "shared/support";
 import { ArrowLeft as ArrowLeftIcon } from '@mui/icons-material';
 import { GetMetaDataInfo } from "shared/common";
+
 
 const Component = (props) => {
 
@@ -24,90 +25,67 @@ const Component = (props) => {
     const { title } = props;
 
     const OnSubmit = async () => {
-        let rslt, data;
-        let productId, otherDetailsId, priceId, mainImageId, otherImagesId;
+        let rslt, data, prodImages, productId;
+
+        let product = row['product'];
+
+        // Add Product Type
+        rslt = await Support.AddOrUpdateProductType(row['producttype'], ["PtId"]);
+        if (rslt.status) {
+            product.find((x) => x.key === 'ProductProductType')['value'] = rslt.id;
+        } else { return; }
+
+        // Add Product Main Image
+        prodImages = product.find((x) => x.key === 'MainImage');
+        rslt = await Support.AddOrUpdateDocument(prodImages);
+        if (rslt.status) {
+            product.find((x) => x.key === 'ProductMainImage')['value'] = rslt.id;
+        } else { return; }
 
         // Add Or Update Product
-        rslt = await Support.AddOrUpdateProduct(row['product'], dropDownOptions);
+        rslt = await Support.AddOrUpdateProduct(product, dropDownOptions, ['MainImage', 'OtherImages']);
         if (rslt.status) {
-            row['product'].find((x) => x.key === 'Product_id').value = parseInt(rslt.id);
+            productId = rslt.id;
+            product.find((x) => x.key === 'Product_id').value = rslt.id;
         } else { return; }
 
-        productId = row['product'].find((x) => x.key === 'Product_id').value || 0;
+        // Add Product Other Images
+        prodImages = product.find((x) => x.key === 'OtherImages').value;
+        for (let i = 0; i < prodImages.length; i++) {
+            rslt = await Support.AddOrUpdateDocument({ value: prodImages[i] });
+            if (rslt.status) {
+                data = [
+                    { key: "Product_id", value: parseInt(productId) },
+                    { key: "DocId", value: parseInt(rslt.id) }
+                ];
+                rslt = await Support.AddOrUpdateProductOtherImages(data);
+                if (!rslt.status) return;
+            }
+        }
 
-        // Add or Update Other Details
-        rslt = await Support.AddOrUpdateOtherDetails(row['otherdetails'], dropDownOptions, ['MainImage', 'OtherImages']);
+        // Add Product Other Details
+        rslt = await Support.AddOrUpdateOtherDetails(row['otherdetails'], dropDownOptions);
         if (rslt.status) {
-            row['otherdetails'].find((x) => x.key === 'OtherDetailsId').value = rslt.id;
-        } else { return; }
+            // Add Or Update Product
+            data = [
+                { key: "Product_id", value: parseInt(productId) },
+                { key: "ProductOtherDetails", value: parseInt(rslt.id) }
+            ];
+            rslt = await Support.AddOrUpdateProduct(data, dropDownOptions);
+            if (!rslt.status) return;
 
-        otherDetailsId = row['otherdetails'].find((x) => x.key === 'OtherDetailsId').value || 0;
-
-        // Add Or Update Document for Main Image
-        data = row['otherdetails'].find((x) => x.key === 'MainImage');
-        rslt = await Support.AddOrUpdateDocument(data);
-        if (rslt.status) {
-            let newValues = row['otherdetails'].find((x) => x.key === 'MainImage').value;
-            newValues = { ...newValues, DocId: rslt.id };
-            row['otherdetails'].find((x) => x.key === 'MainImage').value = newValues;
-        } else { return; }
-
-        mainImageId = row['otherdetails'].find((x) => x.key === 'MainImage').value?.DocId || 0;
-
-        // Update product with child references
-        data = [
-            { key: "Product_id", value: parseInt(productId) },
-            { key: "ProductMainImage", value: parseInt(mainImageId) },
-            { key: "ProductOtherDetails", value: parseInt(otherDetailsId) }
-        ];
-
-        rslt = await Support.AddOrUpdateProduct(data, dropDownOptions);
-        if (!rslt.status) return;
-        row['product'].find((x) => x.key === 'ProductMainImage').value = mainImageId;
-
-        // Add Or Update Document for Other Images
-        data = row['otherdetails'].find((x) => x.key === 'OtherImages');
-        rslt = await Support.AddOrUpdateDocument(data);
-        if (rslt.status) {
-            let oldData = row['otherdetails'].find((x) => x.key === 'OtherImages').value;
-            oldData = { ...oldData, DocId: rslt.id };
-            row['otherdetails'].find((x) => x.key === 'OtherImages').value = oldData;
-        } else { return; }
-
-        otherImagesId = row['otherdetails'].find((x) => x.key === 'OtherImages').value?.DocId || 0;
-        let productOtherImagesId = row['otherdetails'].find((x) => x.key === 'OtherImages').ProductOtherImagesId || 0;
-        productOtherImagesId = parseInt(productOtherImagesId);
-
-        // Update product other images with child reference
-
-        data = [
-            { key: "Product_id", value: parseInt(productId) },
-            { key: "Id", value: productOtherImagesId > 0 ? productOtherImagesId : null },
-            { key: "DocId", value: parseInt(otherImagesId) }
-        ];
-
-        rslt = await Support.AddOrUpdateProductOtherImages(data);
-        if (rslt.status) {
-            row['otherdetails'].find((x) => x.key === 'OtherImages').ProductOtherImagesId = rslt.id;
         } else { return; }
 
         // Add Or Update Product Price
         rslt = await Support.AddOrUpdatePrice(row['productprice']);
         if (rslt.status) {
-            row['productprice'].find((x) => x.key === 'PpId').value = rslt.id;
+            data = [
+                { key: "Product_id", value: parseInt(productId) },
+                { key: "ProductProductPrice", value: parseInt(rslt.id) }
+            ];
+            rslt = await Support.AddOrUpdateProduct(data, dropDownOptions);
+            if (!rslt.status) return;
         } else { return; }
-
-        priceId = row['productprice'].find((x) => x.key === 'PpId').value || 0;
-
-        // Update product with child references
-        data = [
-            { key: "Product_id", value: parseInt(productId) },
-            { key: "ProductProductPrice", value: parseInt(priceId) }
-        ];
-
-        rslt = await Support.AddOrUpdateProduct(data);
-        if (!rslt.status) return;
-        row['product'].find((x) => x.key === 'ProductProductPrice').value = priceId;
 
         global.AlertPopup("success", "Product is created successfully!");
         setShowUpdate(false);
@@ -158,14 +136,14 @@ const Component = (props) => {
 
     const FetchProductDetails = async () => {
         let item = {};
-        ['product', 'otherdetails', 'productprice'].forEach(elm => {
+        ['producttype', 'product', 'otherdetails', 'productprice'].forEach(elm => {
             let items = [];
             for (let prop of ProductJsonConfig[elm]) {
-                items.push({ ...prop, value: null });
+                //items.push({ ...prop, value: null });
+                items.push({ ...prop });
             }
             item[elm] = items;
         });
-
         setRow(item);
     }
 
@@ -175,18 +153,9 @@ const Component = (props) => {
         });
     };
 
-    useEffect(() => {
-        setShowButton(true);
-    }, []);
-
-    if (initialized) {
-        setInitialized(false);
-        fetchData();
-    }
-
-    useEffect(() => {
-        setInitialized(true);
-    }, []);
+    useEffect(() => { setShowButton(true); }, []);
+    if (initialized) { setInitialized(false); fetchData(); }
+    useEffect(() => { setInitialized(true); }, []);
 
     return (
 

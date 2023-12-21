@@ -58,6 +58,33 @@ const GetProductTypes = async (query) => {
     });
 }
 
+const GetProductType = async (id) => {
+    return new Promise(async (resolve) => {
+
+        let url = `${serverApi}ProductTypes(${id})`;
+
+        try {
+            const res = await fetch(url, {
+                method: "GET",
+                headers: {
+                    "Content-type": "application/json"
+                }
+            });
+
+            const json = await res.json();
+            if (res.status === 200) {
+                return resolve({ status: res.ok, values: json || [] });
+            }
+
+            return resolve({ status: false, statusText: json.error.message });
+
+        } catch (error) {
+            console.log(error);
+            return resolve({ status: false, statusText: error.message });
+        }
+    });
+}
+
 const SetProductTypes = async (input) => {
     return new Promise(async (resolve) => {
         let id = input.PtId;
@@ -143,6 +170,36 @@ const GetProducts = async (query) => {
             const json = await res.json();
             if (res.status === 200) {
                 return resolve({ status: res.ok, values: json.value || [] });
+            }
+
+            return resolve({ status: false, statusText: json.error.message });
+
+        } catch (error) {
+            console.log(error);
+            return resolve({ status: false, statusText: error.message });
+        }
+    });
+}
+
+const GetProductStatus = async (productId) => {
+    return new Promise(async (resolve) => {
+        let url = `${serverApi}ProductOnBoardings?$filter=ProductId eq ${productId}`;
+
+        try {
+            const res = await fetch(url, {
+                method: "GET",
+                headers: {
+                    "Content-type": "application/json"
+                }
+            });
+
+            const json = await res.json();
+            if (res.status === 200) {
+                let _tmp = { Status: '' };
+                if (json.value && json.value.length > 0) {
+                    _tmp = json.value[0];
+                }
+                return resolve({ status: res.ok, values: _tmp });
             }
 
             return resolve({ status: false, statusText: json.error.message });
@@ -546,8 +603,8 @@ const GetMetaData = async () => {
 
 export {
     GetMetaData,
-    GetProductTypesCount, GetProductTypes, SetProductTypes,
-    GetDocument, SetDocument,
+    GetProductTypesCount, GetProductTypes, SetProductTypes, GetProductStatus,
+    GetDocument, SetDocument, GetProductType,
     GetProductsCount, GetProducts, GetProduct, SetProduct,
     GetOtherDetails, SetOtherDetails,
     GetProductOtherImages, SetProductOtherImages,

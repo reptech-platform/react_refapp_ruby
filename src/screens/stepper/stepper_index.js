@@ -3,10 +3,10 @@ import Container from "screens/container";
 import { GetMetaDataInfo } from "shared/common";
 import { Box, Grid, Stack, Button, Typography } from '@mui/material';
 import { ArrowLeft as ArrowLeftIcon } from '@mui/icons-material';
-import ProductJsonConfig from "config/productConfig.json";
+import ProductJsonConfig from "config/stepper_config.json";
 import { ProductDetailsForm, ProductForm, ProductPriceForm, ProductReviewForm, ProductTypesForm } from "./childs";
 import * as Api from "shared/services";
-import Helper from "shared/helper";
+import { useNavigate } from "react-router-dom";
 import Stepper from "components/stepper";
 
 const steps = ['Product Type', 'Product', 'OtherDetails', 'ProductPrice', "Review"];
@@ -20,6 +20,8 @@ const Component = (props) => {
     const [stepperComponents, setStepperComponents] = React.useState([]);
     const inputRefs = React.useRef({ productForm: null });
     const [state, setState] = React.useState(false);
+
+    const NavigateTo = useNavigate();
 
     const OnStepClicked = (e) => { setJumpStep(e); }
 

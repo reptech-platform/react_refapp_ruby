@@ -1,16 +1,18 @@
 import * as React from 'react';
-import { ToggleButtonGroup, ToggleButton } from '@mui/material';
-import { GridView as GridViewIcon, TableRows as TableRowsIcon } from '@mui/icons-material';
+import { ToggleButtonGroup, ToggleButton, Tooltip } from '@mui/material';
+import { GridView as TilesViewIcon, TableRows as DetailsIcon, ViewList as ViewListIcon } from '@mui/icons-material';
 
 const Component = (props) => {
-    const { OnViewChanged } = props;
-    const [alignment, setAlignment] = React.useState('LIST');
+    const { OnViewChanged, viewName } = props;
+    const [alignment, setAlignment] = React.useState("");
 
     const handleAlignment = (event, newAlignment) => {
         const nAlign = newAlignment || alignment;
         setAlignment(nAlign);
         if (OnViewChanged) OnViewChanged(nAlign);
     };
+
+    React.useEffect(() => { setAlignment(viewName); }, [viewName]);
 
     return (
         <>
@@ -21,11 +23,25 @@ const Component = (props) => {
                 onChange={handleAlignment}
                 aria-label="text alignment"
             >
-                <ToggleButton value="GRID" aria-label="grid view">
-                    <GridViewIcon />
+                <ToggleButton value="DETAILS" aria-label="Details view">
+                    <Tooltip title="Details View">
+                        <DetailsIcon />
+                    </Tooltip>
                 </ToggleButton>
-                <ToggleButton value="LIST" aria-label="table view">
-                    <TableRowsIcon />
+                <ToggleButton value="TILES" aria-label="Tiles view">
+                    <Tooltip title="Tiles View">
+                        <TilesViewIcon />
+                    </Tooltip>
+                </ToggleButton>
+                {/* <ToggleButton value="CONTENT" aria-label="Content view">
+                    <Tooltip title="Content View">
+                        <ViewListIcon />
+                    </Tooltip>
+                </ToggleButton> */}
+                <ToggleButton value="LIST" aria-label="List view">
+                    <Tooltip title="List View">
+                        <ViewListIcon />
+                    </Tooltip>
                 </ToggleButton>
             </ToggleButtonGroup>
         </>

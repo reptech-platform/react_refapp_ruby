@@ -3,6 +3,59 @@ import { TableContainer, Table, TableBody, TableCell, TableRow, Paper, Typograph
 import { TextInput, ColorPicker, FileInput, CheckInput, DropDown, DateTimePicker } from "components";
 import { Edit as EditIcon } from "@mui/icons-material";
 
+
+const RenderUploadDocument = (props) => {
+
+    const { mode, name, type, acceptTypes, value, validators, validationMessages, width, onInputChange } = props;
+
+    const [values, setValues] = React.useState([]);
+    const [state, setState] = React.useState(false);
+
+    const OnInputChange = (e) => {
+        const nvalue = e.value;
+        let tmp = values || [];
+        tmp[nvalue.index] = nvalue;
+        setValues(tmp);
+        if (onInputChange) onInputChange({ name, value: tmp });
+        setState(!state);
+    }
+
+    const OnAddMoreClicked = (e) => {
+        e.preventDefault();
+        let tmp = values || [];
+        tmp.push({ index: tmp.length });
+        setValues(tmp);
+        setState(!state);
+    }
+
+    const OnDeleteClicked = (e, index) => {
+        e.preventDefault();
+        let tmp = values || [];
+        if (tmp.length > 0) {
+            tmp = tmp.filter((x) => x.index !== index);
+            tmp.forEach((x, index) => x.index = index);
+            setValues(tmp);
+            if (onInputChange) onInputChange({ name, value: tmp });
+            setState(!state);
+        }
+    }
+
+    React.useEffect(() => {
+        let tmp = value || [{ index: 0 }];
+        setValues(tmp);
+    }, [value]);
+
+    return (
+        <>
+            {values && values.length > 0 && values.map((x) => (
+                <FileInput key={x.index} mode={mode} id={name} name={name} type={type} value={x} index={x.index} count={values.length}
+                    validators={validators} validationMessages={validationMessages} sx={{ width: width }} addmore={true} onDeleteClicked={OnDeleteClicked}
+                    acceptTypes={acceptTypes} OnInputChange={OnInputChange} onAddMoreClicked={OnAddMoreClicked} />
+            ))}
+        </>
+    );
+}
+
 const Component = (props) => {
 
     const { mode, step, title, review, controls, options, onInputChange,
@@ -30,7 +83,7 @@ const Component = (props) => {
     }
 
     const GetFilters = (e) => {
-        let tmp = controls && controls.filter((z) => !z.nocreate) || [];
+        let tmp = controls && controls.filter((z) => !z.nocreate && z.type !== "keyid") || [];
         if (excludestepper) {
             tmp = tmp.filter((x) => !x.nostepper);
         }
@@ -84,10 +137,15 @@ const Component = (props) => {
                                         {x.type === 'color' && (
                                             <ColorPicker mode={mode} id={x.key} name={x.key} value={x.value} OnInputChange={OnInputChange} sx={{ width: x.width }} />
                                         )}
-                                        {x.type === 'doc' && (
-                                            <FileInput mode={mode} id={x.key} name={x.key} type={x.type} docName={x.value?.DocName} docId={x.value?.DocId} docType={x.value?.DocExt} docData={x.value?.DocData}
+                                        {!x.multiple && x.type === 'doc' && (
+                                            <FileInput mode={mode} id={x.key} name={x.key} type={x.type} value={x.value}
                                                 validators={x.validators} validationMessages={x.validationMessages} sx={{ width: x.width }}
                                                 acceptTypes={x.accept} OnInputChange={OnInputChange} />
+                                        )}
+                                        {x.multiple && x.type === 'doc' && (
+                                            <RenderUploadDocument mode={mode} name={x.key} type={x.type} value={x.value}
+                                                validators={x.validators} validationMessages={x.validationMessages} width={x.width}
+                                                acceptTypes={x.accept} onInputChange={OnInputChange} />
                                         )}
                                         {x.type === 'date' && (
                                             <TextInput type="date" mode={mode} id={x.key} name={x.key} value={x.value} validators={x.validators} editable={x.editable}

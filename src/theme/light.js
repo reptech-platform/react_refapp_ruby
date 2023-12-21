@@ -63,6 +63,30 @@ const theme = createTheme({
         mandatory: {
             marginLeft: 1,
             color: "rgb(211, 47, 47)"
+        },
+        notstarted: {
+            backgroundColor: "#5E696E",
+            color: "#ffffff",
+            borderRadius: 5,
+            paddingLeft: 3, paddingRight: 3
+        },
+        started: {
+            backgroundColor: "#E78C07",
+            color: "#ffffff",
+            borderRadius: 5,
+            paddingLeft: 3, paddingRight: 3
+        },
+        pending: {
+            backgroundColor: "#BB0000",
+            color: "#ffffff",
+            borderRadius: 5,
+            paddingLeft: 3, paddingRight: 3
+        },
+        completed: {
+            backgroundColor: "#2B7D2B",
+            color: "#ffffff",
+            borderRadius: 5,
+            paddingLeft: 3, paddingRight: 3
         }
     },
     select: {

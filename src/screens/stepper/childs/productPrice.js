@@ -15,27 +15,20 @@ const Component = React.forwardRef((props, ref) => {
 
         return new Promise(async (resolve) => {
 
-            let rslt, data;
-            let productId, priceId;
+            let rslt, data, productId;
 
             productId = props.row['product'].find((x) => x.key === 'Product_id').value || 0;
 
             // Add Or Update Product Price
             rslt = await Support.AddOrUpdatePrice(props.row['productprice']);
-            if (!rslt.status) return resolve(false);
-            props.row['productprice'].find((x) => x.key === 'PpId').value = rslt.id;
-
-            priceId = props.row['productprice'].find((x) => x.key === 'PpId').value || 0;
-
-            // Update product with child references
-            data = [
-                { key: "Product_id", value: parseInt(productId) },
-                { key: "ProductProductPrice", value: parseInt(priceId) }
-            ];
-
-            rslt = await Support.AddOrUpdateProduct(data, enums);
-            if (!rslt.status) return resolve(false);
-            row['product'].find((x) => x.key === 'ProductProductPrice').value = priceId;
+            if (rslt.status) {
+                data = [
+                    { key: "Product_id", value: parseInt(productId) },
+                    { key: "ProductProductPrice", value: parseInt(rslt.id) }
+                ];
+                rslt = await Support.AddOrUpdateProduct(data, enums);
+                if (!rslt.status) return resolve(false);
+            } else { return resolve(false); }
 
             return resolve(true);
 

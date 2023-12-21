@@ -1,5 +1,5 @@
 import React from 'react';
-import { Toolbar, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
+import { Toolbar, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Tooltip } from '@mui/material';
 import MuiDrawer from '@mui/material/Drawer';
 import { styled, useTheme } from '@mui/material/styles';
 import { Pages, ShoppingBasket, Toc, EditNote, Checklist } from '@mui/icons-material';
@@ -9,7 +9,7 @@ import { useNavigate } from 'react-router-dom';
 const openedMixin = (theme) => ({
     width: DRAWER_WIDTH,
     border: 0,
-    borderRight: `dashed ${theme.palette.grey[600]} 1px`,
+    borderRight: `solid rgba(0,0,0,.15) 1px`,
     transition: theme.transitions.create('width', {
         easing: theme.transitions.easing.easeOut,
         duration: theme.transitions.duration.enteringScreen,
@@ -19,7 +19,7 @@ const openedMixin = (theme) => ({
 
 const closedMixin = (theme) => ({
     border: 0,
-    borderRight: `dashed ${theme.palette.grey[600]} 1px`,
+    borderRight: `solid rgba(0,0,0,.15) 1px`,
     transition: theme.transitions.create('width', {
         easing: theme.transitions.easing.sharp,
         duration: theme.transitions.duration.leavingScreen,
@@ -63,47 +63,40 @@ const Component = (props) => {
             <Toolbar />
             <List>
                 <ListItem disablePadding sx={{ display: 'block' }}>
-                    <ListItemButton sx={{
-                        minHeight: 48,
-                        justifyContent: open ? 'initial' : 'center',
-                        px: 2.5,
-                    }} onClick={open ? handleClick : undefined}>
-                        <ListItemIcon sx={{
-                            minWidth: 0,
-                            mr: open ? 1 : 'auto',
-                            justifyContent: 'center',
-                        }}>
-                            <Pages sx={{ width: 24, height: 24, mr: 0 }} />
-                        </ListItemIcon>
-                        <ListItemText primary={"Pages"} sx={{ opacity: open ? 1 : 0 }} />
-                    </ListItemButton>
-                    {open && <List component="div" disablePadding>
-                        <ListItemButton sx={{ pl: 4 }} onClick={() => NavigateTo("/products")}>
+                    <List component="div" disablePadding>
+                        <ListItemButton onClick={() => NavigateTo("/products")} sx={{ height: 50 }}>
                             <ListItemIcon sx={{ minWidth: 30 }}>
-                                <ShoppingBasket />
+                                <Tooltip title="Products">
+                                    <ShoppingBasket />
+                                </Tooltip>
                             </ListItemIcon>
-                            <ListItemText primary="Products" />
+                            {open && <ListItemText primary="Products" sx={{ pl: 1 }} />}
                         </ListItemButton>
-                        <ListItemButton sx={{ pl: 4 }} onClick={() => NavigateTo("/producttypes")}>
+                        <ListItemButton onClick={() => NavigateTo("/producttypes")} sx={{ height: 50 }}>
                             <ListItemIcon sx={{ minWidth: 30 }}>
-                                <Toc />
+                                <Tooltip title="Product Types">
+                                    <Toc />
+                                </Tooltip>
                             </ListItemIcon>
-                            <ListItemText primary="Product Types" />
+                            {open && <ListItemText primary="Product Types" sx={{ pl: 1 }} />}
                         </ListItemButton>
-                        <ListItemButton sx={{ pl: 4 }} onClick={() => NavigateTo("/infoform")}>
+                        <ListItemButton onClick={() => NavigateTo("/infoform")} sx={{ height: 50 }}>
                             <ListItemIcon sx={{ minWidth: 30 }}>
-                                <EditNote />
+                                <Tooltip title="Information Form">
+                                    <EditNote />
+                                </Tooltip>
                             </ListItemIcon>
-                            <ListItemText primary="Information Form" />
+                            {open && <ListItemText primary="Information Form" sx={{ pl: 1 }} />}
                         </ListItemButton>
-                        <ListItemButton sx={{ pl: 4 }} onClick={() => NavigateTo("/stepper")}>
+                        <ListItemButton onClick={() => NavigateTo("/stepper")} sx={{ height: 50 }}>
                             <ListItemIcon sx={{ minWidth: 30 }}>
-                                <Checklist />
+                                <Tooltip title="Stepper Form">
+                                    <Checklist />
+                                </Tooltip>
                             </ListItemIcon>
-                            <ListItemText primary="Stepper Form" />
+                            {open && <ListItemText primary="Stepper Form" sx={{ pl: 1 }} />}
                         </ListItemButton>
                     </List>
-                    }
                 </ListItem>
             </List>
         </CustomDrawer>
