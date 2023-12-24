@@ -68,25 +68,25 @@ const theme = createTheme({
             backgroundColor: "#5E696E",
             color: "#ffffff",
             borderRadius: 5,
-            paddingLeft: 3, paddingRight: 3
+            padding: 3
         },
         started: {
             backgroundColor: "#E78C07",
             color: "#ffffff",
             borderRadius: 5,
-            paddingLeft: 3, paddingRight: 3
+            padding: 3
         },
         pending: {
             backgroundColor: "#BB0000",
             color: "#ffffff",
             borderRadius: 5,
-            paddingLeft: 3, paddingRight: 3
+            padding: 3
         },
         completed: {
             backgroundColor: "#2B7D2B",
             color: "#ffffff",
             borderRadius: 5,
-            paddingLeft: 3, paddingRight: 3
+            padding: 3
         }
     },
     select: {

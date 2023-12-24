@@ -601,6 +601,33 @@ const GetMetaData = async () => {
     });
 }
 
+/* Prodict List View Details */
+const GetProductOnBoardings = async () => {
+    return new Promise(async (resolve) => {
+        let url = `${serverApi}ProductOnBoardings`;
+
+        try {
+            const res = await fetch(url, {
+                method: "GET",
+                headers: {
+                    "Content-type": "application/json"
+                }
+            });
+
+            const json = await res.json();
+            if (res.status === 200) {
+                return resolve({ status: res.ok, values: json.value });
+            }
+
+            return resolve({ status: false, statusText: json.error.message });
+
+        } catch (error) {
+            console.log(error);
+            return resolve({ status: false, statusText: error.message });
+        }
+    });
+}
+
 export {
     GetMetaData,
     GetProductTypesCount, GetProductTypes, SetProductTypes, GetProductStatus,
@@ -608,5 +635,5 @@ export {
     GetProductsCount, GetProducts, GetProduct, SetProduct,
     GetOtherDetails, SetOtherDetails,
     GetProductOtherImages, SetProductOtherImages,
-    GetProductPrice, SetProductPrice
+    GetProductPrice, SetProductPrice, GetProductOnBoardings
 };

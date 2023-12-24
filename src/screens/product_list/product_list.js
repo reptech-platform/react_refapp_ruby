@@ -4,158 +4,23 @@ import { useNavigate } from "react-router-dom";
 import Container from "screens/container";
 import { DataList } from '../childs';
 import * as Api from "shared/services";
-
-import { SearchInput, ToggleButtons, CustomDialog } from "components";
-import Helper from "shared/helper";
+import { SearchInput, ToggleButtons } from "components";
 import { Add as AddBoxIcon } from '@mui/icons-material';
-
-const columns = [
-    { headerName: "Name", field: "Name", flex: 1 },
-    { headerName: "Type", field: "ProductTypeName", flex: 1 },
-    { headerName: "Description", field: "Product_description", flex: 1 },
-    { headerName: "Manufacturer", field: "Manufacturer", flex: 1 },
-    { headerName: "UOM", field: "UnitOfMeasurement", flex: 1 },
-    { headerName: "Weight", field: "Weight", flex: 1 },
-    { headerName: "Size", field: "Size", flex: 1 },
-    { headerName: "Color", field: "Color", flex: 1 }
-];
-
-const defaultError = "Something went wroing while creating record!";
 
 const Component = (props) => {
     const { title } = props;
     const theme = useTheme();
     const [initialize, setInitialize] = useState(false);
-    const [refresh, setRefresh] = useState(false);
     const [pageInfo, setPageInfo] = useState({ page: 0, pageSize: 5 });
-    const [sortBy, setSortBy] = useState(null);
     const [rowsCount, setRowsCount] = useState(0);
     const [rows, setRows] = useState([]);
-    const [productTypes, setProductTypes] = useState([]);
     const [searchStr, setSearchStr] = useState("");
-    const [viewType, setViewType] = useState('LIST');
-    const [showConfirm, setShowConfirm] = useState(false);
-    const [deletedId, setDeletedId] = useState(0);
 
     const NavigateTo = useNavigate();
 
-    const LoadData = async (enums) => {
+    const OnSearchChanged = (e) => { setSearchStr(e); }
 
-        let query = null, filters = [];
-        setRows([]);
-        setRowsCount(0);
-
-        global.Busy(true);
-
-        if (!Helper.IsNullValue(searchStr)) {
-            filters.push(`$filter=contains(ProductDescription, '${searchStr}')`);
-        }
-
-        if (!Helper.IsJSONEmpty(filters)) {
-            query = filters.join("&");
-        }
-
-        await Api.GetProductsCount(query)
-            .then(async (res) => {
-                if (res.status) {
-                    setRowsCount(parseInt(res.values));
-                } else {
-                    console.log(res.statusText);
-                }
-            });
-
-        if (!Helper.IsJSONEmpty(sortBy)) {
-            filters.push(`$orderby=${sortBy.field} ${sortBy.sort}`);
-        }
-
-        const _top = pageInfo.pageSize;
-        const _skip = pageInfo.page * pageInfo.pageSize;
-        filters.push(`$skip=${_skip}`);
-        filters.push(`$top=${_top}`);
-
-        if (!Helper.IsJSONEmpty(filters)) {
-            query = filters.join("&");
-        }
-
-        let _rows = [];
-        await Api.GetProducts(query)
-            .then(async (res) => {
-                if (res.status) {
-                    _rows = res.values || [];
-                    for (let i = 0; i < _rows.length; i++) {
-                        let keyId = 0;
-                        _rows[i].id = Helper.GetGUID();
-
-                        keyId = _rows[i].ProductProductType || 0;
-                        _rows[i].ProductTypeName = enums && enums.find((x) => parseInt(x.PtId) === parseInt(keyId))?.ProductTypeDesc || 'NA';
-
-                        _rows[i].ProductMainImageData = null;
-
-                        keyId = _rows[i].ProductMainImage || 0;
-                        if (keyId > 0) {
-                            await Api.GetDocument(keyId, true, "image/jpeg").then((rslt) => {
-                                _rows[i].ProductMainImageData = rslt.values;
-                            })
-                        }
-
-                        keyId = _rows[i].Product_id || 0;
-                        if (keyId > 0) {
-                            await Api.GetProductStatus(keyId).then((rslt) => {
-                                _rows[i].ProductStatus = rslt.values.Status;
-                            })
-                        }
-
-                        _rows[i].ProductPrice = 0;
-                        keyId = _rows[i].ProductProductPrice || 0;
-                        if (keyId > 0) {
-                            await Api.GetProductPrice(keyId).then((rslt) => {
-                                _rows[i].ProductPrice = rslt.status && rslt.values?.Price || 0;
-                            })
-                        }
-
-                    }
-                } else {
-                    console.log(res.statusText);
-                }
-            });
-
-        setRows(_rows);
-        global.Busy(false);
-        return _rows;
-    }
-
-    const FetchProductTypes = async () => {
-        return new Promise(async (resolve) => {
-            let values = [];
-            global.Busy(true);
-            const rslt = await Api.GetProductTypes();
-            if (rslt.status) {
-                values = rslt.values;
-                setProductTypes(values);
-                global.Busy(false);
-            }
-            return resolve(values);
-        });
-    }
-
-    const FetchResults = async () => {
-        setDeletedId(0);
-        setShowConfirm(false);
-        await FetchProductTypes().then(async (values) => {
-            await LoadData(values);
-        });
-    }
-
-    if (refresh) {
-        setRefresh(false);
-        LoadData(productTypes);
-    }
-    if (initialize) { setInitialize(false); FetchResults(); }
-
-    useEffect(() => { setRefresh(true); }, [sortBy, pageInfo, searchStr, viewType]);
-
-    useEffect(() => { setInitialize(true); }, []);
-    useEffect(() => { if (deletedId > 0) setShowConfirm(true); }, [deletedId]);
+    const OnPageClicked = (e) => { setPageInfo({ page: 0, pageSize: 5 }); if (e) setPageInfo(e); }
 
     const OnViewChanged = (e) => {
         let _route;
@@ -166,37 +31,82 @@ const Component = (props) => {
         if (_route) NavigateTo(_route);
     }
 
-    const OnSearchChanged = (e) => { setSearchStr(e); }
+    const FetchResults = async () => {
+        setRows([]);
+        setRowsCount(0);
 
-    const OnSortClicked = (e) => { setSortBy(e); }
+        let _rows = [];
 
-    const OnPageClicked = (e) => { setPageInfo({ page: 0, pageSize: 5 }); if (e) setPageInfo(e); }
+        global.Busy(true);
+        await Api.GetProductOnBoardings().then(async (res) => {
+            if (res.status) {
+                let _values = res.values || [];
+                for (let i = 0; i < _values.length; i++) {
 
-    const OnDeleteClicked = (e) => { setDeletedId(e); }
+                    /* Pull the data from product onboarding */
+                    /* let _row = {
+                        productId: _values[i].ProductId, name: _values[i].Name,
+                        status: _values[i].Status, description: _values[i].Description
+                    };
 
-    const OnCloseClicked = async (e) => {
-        if (e) {
-            const rslt = await Api.SetProduct({ Product_id: deletedId, Deleted: true });
-            if (rslt.status) {
-                setInitialize(true);
-                global.AlertPopup("success", "Record is deleted successful.!");
+                    await Api.GetProduct(_row.productId).then(async (resP) => {
+                        if (resP.status) {
+                            let _product = resP.values;
+                            _row = { ..._row, unitOfMeasurement: _product.UnitOfMeasurement, weight: _product.Weight };
+
+                            if (_product.ProductMainImage > 0) {
+                                await Api.GetDocument(_product.ProductMainImage, true, "image/jpeg").then((resI) => {
+                                    _row = { ..._row, mainImage: resI.values };
+                                })
+                            }
+
+                        }
+                    }); */
+
+                    /* Pull the data from product from product onboarding product id */
+                    await Api.GetProduct(_values[i].ProductId).then(async (resP) => {
+                        if (resP.status) {
+                            let _product = resP.values;
+
+                            let _row = {
+                                status: _values[i].Status,
+                                description: _product.Product_description,
+                                productId: _product.Product_id,
+                                name: _product.Name,
+                                unitOfMeasurement: _product.UnitOfMeasurement,
+                                weight: _product.Weight
+                            };
+
+                            if (_product.ProductMainImage > 0) {
+                                await Api.GetDocument(_product.ProductMainImage, true, "image/jpeg").then((resI) => {
+                                    _row = { ..._row, mainImage: resI.values };
+                                })
+                            }
+                            _rows.push(_row);
+
+                        }
+                    });
+
+                }
+
+                setRows(_rows);
+                setRowsCount(_rows.length);
+                global.Busy(false);
             } else {
-                const msg = rslt.statusText || defaultError;
-                global.AlertPopup("error", msg);
+                global.Busy(false);
+                console.log(res.statusText);
             }
-        } else {
-            setDeletedId(0);
-            setShowConfirm(false);
-        }
+        }).catch((err) => {
+            console.log(err);
+            global.Busy(false);
+        });
+
     }
 
-    const OnActionClicked = (id, type) => {
-        let _route;
-        if (type === 'edit') _route = `/products/edit/${id}`;
-        if (type === 'view') _route = `/products/view/${id}`;
-        if (type === 'delete') setDeletedId(id);;
-        if (_route) NavigateTo(_route);
-    }
+
+    if (initialize) { setInitialize(false); FetchResults(); }
+
+    useEffect(() => { setInitialize(true); }, []);
 
     return (
 
@@ -228,14 +138,8 @@ const Component = (props) => {
                     </Stack>
                 </Box>
                 <Box style={{ width: '100%' }}>
-                    <DataList keyId={'Product_id'} rowsCount={rowsCount} rows={rows} sortBy={sortBy} pageInfo={pageInfo} onActionClicked={OnActionClicked}
-                        onSortClicked={OnSortClicked} onPageClicked={OnPageClicked} onDeleteClicked={OnDeleteClicked} />
+                    <DataList rowsCount={rowsCount} rows={rows} pageInfo={pageInfo} onPageClicked={OnPageClicked} />
                 </Box>
-                <CustomDialog open={showConfirm} title={"Confirmation"} onCloseClicked={OnCloseClicked}>
-                    <Typography gutterBottom>
-                        Are you sure? You want to delete?
-                    </Typography>
-                </CustomDialog>
             </Container>
         </>
 
