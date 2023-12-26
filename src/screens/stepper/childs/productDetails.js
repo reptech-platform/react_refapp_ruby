@@ -16,7 +16,6 @@ const Component = React.forwardRef((props, ref) => {
 
             productId = props.row['product'].find((x) => x.key === 'Product_id').value || 0;
 
-            debugger;
             // Add Product Other Details
             rslt = await Support.AddOrUpdateOtherDetails(props.row['otherdetails'], enums);
             if (rslt.status) {

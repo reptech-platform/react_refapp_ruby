@@ -7,7 +7,7 @@ import Support from "shared/support";
 
 const Component = React.forwardRef((props, ref) => {
 
-    const { enums, setIsSubmitted, tag, shadow } = props;
+    const { setIsSubmitted, tag, shadow } = props;
     const [rows, setRows] = React.useState(props.row[tag]);
     const [state, setState] = React.useState(false);
     const form = React.useRef(null);
@@ -21,7 +21,6 @@ const Component = React.forwardRef((props, ref) => {
 
     const OnSubmit = async (e) => {
         if (e) e.preventDefault();
-
         let rslt, productTypeId;
 
         rslt = await Support.AddOrUpdateProductType(props.row['producttype'], ["ProductOptionType"]);
@@ -36,55 +35,22 @@ const Component = React.forwardRef((props, ref) => {
         setIsSubmitted(true);
     }
 
-    const ResetValues = (name, items) => {
-        const { TargetTypeName, TargetTypeId, TargetTypeDesc } = items.find((x) => x.key == name);
-        items.find((x) => x.key == TargetTypeId).value = null;
-        items.find((x) => x.key == TargetTypeName).value = null;
-        items.find((x) => x.key == TargetTypeDesc).value = null;
-        items.find((x) => x.key == TargetTypeName).editable = true;
-        items.find((x) => x.key == TargetTypeDesc).editable = true;
-        items.find((x) => x.key == name).value = null;
-    }
-
     const OnInputChange = async (e) => {
         const { name, value } = e;
         let products = props.row[tag];
-        if (name === 'ProductOptionType') {
-            const { TargetTypeName, TargetTypeId, TargetTypeDesc } = products.find((x) => x.key == name);
-            ResetValues(name, products);
-            if (!Helper.IsNullValue(value)) {
-                const { Name, Desc, Value } = enums.find((x) => x.Name === 'ProductTypes').Values.find((x) => x.Value === value);
-                products.find((x) => x.key == TargetTypeId).value = Value;
-                products.find((x) => x.key == TargetTypeName).value = Name;
-                products.find((x) => x.key == TargetTypeName).editable = false;
-                products.find((x) => x.key == TargetTypeDesc).value = Desc;
-                products.find((x) => x.key == TargetTypeDesc).editable = false;
-                products.find((x) => x.key == name).value = value;
-            }
-        } else {
-            products.find((x) => x.key == name).editable = true;
-            products.find((x) => x.key == name).value = null;
+        let index = products.findIndex((x) => x.key === name);
+        if (index > -1) {
+            products[index].value = value;
+
+            props.row[tag] = products;
+            setRows(products);
+            setState(!state);
         }
-        props.row[tag] = products;
-        setRows(products);
-        setState(!state);
     }
 
     React.useEffect(() => {
         let _prop = props.row[tag] || [];
-        const PtId = _prop.find((x) => x.key === 'PtId')?.value || 0;
-        if (PtId > 0) {
-            const { Name, Desc, Value } = enums.find((x) => x.Name === 'ProductTypes').Values.find((x) => x.Value === PtId);
-            const { TargetTypeName, TargetTypeDesc } = _prop.find((x) => x.key == 'ProductOptionType');
-            _prop.find((x) => x.key == 'ProductOptionType').value = Value;
-            _prop.find((x) => x.key == TargetTypeName).value = Name;
-            _prop.find((x) => x.key == TargetTypeName).editable = false;
-            _prop.find((x) => x.key == TargetTypeDesc).value = Desc;
-            _prop.find((x) => x.key == TargetTypeDesc).editable = false;
-            props.row[tag] = _prop;
-            setRows(props.row[tag]);
-            setState(!state);
-        }
+        console.log(_prop);
     }, [props]);
 
     return (

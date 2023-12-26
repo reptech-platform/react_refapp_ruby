@@ -7,10 +7,12 @@ import Container from "screens/container";
 import { useNavigate, useParams } from "react-router-dom";
 import * as Api from "shared/services";
 import { GetMetaDataInfo } from "shared/common";
-import ProductJsonConfig from "config/productConfig.json";
+import ProductJsonConfig from "config/product_config.json";
 import RenderFormContols from "./child/formcontrols";
 import Support from "shared/support";
 import Helper from "shared/helper";
+
+import { GetDocument, GetProductOtherImages } from "shared/services";
 
 const Component = (props) => {
     const { title } = props;
@@ -62,6 +64,7 @@ const Component = (props) => {
             // Get Product Details
             let rslt = await Api.GetProduct(id, "$expand=MainImage");
             const product = rslt.values;
+            console.log(product);
             if (rslt.status) {
                 for (let prop in product) {
                     const tItem = item['product'].find((x) => x.key === prop);
@@ -79,6 +82,15 @@ const Component = (props) => {
                     const _document = await Support.ExtractDocument(product.MainImage, product.MainImage.DocId);
                     item['product'].find((x) => x.key === "MainImage").value = _document;
                 }
+            }
+
+            // Assign Product Type
+            if (product.ProductProductType) {
+                rslt = enums.find((x) => x.Name === "ProductTypes").Values;
+                const { Name, Desc, Value } = rslt.find((x) => parseInt(x.Value) === parseInt(product.ProductProductType));
+                item['producttype'].find((x) => x.key === "PtId").value = Value;
+                item['producttype'].find((x) => x.key === "ProductTypeDesc").value = Desc;
+                item['producttype'].find((x) => x.key === "ProductTypeName").value = Name;
             }
 
             // Get Product Other Details
@@ -110,15 +122,30 @@ const Component = (props) => {
             }
 
             // Get Product Other Images
-            rslt = await Api.GetProductOtherImages(null, `Product_id eq ${product.Product_id}`);
-            if (rslt.status) {
-                const { DocId, Id } = rslt.values && rslt.values.length > 0 && rslt.values[0] || { DocId: 0, Id: 0 };
-                if (DocId > 0) {
-                    let _document = await Support.ExtractDocument(null, DocId);
-                    item['product'].find((x) => x.key === "OtherImages").ProductOtherImagesId = Id;
-                    item['product'].find((x) => x.key === "OtherImages").value = _document;
+            rslt = await GetProductOtherImages(null, `Product_id eq ${product.Product_id}`);
+            if (rslt.status && rslt.values && rslt.values.length > 0) {
+                let docIdList = rslt.values.map((x) => x.DocId);
+                let _document = [];
+                for (let i = 0; i < docIdList.length; i++) {
+                    rslt = await GetDocument(docIdList[i]);
+                    if (rslt.status) {
+                        tmp = {};
+                        ['DocData', 'DocId', 'DocName', 'DocType', 'DocExt'].forEach((x) => {
+                            tmp[x] = rslt.values[x]
+                        });
+
+                        if (tmp.DocId > 0) {
+                            rslt = await GetDocument(tmp.DocId, true, tmp.DocType);
+                            if (rslt.status) tmp['DocData'] = rslt.values;
+                        }
+                        tmp['index'] = i;
+                        _document.push(tmp);
+                    }
                 }
+
+                item['product'].find((x) => x.key === "OtherImages").value = _document;
             }
+
 
             // Get Product Price Details
             if (product.ProductProductPrice) {
@@ -135,7 +162,7 @@ const Component = (props) => {
             }
 
             let bItem = {};
-            ['product', 'otherdetails', 'productprice'].forEach(elm => {
+            ['producttype', 'product', 'otherdetails', 'productprice'].forEach(elm => {
                 let bItems = [];
                 for (let prop of item[elm]) {
                     bItems.push({ key: prop.key, value: prop.value });
@@ -154,7 +181,7 @@ const Component = (props) => {
             await Api.GetProductTypes()
                 .then(async (res) => {
                     if (res.status) {
-                        const pValues = res.values.map((x) => { return { Name: x.ProductTypeName, Value: x.PtId } });
+                        const pValues = res.values.map((x) => { return { Name: x.ProductTypeName, Desc: x.ProductTypeDesc, Value: x.PtId } });
                         await GetMetaDataInfo()
                             .then(async (res2) => {
                                 const enums = res2.filter((x) => x.Type === 'Enum') || [];
@@ -182,10 +209,11 @@ const Component = (props) => {
     const OnSubmit = async () => {
         let rslt, data, changes = [];
         let productId, otherDetailsId, priceId, mainImageId, otherImagesId;
+        debugger;
 
         changes = TrackChanges('product');
         if (changes.length > 0) {
-            rslt = await Support.AddOrUpdateProduct(row['product'], dropDownOptions);
+            rslt = await Support.AddOrUpdateProduct(row['product'], dropDownOptions, ["MainImage", "OtherImages"]);
             if (rslt.status) {
                 row['product'].find((x) => x.key === 'Product_id').value = rslt.id;
                 UpdateBackUp('product', Helper.CopyObject(row['product']));
