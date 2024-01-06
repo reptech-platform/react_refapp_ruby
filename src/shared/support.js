@@ -8,7 +8,7 @@ var fn = {};
 
 const numberItems = ['Price', 'Size', 'ProductOtherDetails', 'ProductProductType', 'Weight',
     'ProductProductPrice', 'Product_id', 'ProductMainImage', 'DocId', 'Id'];
-const defaultError = "Something went wroing while processing request!";
+const defaultError = "Something went wrong while processing request!";
 
 
 /* fn.AddDocumentw = async (input, tagName) => {
