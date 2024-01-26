@@ -1,6 +1,9 @@
 import Helper from "shared/helper";
-//const serverApi = "http:/34.238.241.129:8081/";
-const serverApi = "http://52.15.220.173:8081/ecom/";
+import apiUrl from "config/config";
+
+const serverApi = apiUrl;
+// const serverApi = "http:/34.238.241.129:8081/ecom/";
+// const serverApi = "http://52.15.220.173:8081/ecom/";
 
 /* Product Types */
 const GetProductTypesCount = async (query) => {
