@@ -5,8 +5,8 @@ import Products from "./product_table/product_index.js";
 import ProductTiles from "./product_tiles/product_tiles.js";
 import ProductList from "./product_list/product_list.js";
 import ProductTypes from "./productType_table/productType_index.js";
-import InformatForm from "./information_form/information_form.js";
-import StepperForm from "./stepper/stepper_index.js";
+import InformatForm from "./product_information_form/product_information_form.js";
+import StepperForm from "./product_stepper/product_stepper_index.js";
 
 export {
     ProductCreate,
