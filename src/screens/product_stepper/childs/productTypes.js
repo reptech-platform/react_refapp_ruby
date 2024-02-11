@@ -50,7 +50,6 @@ const Component = React.forwardRef((props, ref) => {
 
     React.useEffect(() => {
         let _prop = props.row[tag] || [];
-        console.log(_prop);
     }, [props]);
 
     return (

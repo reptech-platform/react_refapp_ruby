@@ -64,7 +64,7 @@ const Component = (props) => {
                     }); */
 
                     /* Pull the data from product from product onboarding product id */
-                    await Api.GetProduct(_values[i].ProductId).then(async (resP) => {
+                    await Api.GetProduct(_values[i].ProductId, null, "MainImage").then(async (resP) => {
                         if (resP.status) {
                             let _product = resP.values;
 
@@ -77,11 +77,11 @@ const Component = (props) => {
                                 weight: _product.Weight
                             };
 
-                            if (_product.ProductMainImage > 0) {
-                                await Api.GetDocument(_product.ProductMainImage, true, "image/jpeg").then((resI) => {
+                            _product.MainImage &&
+                                await Api.GetDocument(_product.MainImage.DocId, true, _product.MainImage.DocType).then((resI) => {
                                     _row = { ..._row, mainImage: resI.values };
                                 })
-                            }
+
                             _rows.push(_row);
 
                         }

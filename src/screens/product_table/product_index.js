@@ -11,7 +11,7 @@ import { Add as AddBoxIcon } from '@mui/icons-material';
 
 const columns = [
     { headerName: "Name", field: "Name", flex: 1 },
-    { headerName: "Type", field: "ProductTypeName", flex: 1 },
+    { headerName: "Type", field: "ProductTypeDesc", flex: 1 },
     { headerName: "Description", field: "Product_description", flex: 1 },
     { headerName: "Manufacturer", field: "Manufacturer", flex: 1 },
     { headerName: "UOM", field: "UnitOfMeasurement", flex: 1 },
@@ -26,24 +26,23 @@ const Component = (props) => {
     const { title } = props;
     const theme = useTheme();
     const [initialize, setInitialize] = useState(false);
-    const [refresh, setRefresh] = useState(false);
     const [pageInfo, setPageInfo] = useState({ page: 0, pageSize: 5 });
     const [sortBy, setSortBy] = useState(null);
     const [rowsCount, setRowsCount] = useState(0);
     const [rows, setRows] = useState([]);
-    const [productTypes, setProductTypes] = useState([]);
     const [searchStr, setSearchStr] = useState("");
-    const [viewType, setViewType] = useState('LIST');
     const [showConfirm, setShowConfirm] = useState(false);
     const [deletedId, setDeletedId] = useState(0);
 
     const NavigateTo = useNavigate();
 
-    const LoadData = async (enums) => {
+    const FetchResults = async () => {
 
         let query = null, filters = [];
         setRows([]);
         setRowsCount(0);
+        setDeletedId(0);
+        setShowConfirm(false);
 
         global.Busy(true);
 
@@ -78,18 +77,15 @@ const Component = (props) => {
         }
 
         let _rows = [];
-        await Api.GetProducts(query)
+        await Api.GetProducts(query, "ProductType")
             .then(async (res) => {
                 if (res.status) {
                     _rows = res.values || [];
-                    for (let i = 0; i < _rows.length; i++) {
-                        let keyId = 0;
-                        _rows[i].id = Helper.GetGUID();
-
-                        keyId = _rows[i].ProductProductType || 0;
-                        _rows[i].ProductTypeName = enums && enums.find((x) => parseInt(x.PtId) === parseInt(keyId))?.ProductTypeDesc || 'NA';
-
-                        _rows[i].ProductMainImageData = null;
+                    if (_rows.length > 0) {
+                        _rows.forEach(x => {
+                            x.id = Helper.GetGUID();
+                            x.ProductTypeDesc = x.ProductType?.ProductTypeDesc || 'NA';
+                        });
                     }
                 } else {
                     console.log(res.statusText);
@@ -100,39 +96,6 @@ const Component = (props) => {
         global.Busy(false);
         return _rows;
     }
-
-    const FetchProductTypes = async () => {
-        return new Promise(async (resolve) => {
-            let values = [];
-            global.Busy(true);
-            const rslt = await Api.GetProductTypes();
-            if (rslt.status) {
-                values = rslt.values;
-                setProductTypes(values);
-                global.Busy(false);
-            }
-            return resolve(values);
-        });
-    }
-
-    const FetchResults = async () => {
-        setDeletedId(0);
-        setShowConfirm(false);
-        await FetchProductTypes().then(async (values) => {
-            await LoadData(values);
-        });
-    }
-
-    if (refresh) {
-        setRefresh(false);
-        LoadData(productTypes);
-    }
-    if (initialize) { setInitialize(false); FetchResults(); }
-
-    useEffect(() => { setRefresh(true); }, [sortBy, pageInfo, searchStr, viewType]);
-
-    useEffect(() => { setInitialize(true); }, []);
-    useEffect(() => { if (deletedId > 0) setShowConfirm(true); }, [deletedId]);
 
     const OnViewChanged = (e) => {
         let _route;
@@ -174,6 +137,14 @@ const Component = (props) => {
         if (type === 'delete') setDeletedId(id);;
         if (_route) NavigateTo(_route);
     }
+
+    if (initialize) { setInitialize(false); FetchResults(); }
+
+    useEffect(() => { setInitialize(true); }, [sortBy, pageInfo, searchStr]);
+
+    useEffect(() => { setInitialize(true); }, []);
+
+    useEffect(() => { if (deletedId > 0) setShowConfirm(true); }, [deletedId]);
 
     return (
 

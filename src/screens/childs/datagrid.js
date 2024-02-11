@@ -29,7 +29,7 @@ const Component = (props) => {
                         description={x.Product_description} onActionClicked={OnActionClicked}>
                         <Grid container direction="column">
                             <Typography variant="caption" color="text.secondary">
-                                <strong>Type:</strong>&nbsp;{x.ProductTypeName}
+                                <strong>Type:</strong>&nbsp;{x.ProductTypeDesc}
                             </Typography>
                             <Typography variant="caption" color="text.secondary">
                                 <strong>Price:</strong>&nbsp;₹{x.ProductPrice}

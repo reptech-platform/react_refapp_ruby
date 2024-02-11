@@ -157,10 +157,11 @@ const GetProductsCount = async (query) => {
     })
 }
 
-const GetProducts = async (query) => {
+const GetProducts = async (query, expands) => {
     return new Promise(async (resolve) => {
         let url = `${serverApi}Products`;
         if (query) url = `${serverApi}Products?${query}`;
+        if (expands) url = `${url}&$expand=${expands}`;
 
         try {
             const res = await fetch(url, {
@@ -214,12 +215,13 @@ const GetProductStatus = async (productId) => {
     });
 }
 
-const GetProduct = async (id, params) => {
+const GetProduct = async (id, params, expands) => {
     return new Promise(async (resolve) => {
         let url = `${serverApi}Products(${id})`;
         if (params) {
             url = `${serverApi}Products(${id})?${params}`;
         }
+        if (expands) url = params ? `${url}&$expand=${expands}` : `${url}?&$expand=${expands}`;
 
         try {
             const res = await fetch(url, {
