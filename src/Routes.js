@@ -3,7 +3,7 @@ import { Routes, Route } from "react-router-dom";
 import {
     ProductCreate,
     Products, ProductTiles, ProductList,
-    ProductEdit, StepperForm,
+    ProductEdit, StepperForm, TabbedLayout,
     ProductView, ProductTypes, InformatForm
 } from "screens";
 
@@ -13,6 +13,7 @@ const Component = (props) => {
         <Routes>
             <Route path="/infoform" element={<InformatForm {...props} title={'Information Form'} />} />
             <Route path="/stepper" element={<StepperForm {...props} title={'Stepper Form'} />} />
+            <Route path="/tabbed" element={<TabbedLayout {...props} title={'Tabbed Layout'} />} />
             <Route path="/producttypes" element={<ProductTypes {...props} title={'Product Types'} />} />
             <Route path="/products/view/:id" element={<ProductView {...props} title={'View Product'} />} />
             <Route path="/products/edit/:id" element={<ProductEdit {...props} title={'Edit Product'} />} />

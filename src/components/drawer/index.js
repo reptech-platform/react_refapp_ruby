@@ -2,7 +2,7 @@ import React from 'react';
 import { Toolbar, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Tooltip } from '@mui/material';
 import MuiDrawer from '@mui/material/Drawer';
 import { styled, useTheme } from '@mui/material/styles';
-import { Pages, ShoppingBasket, Toc, EditNote, Checklist } from '@mui/icons-material';
+import { Pages, ShoppingBasket, Toc, EditNote, Checklist, Tab } from '@mui/icons-material';
 import { DRAWER_WIDTH } from "config";
 import { useNavigate } from 'react-router-dom';
 
@@ -95,6 +95,14 @@ const Component = (props) => {
                                 </Tooltip>
                             </ListItemIcon>
                             {open && <ListItemText primary="Stepper Form" sx={{ pl: 1 }} />}
+                        </ListItemButton>
+                        <ListItemButton onClick={() => NavigateTo("/tabbed")} sx={{ height: 50 }}>
+                            <ListItemIcon sx={{ minWidth: 30 }}>
+                                <Tooltip title="Tabbed Layout">
+                                    <Tab />
+                                </Tooltip>
+                            </ListItemIcon>
+                            {open && <ListItemText primary="Tabbed Layout" sx={{ pl: 1 }} />}
                         </ListItemButton>
                     </List>
                 </ListItem>

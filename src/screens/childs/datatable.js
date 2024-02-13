@@ -6,9 +6,8 @@ import { ROWSPERPAGE } from "config";
 
 const Component = (props) => {
 
-    const theme = useTheme();
 
-    const { columns, rowsCount, rows, pageInfo, onActionClicked, sortBy, keyId,
+    const { columns, rowsCount, rows, pageInfo, onActionClicked, sortBy, keyId, noActions,
         onSortClicked, onPageClicked } = props;
 
     const OnActionClicked = (id, type) => {
@@ -75,12 +74,17 @@ const Component = (props) => {
         if (onPageClicked) onPageClicked(e);
     }
 
+    const GetColumns = () => {
+        if (noActions) return [...columns];
+        return [...columns, RenderGridActions(props)];
+    }
+
     return (
         <>
             <DataGrid
                 autoHeight
                 disableColumnMenu
-                columns={[...columns, RenderGridActions(props)]}
+                columns={GetColumns()}
                 rowCount={rowsCount}
                 rows={rows}
                 rowSelection={false}
