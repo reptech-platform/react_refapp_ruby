@@ -136,7 +136,7 @@ const Component = (props) => {
 
     const FetchProductDetails = async () => {
         let item = {};
-        ['producttype', 'product', 'otherdetails', 'productprice'].forEach(elm => {
+        ['product'].forEach(elm => {
             let items = [];
             for (let prop of ProductJsonConfig[elm]) {
                 //items.push({ ...prop, value: null });

@@ -50,8 +50,10 @@ const Component = (props) => {
     const FetchProductDetails = async (enums) => {
 
         let item = {}, tmp;
+        let screenItems = ['producttype', 'product', 'otherdetails', 'productprice'];
+        screenItems = ['product'];
 
-        ['producttype', 'product', 'otherdetails', 'productprice'].forEach(elm => {
+        screenItems.forEach(elm => {
             let items = [];
             for (let prop of ProductJsonConfig[elm]) {
                 items.push({ ...prop, value: null });
@@ -64,7 +66,6 @@ const Component = (props) => {
             // Get Product Details
             let rslt = await Api.GetProduct(id, "$expand=MainImage");
             const product = rslt.values;
-            console.log(product);
             if (rslt.status) {
                 for (let prop in product) {
                     const tItem = item['product'].find((x) => x.key === prop);
@@ -85,7 +86,7 @@ const Component = (props) => {
             }
 
             // Assign Product Type
-            if (product.ProductProductType) {
+            if (item['producttype'] && product.ProductProductType) {
                 rslt = enums.find((x) => x.Name === "ProductTypes").Values;
                 const { Name, Desc, Value } = rslt.find((x) => parseInt(x.Value) === parseInt(product.ProductProductType));
                 item['producttype'].find((x) => x.key === "PtId").value = Value;
@@ -94,7 +95,7 @@ const Component = (props) => {
             }
 
             // Get Product Other Details
-            if (product.ProductOtherDetails) {
+            if (item['otherdetails'] && product.ProductOtherDetails) {
                 rslt = await Api.GetOtherDetails(product.ProductOtherDetails);
                 //console.log(rslt);
                 if (rslt.status) {
@@ -148,7 +149,7 @@ const Component = (props) => {
 
 
             // Get Product Price Details
-            if (product.ProductProductPrice) {
+            if (item['productprice'] && product.ProductProductPrice) {
                 rslt = await Api.GetProductPrice(product.ProductProductPrice);
                 if (rslt.status) {
                     tmp = rslt.values;
@@ -162,7 +163,7 @@ const Component = (props) => {
             }
 
             let bItem = {};
-            ['producttype', 'product', 'otherdetails', 'productprice'].forEach(elm => {
+            screenItems.forEach(elm => {
                 let bItems = [];
                 for (let prop of item[elm]) {
                     bItems.push({ key: prop.key, value: prop.value });
