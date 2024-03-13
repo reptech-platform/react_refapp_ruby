@@ -11,6 +11,7 @@ import Support from "shared/support";
 import { ArrowLeft as ArrowLeftIcon } from '@mui/icons-material';
 import { GetMetaDataInfo } from "shared/common";
 
+const screenItems = ['product', 'producttype', 'otherdetails', 'productprice'];
 
 const Component = (props) => {
 
@@ -20,7 +21,6 @@ const Component = (props) => {
     const [showButton, setShowButton] = useState(true);
     const [dropDownOptions, setDropDownOptions] = useState([]);
     const NavigateTo = useNavigate();
-    const theme = useTheme();
     const [showUpdate, setShowUpdate] = useState(false);
     const { title } = props;
 
@@ -29,39 +29,24 @@ const Component = (props) => {
 
         let product = row['product'];
 
-        // Add Product Type
-        rslt = await Support.AddOrUpdateProductType(row['producttype'], ["PtId"]);
-        if (rslt.status) {
-            product.find((x) => x.key === 'ProductProductType')['value'] = rslt.id;
-        } else { return; }
-
-        // Add Product Main Image
-        prodImages = product.find((x) => x.key === 'MainImage');
-        rslt = await Support.AddOrUpdateDocument(prodImages);
-        if (rslt.status) {
-            product.find((x) => x.key === 'ProductMainImage')['value'] = rslt.id;
-        } else { return; }
-
         // Add Or Update Product
         rslt = await Support.AddOrUpdateProduct(product, dropDownOptions, ['MainImage', 'OtherImages']);
         if (rslt.status) {
             productId = rslt.id;
-            product.find((x) => x.key === 'Product_id').value = rslt.id;
         } else { return; }
 
-        // Add Product Other Images
-        prodImages = product.find((x) => x.key === 'OtherImages').value;
-        for (let i = 0; i < prodImages.length; i++) {
-            rslt = await Support.AddOrUpdateDocument({ value: prodImages[i] });
-            if (rslt.status) {
-                data = [
-                    { key: "Product_id", value: parseInt(productId) },
-                    { key: "DocId", value: parseInt(rslt.id) }
-                ];
-                rslt = await Support.AddOrUpdateProductOtherImages(data);
-                if (!rslt.status) return;
-            }
-        }
+        // Add Product Type
+        rslt = await Support.AddOrUpdateProductType(row['producttype']);
+        if (rslt.status) {
+            // Add Or Update Product
+            data = [
+                { key: "Product_id", value: parseInt(productId) },
+                { key: "ProductProductType", value: parseInt(rslt.id) }
+            ];
+            rslt = await Support.AddOrUpdateProduct(data, dropDownOptions);
+            if (!rslt.status) return;
+
+        } else { return; }
 
         // Add Product Other Details
         rslt = await Support.AddOrUpdateOtherDetails(row['otherdetails'], dropDownOptions);
@@ -86,6 +71,34 @@ const Component = (props) => {
             rslt = await Support.AddOrUpdateProduct(data, dropDownOptions);
             if (!rslt.status) return;
         } else { return; }
+
+
+        // Add Product Other Images
+        prodImages = product.find((x) => x.key === 'OtherImages').value;
+        for (let i = 0; i < prodImages.length; i++) {
+            rslt = await Support.AddOrUpdateDocument({ value: prodImages[i] });
+            if (rslt.status) {
+                data = [
+                    { key: "Product_id", value: parseInt(productId) },
+                    { key: "DocId", value: parseInt(rslt.id) }
+                ];
+                rslt = await Support.AddOrUpdateProductOtherImages(data);
+                if (!rslt.status) return;
+            }
+        }
+
+        // Add Product Main Image
+        prodImages = product.find((x) => x.key === 'MainImage');
+        rslt = await Support.AddOrUpdateDocument(prodImages);
+        if (rslt.status) {
+            data = [
+                { key: "Product_id", value: parseInt(productId) },
+                { key: "ProductMainImage", value: parseInt(rslt.id) }
+            ];
+            rslt = await Support.AddOrUpdateProduct(data, dropDownOptions);
+            if (!rslt.status) return;
+        } else { return; }
+
 
         global.AlertPopup("success", "Product is created successfully!");
         setShowUpdate(false);
@@ -136,11 +149,11 @@ const Component = (props) => {
 
     const FetchProductDetails = async () => {
         let item = {};
-        ['product'].forEach(elm => {
+        screenItems.forEach(elm => {
             let items = [];
             for (let prop of ProductJsonConfig[elm]) {
-                //items.push({ ...prop, value: null });
-                items.push({ ...prop });
+                items.push({ ...prop, value: null });
+                //items.push({ ...prop });
             }
             item[elm] = items;
         });

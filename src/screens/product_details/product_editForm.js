@@ -14,6 +14,8 @@ import Helper from "shared/helper";
 
 import { GetDocument, GetProductOtherImages } from "shared/services";
 
+const screenItems = ['producttype', 'product', 'otherdetails', 'productprice'];
+
 const Component = (props) => {
     const { title } = props;
     const [form, setForm] = useState(null);
@@ -50,8 +52,6 @@ const Component = (props) => {
     const FetchProductDetails = async (enums) => {
 
         let item = {}, tmp;
-        let screenItems = ['producttype', 'product', 'otherdetails', 'productprice'];
-        screenItems = ['product'];
 
         screenItems.forEach(elm => {
             let items = [];
@@ -225,7 +225,6 @@ const Component = (props) => {
 
         changes = TrackChanges('otherdetails');
         if (changes.length > 0) {
-
             const filters = ['MainImage', 'OtherImages'];
             let tmp = changes.filter((x) => filters.indexOf(x) === -1);
             if (tmp.length > 0) {
@@ -245,54 +244,6 @@ const Component = (props) => {
                 if (!rslt.status) return;
                 row['product'].find((x) => x.key === 'ProductOtherDetails').value = otherDetailsId;
             }
-
-            if (changes.indexOf('MainImage') > -1) {
-                data = row['otherdetails'].find((x) => x.key === 'MainImage');
-                rslt = await Support.AddOrUpdateDocument(data);
-                if (rslt.status) {
-                    let newValues = row['otherdetails'].find((x) => x.key === 'MainImage').value;
-                    newValues = { ...newValues, DocId: rslt.id };
-                    row['otherdetails'].find((x) => x.key === 'MainImage').value = newValues
-                    UpdateBackUp('otherdetails', Helper.CopyObject(row['otherdetails']));
-                } else { return; }
-
-                // Update product with child references
-                mainImageId = row['otherdetails'].find((x) => x.key === 'MainImage').value?.DocId || 0;
-                data = [
-                    { key: "Product_id", value: parseInt(productId) },
-                    { key: "ProductMainImage", value: parseInt(mainImageId) }
-                ];
-                rslt = await Support.AddOrUpdateProduct(data, dropDownOptions);
-                if (!rslt.status) return;
-                row['product'].find((x) => x.key === 'ProductMainImage').value = mainImageId;
-            }
-
-            if (changes.indexOf('OtherImages') > -1) {
-                data = row['otherdetails'].find((x) => x.key === 'OtherImages');
-                rslt = await Support.AddOrUpdateDocument(data);
-                if (rslt.status) {
-                    let oldData = row['otherdetails'].find((x) => x.key === 'OtherImages').value;
-                    oldData = { ...oldData, DocId: rslt.id };
-                    row['otherdetails'].find((x) => x.key === 'OtherImages').value = oldData
-                    UpdateBackUp('otherdetails', Helper.CopyObject(row['otherdetails']));
-                } else { return; }
-
-                otherImagesId = row['otherdetails'].find((x) => x.key === 'OtherImages').value?.DocId || 0;
-                let productOtherImagesId = row['otherdetails'].find((x) => x.key === 'OtherImages').ProductOtherImagesId || 0;
-                productOtherImagesId = parseInt(productOtherImagesId);
-                // Update product other images with child referenc
-                data = [
-                    { key: "Product_id", value: parseInt(productId) },
-                    { key: "Id", value: productOtherImagesId > 0 ? productOtherImagesId : null },
-                    { key: "DocId", value: parseInt(otherImagesId) }
-                ];
-
-                rslt = await Support.AddOrUpdateProductOtherImages(data);
-                if (rslt.status) {
-                    row['otherdetails'].find((x) => x.key === 'OtherImages').ProductOtherImagesId = rslt.id;
-                } else { return; }
-            }
-
         }
 
         changes = TrackChanges('productprice');
@@ -313,6 +264,55 @@ const Component = (props) => {
             rslt = await Support.AddOrUpdateProduct(data, dropDownOptions);
             if (!rslt.status) return;
             row['product'].find((x) => x.key === 'ProductProductPrice').value = priceId;
+        }
+
+        changes = TrackChanges('otherdetails');
+        if (changes.length > 0 && changes.indexOf('MainImage') > -1) {
+            data = row['otherdetails'].find((x) => x.key === 'MainImage');
+            rslt = await Support.AddOrUpdateDocument(data);
+            if (rslt.status) {
+                let newValues = row['otherdetails'].find((x) => x.key === 'MainImage').value;
+                newValues = { ...newValues, DocId: rslt.id };
+                row['otherdetails'].find((x) => x.key === 'MainImage').value = newValues
+                UpdateBackUp('otherdetails', Helper.CopyObject(row['otherdetails']));
+            } else { return; }
+
+            // Update product with child references
+            mainImageId = row['otherdetails'].find((x) => x.key === 'MainImage').value?.DocId || 0;
+            data = [
+                { key: "Product_id", value: parseInt(productId) },
+                { key: "ProductMainImage", value: parseInt(mainImageId) }
+            ];
+            rslt = await Support.AddOrUpdateProduct(data, dropDownOptions);
+            if (!rslt.status) return;
+            row['product'].find((x) => x.key === 'ProductMainImage').value = mainImageId;
+        }
+
+        changes = TrackChanges('otherdetails');
+        if (changes.length > 0 && changes.indexOf('OtherImages') > -1) {
+            data = row['otherdetails'].find((x) => x.key === 'OtherImages');
+            rslt = await Support.AddOrUpdateDocument(data);
+            if (rslt.status) {
+                let oldData = row['otherdetails'].find((x) => x.key === 'OtherImages').value;
+                oldData = { ...oldData, DocId: rslt.id };
+                row['otherdetails'].find((x) => x.key === 'OtherImages').value = oldData
+                UpdateBackUp('otherdetails', Helper.CopyObject(row['otherdetails']));
+            } else { return; }
+
+            otherImagesId = row['otherdetails'].find((x) => x.key === 'OtherImages').value?.DocId || 0;
+            let productOtherImagesId = row['otherdetails'].find((x) => x.key === 'OtherImages').ProductOtherImagesId || 0;
+            productOtherImagesId = parseInt(productOtherImagesId);
+            // Update product other images with child referenc
+            data = [
+                { key: "Product_id", value: parseInt(productId) },
+                { key: "Id", value: productOtherImagesId > 0 ? productOtherImagesId : null },
+                { key: "DocId", value: parseInt(otherImagesId) }
+            ];
+
+            rslt = await Support.AddOrUpdateProductOtherImages(data);
+            if (rslt.status) {
+                row['otherdetails'].find((x) => x.key === 'OtherImages').ProductOtherImagesId = rslt.id;
+            } else { return; }
         }
 
         global.AlertPopup("success", "Product is updated successfully!");

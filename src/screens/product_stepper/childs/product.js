@@ -14,13 +14,6 @@ const Component = React.forwardRef((props, ref) => {
         let rslt, data, prodImages, productId;
         let product = props.row['product'];
 
-        // Add Product Main Image
-        prodImages = product.find((x) => x.key === 'MainImage');
-        rslt = await Support.AddOrUpdateDocument(prodImages);
-        if (rslt.status) {
-            product.find((x) => x.key === 'ProductMainImage')['value'] = rslt.id;
-        } else { return; }
-
 
         // Add Or Update Product
         rslt = await Support.AddOrUpdateProduct(product, enums, ['MainImage', 'OtherImages']);
@@ -28,6 +21,21 @@ const Component = React.forwardRef((props, ref) => {
             productId = rslt.id;
             product.find((x) => x.key === 'Product_id').value = rslt.id;
             props.row['product'].find((x) => x.key === 'Product_id').value = rslt.id;
+        } else { return; }
+
+        // Add Product Main Image
+        prodImages = product.find((x) => x.key === 'MainImage');
+        rslt = await Support.AddOrUpdateDocument(prodImages);
+        if (rslt.status) {
+            product.find((x) => x.key === 'ProductMainImage')['value'] = rslt.id;
+            // Add Or Update Product
+            data = [
+                { key: "Product_id", value: parseInt(productId) },
+                { key: "ProductMainImage", value: parseInt(rslt.id) }
+            ];
+            rslt = await Support.AddOrUpdateProduct(data, dropDownOptions);
+            if (!rslt.status) return;
+
         } else { return; }
 
         // Add Product Other Images
