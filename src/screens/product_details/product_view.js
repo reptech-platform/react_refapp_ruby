@@ -61,31 +61,26 @@ const Component = (props) => {
                     })
                 }
 
-                // Get Product Other Details
-                if (product.ProductOtherDetails) {
-                    rslt = await GetOtherDetails(product.ProductOtherDetails);
-                    if (rslt.status) {
-                        tmp = rslt.values;
-                        for (let prop in tmp) {
-                            const tItem = item['otherdetails'].find((x) => x.key === prop);
-                            if (tItem) {
-                                if (prop === 'UnitOfMeasurement') {
-                                    const dpItems = enums.find((z) => z.Name === tItem.source).Values;
-                                    const _value = dpItems.find((m) => m.Name === tmp[prop]).Value;
-                                    item['otherdetails'].find((x) => x.key === prop).value = parseInt(_value);
-                                } else if (prop === 'AvailabilityStatus') {
-                                    const dpItems = enums.find((z) => z.Name === tItem.source).Values;
-                                    const _value = dpItems.find((m) => m.Name === tmp[prop]).Value;
-                                    item['otherdetails'].find((x) => x.key === prop).value = parseInt(_value);
-                                } else if (prop === 'ManufacturingDate') {
-                                    let tmpDate = tmp[prop].split('T');
-                                    item['otherdetails'].find((x) => x.key === prop).value = tmpDate[0];
-                                } else {
-                                    item['otherdetails'].find((x) => x.key === prop).value = tmp[prop];
-                                }
+                if (product.OtherDetails) {
+                    Object.keys(product.OtherDetails).forEach(prop => {
+                        const tItem = item['otherdetails'].find((x) => x.key === prop);
+                        if (tItem) {
+                            if (prop === 'UnitOfMeasurement') {
+                                const dpItems = enums.find((z) => z.Name === tItem.source).Values;
+                                const _value = dpItems.find((m) => m.Name === product.OtherDetails[prop]).Value;
+                                item['otherdetails'].find((x) => x.key === prop).value = parseInt(_value);
+                            } else if (prop === 'AvailabilityStatus') {
+                                const dpItems = enums.find((z) => z.Name === tItem.source).Values;
+                                const _value = dpItems.find((m) => m.Name === product.OtherDetails[prop]).Value;
+                                item['otherdetails'].find((x) => x.key === prop).value = parseInt(_value);
+                            } else if (prop === 'ManufacturingDate') {
+                                let tmpDate = product.OtherDetails[prop].split('T');
+                                item['otherdetails'].find((x) => x.key === prop).value = tmpDate[0];
+                            } else {
+                                item['otherdetails'].find((x) => x.key === prop).value = product.OtherDetails[prop];
                             }
                         }
-                    }
+                    })
                 }
 
                 // Product Price

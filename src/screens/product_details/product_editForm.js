@@ -65,8 +65,9 @@ const Component = (props) => {
             global.Busy(true);
 
             // Get Product Details
-            let rslt = await Api.GetProduct(id, "$expand=MainImage,ProductType,ProductPrice");
+            let rslt = await Api.GetProduct(id, "$expand=MainImage,ProductType,ProductPrice,OtherDetails");
             const product = rslt.values;
+            debugger;
             if (rslt.status) {
                 for (let prop in product) {
                     const tItem = item['product'].find((x) => x.key === prop);
@@ -91,40 +92,34 @@ const Component = (props) => {
                     })
                 }
 
+                if (product.OtherDetails) {
+                    Object.keys(product.OtherDetails).forEach(prop => {
+                        const tItem = item['otherdetails'].find((x) => x.key === prop);
+                        if (tItem) {
+                            if (prop === 'UnitOfMeasurement') {
+                                const dpItems = enums.find((z) => z.Name === tItem.source).Values;
+                                const _value = dpItems.find((m) => m.Name === product.OtherDetails[prop]).Value;
+                                item['otherdetails'].find((x) => x.key === prop).value = parseInt(_value);
+                            } else if (prop === 'AvailabilityStatus') {
+                                const dpItems = enums.find((z) => z.Name === tItem.source).Values;
+                                const _value = dpItems.find((m) => m.Name === product.OtherDetails[prop]).Value;
+                                item['otherdetails'].find((x) => x.key === prop).value = parseInt(_value);
+                            } else if (prop === 'ManufacturingDate') {
+                                let tmpDate = product.OtherDetails[prop].split('T');
+                                item['otherdetails'].find((x) => x.key === prop).value = tmpDate[0];
+                            } else {
+                                item['otherdetails'].find((x) => x.key === prop).value = product.OtherDetails[prop];
+                            }
+                        }
+                    })
+                }
+
                 if (product.ProductPrice) {
                     Object.keys(product.ProductPrice).forEach(x => {
                         item['productprice'].find(z => z.key === x).value = product.ProductPrice[x];
                     })
                 }
 
-            }
-
-            // Get Product Other Details
-            if (item['otherdetails'] && product.ProductOtherDetails) {
-                rslt = await Api.GetOtherDetails(product.ProductOtherDetails);
-                //console.log(rslt);
-                if (rslt.status) {
-                    tmp = rslt.values;
-                    for (let prop in tmp) {
-                        const tItem = item['otherdetails'].find((x) => x.key === prop);
-                        if (tItem) {
-                            if (prop === 'UnitOfMeasurement') {
-                                const dpItems = enums.find((z) => z.Name === tItem.source).Values;
-                                const _value = dpItems.find((m) => m.Name === tmp[prop]).Value;
-                                item['otherdetails'].find((x) => x.key === prop).value = parseInt(_value);
-                            } else if (prop === 'AvailabilityStatus') {
-                                const dpItems = enums.find((z) => z.Name === tItem.source).Values;
-                                const _value = dpItems.find((m) => m.Name === tmp[prop]).Value;
-                                item['otherdetails'].find((x) => x.key === prop).value = parseInt(_value);
-                            } else if (prop === 'ManufacturingDate') {
-                                let tmpDate = tmp[prop].split('T');
-                                item['otherdetails'].find((x) => x.key === prop).value = tmpDate[0];
-                            } else {
-                                item['otherdetails'].find((x) => x.key === prop).value = tmp[prop];
-                            }
-                        }
-                    }
-                }
             }
 
             // Get Product Other Images
