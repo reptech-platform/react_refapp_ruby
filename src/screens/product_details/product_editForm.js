@@ -63,8 +63,9 @@ const Component = (props) => {
 
         if (id) {
             global.Busy(true);
+
             // Get Product Details
-            let rslt = await Api.GetProduct(id, "$expand=MainImage");
+            let rslt = await Api.GetProduct(id, "$expand=MainImage,ProductType,ProductPrice");
             const product = rslt.values;
             if (rslt.status) {
                 for (let prop in product) {
@@ -83,15 +84,19 @@ const Component = (props) => {
                     const _document = await Support.ExtractDocument(product.MainImage, product.MainImage.DocId);
                     item['product'].find((x) => x.key === "MainImage").value = _document;
                 }
-            }
 
-            // Assign Product Type
-            if (item['producttype'] && product.ProductProductType) {
-                rslt = enums.find((x) => x.Name === "ProductTypes").Values;
-                const { Name, Desc, Value } = rslt.find((x) => parseInt(x.Value) === parseInt(product.ProductProductType));
-                item['producttype'].find((x) => x.key === "PtId").value = Value;
-                item['producttype'].find((x) => x.key === "ProductTypeDesc").value = Desc;
-                item['producttype'].find((x) => x.key === "ProductTypeName").value = Name;
+                if (product.ProductType) {
+                    Object.keys(product.ProductType).forEach(x => {
+                        item['producttype'].find(z => z.key === x).value = product.ProductType[x];
+                    })
+                }
+
+                if (product.ProductPrice) {
+                    Object.keys(product.ProductPrice).forEach(x => {
+                        item['productprice'].find(z => z.key === x).value = product.ProductPrice[x];
+                    })
+                }
+
             }
 
             // Get Product Other Details
@@ -145,21 +150,6 @@ const Component = (props) => {
                 }
 
                 item['product'].find((x) => x.key === "OtherImages").value = _document;
-            }
-
-
-            // Get Product Price Details
-            if (item['productprice'] && product.ProductProductPrice) {
-                rslt = await Api.GetProductPrice(product.ProductProductPrice);
-                if (rslt.status) {
-                    tmp = rslt.values;
-                    for (let prop in tmp) {
-                        const tItem = item['productprice'].find((x) => x.key === prop);
-                        if (tItem) {
-                            item['productprice'].find((x) => x.key === prop).value = tmp[prop];
-                        }
-                    }
-                }
             }
 
             let bItem = {};
