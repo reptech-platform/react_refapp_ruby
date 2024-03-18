@@ -36,7 +36,7 @@ const Component = (props) => {
         if (id) {
             global.Busy(true);
             // Get Product Details
-            let rslt = await GetProduct(id, "$expand=MainImage");
+            let rslt = await GetProduct(id, "$expand=MainImage,ProductType,ProductPrice");
             if (rslt.status) {
 
                 const product = rslt.values;
@@ -55,14 +55,44 @@ const Component = (props) => {
                 }
 
                 // Product Type
-                rslt = await GetProductType(product.ProductProductType);
-                if (rslt.status) {
-                    for (let prop in rslt.values) {
-                        const tItem = item['producttype'].find((x) => x.key === prop);
-                        if (tItem) {
-                            item['producttype'].find((x) => x.key === prop).value = rslt.values[prop];
+                if (product.ProductType) {
+                    Object.keys(product.ProductType).forEach(x => {
+                        item['producttype'].find(z => z.key === x).value = product.ProductType[x];
+                    })
+                }
+
+                // Get Product Other Details
+                if (product.ProductOtherDetails) {
+                    rslt = await GetOtherDetails(product.ProductOtherDetails);
+                    if (rslt.status) {
+                        tmp = rslt.values;
+                        for (let prop in tmp) {
+                            const tItem = item['otherdetails'].find((x) => x.key === prop);
+                            if (tItem) {
+                                if (prop === 'UnitOfMeasurement') {
+                                    const dpItems = enums.find((z) => z.Name === tItem.source).Values;
+                                    const _value = dpItems.find((m) => m.Name === tmp[prop]).Value;
+                                    item['otherdetails'].find((x) => x.key === prop).value = parseInt(_value);
+                                } else if (prop === 'AvailabilityStatus') {
+                                    const dpItems = enums.find((z) => z.Name === tItem.source).Values;
+                                    const _value = dpItems.find((m) => m.Name === tmp[prop]).Value;
+                                    item['otherdetails'].find((x) => x.key === prop).value = parseInt(_value);
+                                } else if (prop === 'ManufacturingDate') {
+                                    let tmpDate = tmp[prop].split('T');
+                                    item['otherdetails'].find((x) => x.key === prop).value = tmpDate[0];
+                                } else {
+                                    item['otherdetails'].find((x) => x.key === prop).value = tmp[prop];
+                                }
+                            }
                         }
                     }
+                }
+
+                // Product Price
+                if (product.ProductPrice) {
+                    Object.keys(product.ProductPrice).forEach(x => {
+                        item['productprice'].find(z => z.key === x).value = product.ProductPrice[x];
+                    })
                 }
 
                 // Main Image
@@ -102,47 +132,6 @@ const Component = (props) => {
                     }
 
                     item['product'].find((x) => x.key === "OtherImages").value = _document;
-                }
-
-                // Get Product Other Details
-                if (product.ProductOtherDetails) {
-                    rslt = await GetOtherDetails(product.ProductOtherDetails);
-                    if (rslt.status) {
-                        tmp = rslt.values;
-                        for (let prop in tmp) {
-                            const tItem = item['otherdetails'].find((x) => x.key === prop);
-                            if (tItem) {
-                                if (prop === 'UnitOfMeasurement') {
-                                    const dpItems = enums.find((z) => z.Name === tItem.source).Values;
-                                    const _value = dpItems.find((m) => m.Name === tmp[prop]).Value;
-                                    item['otherdetails'].find((x) => x.key === prop).value = parseInt(_value);
-                                } else if (prop === 'AvailabilityStatus') {
-                                    const dpItems = enums.find((z) => z.Name === tItem.source).Values;
-                                    const _value = dpItems.find((m) => m.Name === tmp[prop]).Value;
-                                    item['otherdetails'].find((x) => x.key === prop).value = parseInt(_value);
-                                } else if (prop === 'ManufacturingDate') {
-                                    let tmpDate = tmp[prop].split('T');
-                                    item['otherdetails'].find((x) => x.key === prop).value = tmpDate[0];
-                                } else {
-                                    item['otherdetails'].find((x) => x.key === prop).value = tmp[prop];
-                                }
-                            }
-                        }
-                    }
-                }
-
-                // Get Product Price Details
-                if (product.ProductProductPrice) {
-                    rslt = await GetProductPrice(product.ProductProductPrice);
-                    if (rslt.status) {
-                        tmp = rslt.values;
-                        for (let prop in tmp) {
-                            const tItem = item['productprice'].find((x) => x.key === prop);
-                            if (tItem) {
-                                item['productprice'].find((x) => x.key === prop).value = tmp[prop];
-                            }
-                        }
-                    }
                 }
 
             }
