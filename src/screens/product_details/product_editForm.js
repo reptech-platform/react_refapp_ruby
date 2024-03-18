@@ -12,7 +12,7 @@ import RenderFormContols from "./child/formcontrols";
 import Support from "shared/support";
 import Helper from "shared/helper";
 
-import { GetDocument, GetProductOtherImages } from "shared/services";
+import { GetDocument } from "shared/services";
 
 const screenItems = ['producttype', 'product', 'otherdetails', 'productprice'];
 
@@ -65,10 +65,11 @@ const Component = (props) => {
             global.Busy(true);
 
             // Get Product Details
-            let rslt = await Api.GetProduct(id, "$expand=MainImage,ProductType,ProductPrice,OtherDetails");
+            let rslt = await Api.GetProduct(id, "$expand=MainImage,ProductType,ProductPrice,OtherDetails,OtherImages");
             const product = rslt.values;
-            debugger;
+
             if (rslt.status) {
+
                 for (let prop in product) {
                     const tItem = item['product'].find((x) => x.key === prop);
                     if (tItem && !Helper.IsNullValue(product[prop])) {
@@ -81,6 +82,7 @@ const Component = (props) => {
                         }
                     }
                 }
+
                 if (product.MainImage) {
                     const _document = await Support.ExtractDocument(product.MainImage, product.MainImage.DocId);
                     item['product'].find((x) => x.key === "MainImage").value = _document;
@@ -120,31 +122,28 @@ const Component = (props) => {
                     })
                 }
 
-            }
+                // Get Product Other Images
+                if (!Helper.IsJSONEmpty(product.OtherImages) && product.OtherImages.length > 0) {
+                    let _document = [];
 
-            // Get Product Other Images
-            rslt = await GetProductOtherImages(null, `Product_id eq ${product.Product_id}`);
-            if (rslt.status && rslt.values && rslt.values.length > 0) {
-                let docIdList = rslt.values.map((x) => x.DocId);
-                let _document = [];
-                for (let i = 0; i < docIdList.length; i++) {
-                    rslt = await GetDocument(docIdList[i]);
-                    if (rslt.status) {
-                        tmp = {};
-                        ['DocData', 'DocId', 'DocName', 'DocType', 'DocExt'].forEach((x) => {
-                            tmp[x] = rslt.values[x]
-                        });
+                    for (let i = 0; i < product.OtherImages.length; i++) {
+                        let docItem = product.OtherImages[i];
+                        let tmp = {};
 
-                        if (tmp.DocId > 0) {
+                        ['DocData', 'DocId', 'DocName', 'DocType', 'DocExt'].forEach((x) => { tmp[x] = docItem[x] });
+
+                        if (parseInt(tmp.DocId) > 0) {
                             rslt = await GetDocument(tmp.DocId, true, tmp.DocType);
                             if (rslt.status) tmp['DocData'] = rslt.values;
                         }
+
                         tmp['index'] = i;
                         _document.push(tmp);
                     }
+
+                    item['product'].find((x) => x.key === "OtherImages").value = _document;
                 }
 
-                item['product'].find((x) => x.key === "OtherImages").value = _document;
             }
 
             let bItem = {};
@@ -161,29 +160,14 @@ const Component = (props) => {
         }
     }
 
-    const FetchProductTypes = async () => {
+    const FetchMetaDataInfo = async () => {
         return new Promise(async (resolve) => {
             global.Busy(true);
-            await Api.GetProductTypes()
-                .then(async (res) => {
-                    if (res.status) {
-                        const pValues = res.values.map((x) => { return { Name: x.ProductTypeName, Desc: x.ProductTypeDesc, Value: x.PtId } });
-                        await GetMetaDataInfo()
-                            .then(async (res2) => {
-                                const enums = res2.filter((x) => x.Type === 'Enum') || [];
-                                enums.push({ Name: "ProductTypes", Type: 'Enum', Values: pValues });
-                                setDropDownOptions(enums);
-                                global.Busy(false);
-                                return resolve(enums);
-                            });
-
-                    } else {
-                        global.Busy(false);
-                        console.log(res.statusText);
-                        return resolve([]);
-                    }
-                });
-
+            const rlst = await GetMetaDataInfo();
+            const enums = rlst.filter((x) => x.Type === 'Enum') || [];
+            setDropDownOptions(enums);
+            global.Busy(false);
+            return resolve(enums);
         });
     }
 
@@ -324,7 +308,7 @@ const Component = (props) => {
     useEffect(() => {
         const fetchData = async () => {
             if (initialized) {
-                await FetchProductTypes().then(async (enums) => {
+                await FetchMetaDataInfo().then(async (enums) => {
                     await FetchProductDetails(enums);
                 });
             }

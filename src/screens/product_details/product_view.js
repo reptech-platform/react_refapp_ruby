@@ -4,13 +4,11 @@ import { ArrowLeft as ArrowLeftIcon, Edit as EditIcon } from '@mui/icons-materia
 import { useTheme } from '@mui/material/styles';
 import Container from "screens/container";
 import { useNavigate, useParams } from "react-router-dom";
-import {
-    GetProductTypes, GetProduct, GetOtherDetails, GetProductPrice,
-    GetProductOtherImages, GetDocument, GetProductType
-} from "shared/services";
+import { GetProduct, GetDocument } from "shared/services";
 import { GetMetaDataInfo } from "shared/common";
 import ProductJsonConfig from "config/product_config.json";
 import RenderFormContols from "./child/formcontrols";
+import Helper from "shared/helper";
 
 const Component = (props) => {
     const { title } = props;
@@ -36,7 +34,7 @@ const Component = (props) => {
         if (id) {
             global.Busy(true);
             // Get Product Details
-            let rslt = await GetProduct(id, "$expand=MainImage,ProductType,ProductPrice,OtherDetails");
+            let rslt = await GetProduct(id, "$expand=MainImage,ProductType,ProductPrice,OtherDetails,OtherImages");
             if (rslt.status) {
 
                 const product = rslt.values;
@@ -104,26 +102,23 @@ const Component = (props) => {
                     item['product'].find((x) => x.key === "MainImage").value = tmp;
                 }
 
-                // Other Images
-                rslt = await GetProductOtherImages(null, `Product_id eq ${product.Product_id}`);
-                if (rslt.status && rslt.values && rslt.values.length > 0) {
-                    let docIdList = rslt.values.map((x) => x.DocId);
+                // Get Product Other Images
+                if (!Helper.IsJSONEmpty(product.OtherImages) && product.OtherImages.length > 0) {
                     let _document = [];
-                    for (let i = 0; i < docIdList.length; i++) {
-                        rslt = await GetDocument(docIdList[i]);
-                        if (rslt.status) {
-                            tmp = {};
-                            ['DocData', 'DocId', 'DocName', 'DocType', 'DocExt'].forEach((x) => {
-                                tmp[x] = rslt.values[x]
-                            });
 
-                            if (tmp.DocId > 0) {
-                                rslt = await GetDocument(tmp.DocId, true, tmp.DocType);
-                                if (rslt.status) tmp['DocData'] = rslt.values;
-                            }
-                            tmp['index'] = i;
-                            _document.push(tmp);
+                    for (let i = 0; i < product.OtherImages.length; i++) {
+                        let docItem = product.OtherImages[i];
+                        let tmp = {};
+
+                        ['DocData', 'DocId', 'DocName', 'DocType', 'DocExt'].forEach((x) => { tmp[x] = docItem[x] });
+
+                        if (parseInt(tmp.DocId) > 0) {
+                            rslt = await GetDocument(tmp.DocId, true, tmp.DocType);
+                            if (rslt.status) tmp['DocData'] = rslt.values;
                         }
+
+                        tmp['index'] = i;
+                        _document.push(tmp);
                     }
 
                     item['product'].find((x) => x.key === "OtherImages").value = _document;
@@ -136,15 +131,11 @@ const Component = (props) => {
         }
     }
 
-    const FetchProductTypes = async () => {
+    const FetchMetaDataInfo = async () => {
         return new Promise(async (resolve) => {
             global.Busy(true);
-            const productTypes = await GetProductTypes();
-            const { values } = productTypes || { values: [] };
-            const pValues = values.map((x) => { return { Name: x.ProductTypeName, Value: x.PtId } });
             const rlst = await GetMetaDataInfo();
             const enums = rlst.filter((x) => x.Type === 'Enum') || [];
-            enums.push({ Name: "ProductTypes", Type: 'Enum', Values: pValues });
             setDropDownOptions(enums);
             global.Busy(false);
             return resolve(enums);
@@ -154,7 +145,7 @@ const Component = (props) => {
     useEffect(() => {
         const fetchData = async () => {
             if (initialized) {
-                await FetchProductTypes().then(async (enums) => {
+                await FetchMetaDataInfo().then(async (enums) => {
                     await FetchProductDetails(enums);
                 });
             }
