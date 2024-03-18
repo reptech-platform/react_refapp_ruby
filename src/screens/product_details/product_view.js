@@ -36,7 +36,7 @@ const Component = (props) => {
         if (id) {
             global.Busy(true);
             // Get Product Details
-            let rslt = await GetProduct(id, "$expand=MainImage,ProductType,ProductPrice");
+            let rslt = await GetProduct(id, "$expand=MainImage,ProductType,ProductPrice,OtherDetails");
             if (rslt.status) {
 
                 const product = rslt.values;
