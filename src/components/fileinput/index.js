@@ -62,7 +62,7 @@ const Component = (props) => {
                 OnInputChange({
                     name, value: {
                         index, DocId: iDocId, DocName: iDocName, DocExt: iDocExt,
-                        DocType: tDocType, DocData: tDocData
+                        DocType: tDocType, DocData: tDocData, ProductOtherImagesId: value.ProductOtherImagesId
                     }, type
                 });
             }

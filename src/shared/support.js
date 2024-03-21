@@ -160,7 +160,9 @@ fn.AddOrUpdateDocument = async (input) => {
             status = true;
         } else {
             const msg = rslt.statusText || defaultError;
-            global.AlertPopup("error", msg);
+            if (msg.indexOf('ERROR: update or delete on table') === -1) {
+                global.AlertPopup("error", msg);
+            }
         }
 
         return resolve({ status, id });
