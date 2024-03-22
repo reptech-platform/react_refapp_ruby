@@ -96,8 +96,17 @@ const Component = (props) => {
                 }
 
                 if (product.MainImage) {
-                    const _document = await Support.ExtractDocument(product.MainImage, product.MainImage.DocId);
-                    item['product'].find((x) => x.key === "MainImage").value = _document;
+
+                    tmp = {};
+                    ['DocData', 'DocId', 'DocName', 'DocType', 'DocExt'].forEach((x) => {
+                        tmp[x] = product.MainImage[x]
+                    });
+
+                    if (tmp.DocId > 0) {
+                        rslt = await GetDocument(tmp.DocId, true, tmp.DocType);
+                        if (rslt.status) tmp['DocData'] = rslt.values;
+                    }
+                    item['product'].find((x) => x.key === "MainImage").value = tmp;
                 }
 
                 if (product.ProductType) {
