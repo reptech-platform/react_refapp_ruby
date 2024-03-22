@@ -169,30 +169,6 @@ fn.AddOrUpdateDocument = async (input) => {
     });
 };
 
-fn.ExtractDocument = async (input, docId) => {
-    return new Promise(async (resolve) => {
-        let rslt;
-
-        if (docId) {
-            rslt = await GetDocument(docId);
-            input = rslt.values || { DocId: 0, DocName: null, DocType: null, DocExt: null };
-        }
-        rslt = {
-            DocData: null, DocId: input.DocId, DocName: input.DocName,
-            DocType: input.DocType, DocExt: input.DocExt
-        };
-
-        if (rslt.DocId > 0) {
-            global.Busy(true);
-            const { values } = await GetDocument(rslt.DocId, true, rslt.DocType);
-            rslt.DocData = !Helper.IsNullValue(values) ? values : null;
-            global.Busy(false);
-        }
-
-        return resolve(rslt);
-    });
-};
-
 fn.AddOrUpdateProductOtherImages = async (input, excludesItems) => {
     return new Promise(async (resolve) => {
         let data = {}, status = false, id = null;
