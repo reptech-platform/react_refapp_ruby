@@ -6,6 +6,7 @@ import { DataList } from '../childs';
 import * as Api from "shared/services";
 import { SearchInput, ToggleButtons } from "components";
 import { Add as AddBoxIcon } from '@mui/icons-material';
+import ProductJsonConfig from "config/product_list_config.json";
 
 const Component = (props) => {
     const { title } = props;
@@ -67,20 +68,20 @@ const Component = (props) => {
                     await Api.GetProduct(_values[i].ProductId, null, "MainImage").then(async (resP) => {
                         if (resP.status) {
                             let _product = resP.values;
+                            let nameItems = ProductJsonConfig['product'];
 
-                            let _row = {
-                                status: _values[i].Status,
-                                description: _product.Product_description,
-                                productId: _product.Product_id,
-                                name: _product.Name,
-                                unitOfMeasurement: _product.UnitOfMeasurement,
-                                weight: _product.Weight
-                            };
+                            let _row = { status: _values[i].Status };
 
-                            _product.MainImage &&
-                                await Api.GetDocument(_product.MainImage.DocId, true, _product.MainImage.DocType).then((resI) => {
-                                    _row = { ..._row, mainImage: resI.values };
-                                })
+                            for (let j = 0; j < nameItems.length; j++) {
+                                let _nameItem = nameItems[j];
+                                if (_nameItem.key === "MainImage" && _product[_nameItem.key]) {
+                                    await Api.GetDocument(_product.MainImage.DocId, true, _product.MainImage.DocType).then((resI) => {
+                                        _row = { ..._row, mainImage: resI.values };
+                                    })
+                                } else {
+                                    _row = { ..._row, [_nameItem.target]: _product[_nameItem.key] };
+                                }
+                            }
 
                             _rows.push(_row);
 

@@ -32,7 +32,7 @@ const Component = (props) => {
                                 <strong>Type:</strong>&nbsp;{x.ProductTypeDesc}
                             </Typography>
                             <Typography variant="caption" color="text.secondary">
-                                <strong>Price:</strong>&nbsp;₹{x.ProductPrice}
+                                <strong>Price:</strong>&nbsp;₹{x.Price}
                             </Typography>
                         </Grid>
                     </CardItem>

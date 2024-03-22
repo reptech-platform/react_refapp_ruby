@@ -1,0 +1,19 @@
+{
+    "ProductType": [
+        {
+            "key": "ProductTypeDesc",
+            "default": "NA"
+        }
+    ],
+    "ProductPrice": [
+        {
+            "key": "Price",
+            "default": 0
+        }
+    ],
+    "MainImage": [
+        {
+            "key": "DocId"
+        }
+    ]
+}

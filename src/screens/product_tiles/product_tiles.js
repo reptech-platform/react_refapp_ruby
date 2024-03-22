@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import Container from "screens/container";
 import { DataGrid } from '../childs';
 import * as Api from "shared/services";
+import ProductJsonConfig from "config/product_tiles_config.json";
 
 import { SearchInput, ToggleButtons, CustomDialog } from "components";
 import Helper from "shared/helper";
@@ -66,22 +67,29 @@ const Component = (props) => {
         }
 
         let _rows = [];
-        await Api.GetProducts(query, "ProductType,ProductPrice,MainImage")
+        const entityItems = "ProductType,ProductPrice,MainImage";
+        const nameItems = entityItems.split(",");
+        await Api.GetProducts(query, entityItems)
             .then(async (res) => {
                 if (res.status) {
                     _rows = res.values || [];
                     for (let i = 0; i < _rows.length; i++) {
-                        let keyId = 0;
                         _rows[i].id = Helper.GetGUID();
+                        for (let j = 0; j < nameItems.length; j++) {
+                            let nameId = nameItems[j];
+                            for (let prop of ProductJsonConfig[nameId]) {
+                                if (_rows[i][nameId]) {
+                                    if (nameId === 'MainImage') {
+                                        await Api.GetDocument(_rows[i][nameId].DocId, true, _rows[i][nameId].DocType).then((rslt) => {
+                                            _rows[i].ProductMainImageData = rslt.values;
+                                        })
+                                    } else {
+                                        _rows[i][prop.key] = _rows[i][nameId][prop.key] || prop.default;
+                                    }
+                                }
 
-                        keyId = _rows[i].ProductProductType || 0;
-                        _rows[i].ProductTypeDesc = _rows[i].ProductType?.ProductTypeDesc || 'NA';
-                        _rows[i].ProductPrice = _rows[i].ProductPrice?.Price || 0;
-
-                        _rows[i].MainImage &&
-                            await Api.GetDocument(_rows[i].MainImage.DocId, true, _rows[i].MainImage.DocType).then((rslt) => {
-                                _rows[i].ProductMainImageData = rslt.values;
-                            })
+                            }
+                        }
                     }
                 } else {
                     console.log(res.statusText);
