@@ -1,5 +1,5 @@
 import Helper from "shared/helper";
-import apiUrl from "config/config";
+import { apiUrl } from "config";
 
 const serverApi = apiUrl;
 // const serverApi = "http:/34.238.241.129:8081/ecom/";
