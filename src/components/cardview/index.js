@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Grid, Card, CardActions, CardContent, CardMedia } from '@mui/material';
+import { Grid, Card, CardActions, CardContent, CardMedia, Box } from '@mui/material';
 import { Typography, IconButton } from '@mui/material';
 import { Edit as EditIcon, DeleteOutlined as DeleteIcon, Visibility as VisibilityIcon } from '@mui/icons-material';
 
@@ -23,7 +23,7 @@ const Component = ({ title, keyid, description, imgsrc, children, width, sx, onA
                     {imgsrc ? (
                         <CardMedia
                             component="img"
-                            sx={{ height: 140, objectFit: "contain" }}
+                            sx={{ height: 140 }}
                             src={imgsrc}
                         />
                     ) : (

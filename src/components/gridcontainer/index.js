@@ -1,15 +1,20 @@
 import * as React from 'react';
-import { Grid } from '@mui/material';
+import { Grid, useTheme } from '@mui/material';
 
 const Component = ({ children }) => {
+
+    const theme = useTheme();
 
     return (
         <>
             <Grid container sx={{
                 display: "flex",
                 flexDirection: "row",
-                gap: 1,
-                padding: 1
+                gap: 4,
+                padding: 4,
+                borderRadius: "4px",
+                backgroundColor: theme.customBackColor,
+                border: theme.customBorder
             }}>
                 {children}
             </Grid>

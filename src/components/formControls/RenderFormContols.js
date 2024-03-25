@@ -119,7 +119,7 @@ const Component = (props) => {
                         {GetFilters().map((x, i) => {
                             return (
                                 <TableRow key={i}>
-                                    <TableCell align="right" sx={{ verticalAlign: "top", paddingTop, border: 0, whiteSpace: "nowrap" }}>
+                                    <TableCell sx={{ verticalAlign: "top", paddingTop, border: 0, whiteSpace: "nowrap" }}>
                                         {x.type === 'check' && (' ')}
                                         {x.type !== 'check' && (
                                             <Typography nowrap="true" variant="labelheader">{x.label}{IsMandatory(x.validators) && (mode !== 'view' && <Typography variant="mandatory">*</Typography>)}</Typography>)}
