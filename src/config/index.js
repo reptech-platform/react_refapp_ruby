@@ -15,4 +15,4 @@ export const DRAWER_WIDTH = 200;
 
 export const ROWSPERPAGE = [5, 10, 15, 20, 25];
 
-export const apiUrl = "https://ruby-refapp-bknd.code-wizard.in/ecom/";
+export const apiUrl = "https://ruby-refapp-bknd.code-wizard.in/ExclusiveAccess/";
