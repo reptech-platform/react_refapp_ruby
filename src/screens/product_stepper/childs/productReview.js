@@ -1,11 +1,11 @@
 import React from 'react';
 import RenderFormContols from "./formcontrols";
 import ProductJsonConfig from "config/stepper_config.json";
-import {
-    GetProductTypes, GetProduct, GetOtherDetails, GetProductPrice,
-    GetProductOtherImages, GetDocument, GetProductType
-} from "shared/services";
+import * as Api from "shared/services";
 import { GetMetaDataInfo } from "shared/common";
+import Helper from "shared/helper";
+
+const screenItems = ['product', 'producttype', 'otherdetails', 'productprice'];
 
 const Component = React.forwardRef((props, ref) => {
 
@@ -32,7 +32,7 @@ const Component = React.forwardRef((props, ref) => {
 
         let item = {}, tmp;
 
-        ['producttype', 'product', 'otherdetails', 'productprice'].forEach(elm => {
+        screenItems.forEach(elm => {
             let items = [];
             for (let prop of ProductJsonConfig[elm]) {
                 items.push({ ...prop, value: null });
@@ -42,7 +42,7 @@ const Component = React.forwardRef((props, ref) => {
 
         global.Busy(true);
         // Get Product Details
-        let rslt = await GetProduct(productId, "$expand=MainImage");
+        let rslt = await Api.GetProduct(productId, "$expand=MainImage,PType,SellingPrice,ODetails,OtherImages");
         if (rslt.status) {
 
             const product = rslt.values;
@@ -61,14 +61,40 @@ const Component = React.forwardRef((props, ref) => {
             }
 
             // Product Type
-            rslt = await GetProductType(product.ProductProductType);
-            if (rslt.status) {
-                for (let prop in rslt.values) {
-                    const tItem = item['producttype'].find((x) => x.key === prop);
+            if (product.PType) {
+                Object.keys(product.PType).forEach(x => {
+                    item['producttype'].find(z => z.key === x).value = product.PType[x];
+                })
+            }
+
+            // Get Product Other Details
+            if (product.ODetails) {
+                Object.keys(product.ODetails).forEach(prop => {
+                    const tItem = item['otherdetails'].find((x) => x.key === prop);
                     if (tItem) {
-                        item['producttype'].find((x) => x.key === prop).value = rslt.values[prop];
+                        if (prop === 'UnitOfMeasurement') {
+                            const dpItems = enums.find((z) => z.Name === tItem.source).Values;
+                            const _value = dpItems.find((m) => m.Name === product.ODetails[prop]).Value;
+                            item['otherdetails'].find((x) => x.key === prop).value = parseInt(_value);
+                        } else if (prop === 'AvailabilityStatus') {
+                            const dpItems = enums.find((z) => z.Name === tItem.source).Values;
+                            const _value = dpItems.find((m) => m.Name === product.ODetails[prop]).Value;
+                            item['otherdetails'].find((x) => x.key === prop).value = parseInt(_value);
+                        } else if (prop === 'ManufacturingDate') {
+                            let tmpDate = product.ODetails[prop].split('T');
+                            item['otherdetails'].find((x) => x.key === prop).value = tmpDate[0];
+                        } else {
+                            item['otherdetails'].find((x) => x.key === prop).value = product.ODetails[prop];
+                        }
                     }
-                }
+                })
+            }
+
+            // Product Price
+            if (product.SellingPrice) {
+                Object.keys(product.SellingPrice).forEach(x => {
+                    item['productprice'].find(z => z.key === x).value = product.SellingPrice[x];
+                })
             }
 
             // Main Image
@@ -79,78 +105,33 @@ const Component = React.forwardRef((props, ref) => {
                 });
 
                 if (tmp.DocId > 0) {
-                    rslt = await GetDocument(tmp.DocId, true, tmp.DocType);
+                    rslt = await Api.GetDocument(tmp.DocId, true, tmp.DocType);
                     if (rslt.status) tmp['DocData'] = rslt.values;
                 }
                 item['product'].find((x) => x.key === "MainImage").value = tmp;
             }
 
-            // Other Images
-            rslt = await GetProductOtherImages(null, `Product_id eq ${product.Product_id}`);
-            if (rslt.status && rslt.values && rslt.values.length > 0) {
-                let docIdList = rslt.values.map((x) => x.DocId);
+            // Get Product Other Images
+            if (!Helper.IsJSONEmpty(product.OtherImages) && product.OtherImages.length > 0) {
                 let _document = [];
-                for (let i = 0; i < docIdList.length; i++) {
-                    rslt = await GetDocument(docIdList[i]);
-                    if (rslt.status) {
-                        tmp = {};
-                        ['DocData', 'DocId', 'DocName', 'DocType', 'DocExt'].forEach((x) => {
-                            tmp[x] = rslt.values[x]
-                        });
 
-                        if (tmp.DocId > 0) {
-                            rslt = await GetDocument(tmp.DocId, true, tmp.DocType);
-                            if (rslt.status) tmp['DocData'] = rslt.values;
-                        }
-                        tmp['index'] = i;
-                        _document.push(tmp);
+                for (let i = 0; i < product.OtherImages.length; i++) {
+                    let docItem = product.OtherImages[i];
+                    let tmp = {};
+
+                    ['DocData', 'DocId', 'DocName', 'DocType', 'DocExt'].forEach((x) => { tmp[x] = docItem[x] });
+
+                    if (parseInt(tmp.DocId) > 0) {
+                        rslt = await Api.GetDocument(tmp.DocId, true, tmp.DocType);
+                        if (rslt.status) tmp['DocData'] = rslt.values;
                     }
+
+                    tmp['index'] = i;
+                    _document.push(tmp);
                 }
 
                 item['product'].find((x) => x.key === "OtherImages").value = _document;
             }
-
-            // Get Product Other Details
-            if (product.ProductOtherDetails) {
-                rslt = await GetOtherDetails(product.ProductOtherDetails);
-                if (rslt.status) {
-                    tmp = rslt.values;
-                    for (let prop in tmp) {
-                        const tItem = item['otherdetails'].find((x) => x.key === prop);
-                        if (tItem) {
-                            if (prop === 'UnitOfMeasurement') {
-                                const dpItems = enums.find((z) => z.Name === tItem.source).Values;
-                                const _value = dpItems.find((m) => m.Name === tmp[prop]).Value;
-                                item['otherdetails'].find((x) => x.key === prop).value = parseInt(_value);
-                            } else if (prop === 'AvailabilityStatus') {
-                                const dpItems = enums.find((z) => z.Name === tItem.source).Values;
-                                const _value = dpItems.find((m) => m.Name === tmp[prop]).Value;
-                                item['otherdetails'].find((x) => x.key === prop).value = parseInt(_value);
-                            } else if (prop === 'ManufacturingDate') {
-                                let tmpDate = tmp[prop].split('T');
-                                item['otherdetails'].find((x) => x.key === prop).value = tmpDate[0];
-                            } else {
-                                item['otherdetails'].find((x) => x.key === prop).value = tmp[prop];
-                            }
-                        }
-                    }
-                }
-            }
-
-            // Get Product Price Details
-            if (product.ProductProductPrice) {
-                rslt = await GetProductPrice(product.ProductProductPrice);
-                if (rslt.status) {
-                    tmp = rslt.values;
-                    for (let prop in tmp) {
-                        const tItem = item['productprice'].find((x) => x.key === prop);
-                        if (tItem) {
-                            item['productprice'].find((x) => x.key === prop).value = tmp[prop];
-                        }
-                    }
-                }
-            }
-
         }
 
         setRow(item);
@@ -160,7 +141,7 @@ const Component = React.forwardRef((props, ref) => {
     const FetchProductTypes = async () => {
         return new Promise(async (resolve) => {
             global.Busy(true);
-            const productTypes = await GetProductTypes();
+            const productTypes = await Api.GetProductTypes();
             const { values } = productTypes || { values: [] };
             const pValues = values.map((x) => { return { Name: x.ProductTypeName, Value: x.PtId } });
             const rlst = await GetMetaDataInfo();
