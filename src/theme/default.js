@@ -4,7 +4,11 @@ import createTheme from '@mui/material/styles/createTheme';
 const theme = createTheme({
     palette: {
         mode: "light",
-        primary: { main: grey[500] }
+        primary: { main: grey[500] },
+        secondary: { main: "#ffffff" }
+    },
+    stepper: {
+        contentColor: "#ffffff"
     },
     typography: {
         fontFamily: [

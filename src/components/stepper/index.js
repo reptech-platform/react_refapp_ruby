@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, Stepper, Step, StepLabel, Divider, Grid, Button, Typography } from '@mui/material';
-import { styled } from '@mui/material/styles';
+import { styled, useTheme } from '@mui/material/styles';
 
 const StepperContainer = styled(Box)(({ theme }) => ({
     width: '100%',
@@ -17,6 +17,7 @@ const Component = (props) => {
 
     const stepItems = steps || [];
     const stepsCount = stepItems.length - 1;
+    const theme = useTheme();
 
     const [activeStep, setActiveStep] = React.useState(0);
     const [skipped, setSkipped] = React.useState(new Set());
@@ -80,11 +81,11 @@ const Component = (props) => {
             <>
                 <Box sx={{ display: 'flex', flexDirection: 'row' }}>
                     <Grid container sx={{ flex: 1, alignItems: "center", justifyContent: 'flex-start', gap: 1, pt: 1, pb: 1 }}>
-                        {activeStep > 0 && <Button variant="contained" onClick={handleBack}>Prev</Button>}
+                        {activeStep > 0 && <Button variant="contained" sx={{ color: theme.stepper?.contentColor }} onClick={handleBack}>Prev</Button>}
                         {isStepOptional() && (
-                            <Button variant="contained" onClick={handleSkip} >Skip</Button>
+                            <Button variant="contained" onClick={handleSkip} sx={{ color: theme.stepper?.contentColor }}>Skip</Button>
                         )}
-                        {activeStep < stepsCount && <Button variant="contained" onClick={handleNext}>Next</Button>}
+                        {activeStep < stepsCount && <Button variant="contained" sx={{ color: theme.stepper?.contentColor }} onClick={handleNext}>Next</Button>}
                         {activeStep === stepsCount && <Button variant="contained">Submit</Button>}
                     </Grid>
                 </Box>

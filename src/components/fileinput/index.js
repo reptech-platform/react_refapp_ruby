@@ -60,10 +60,13 @@ const Component = (props) => {
 
             if (OnInputChange) {
                 OnInputChange({
-                    name, value: {
-                        index, DocId: iDocId, DocName: iDocName, DocExt: iDocExt,
-                        DocType: tDocType, DocData: tDocData, ProductOtherImagesId: value.ProductOtherImagesId
-                    }, type
+                    name,
+                    value: {
+                        index, DocId: iDocId, DocName: iDocName,
+                        DocExt: iDocExt, DocType: tDocType, DocData: tDocData,
+                        ProductOtherImagesId: value['ProductOtherImagesId']
+                    },
+                    type
                 });
             }
         };

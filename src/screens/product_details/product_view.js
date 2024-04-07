@@ -4,11 +4,13 @@ import { ArrowLeft as ArrowLeftIcon, Edit as EditIcon } from '@mui/icons-materia
 import { useTheme } from '@mui/material/styles';
 import Container from "screens/container";
 import { useNavigate, useParams } from "react-router-dom";
-import { GetProduct, GetDocument } from "shared/services";
+import * as Api from "shared/services";
 import { GetMetaDataInfo } from "shared/common";
 import ProductJsonConfig from "config/product_config.json";
 import RenderFormContols from "./child/formcontrols";
 import Helper from "shared/helper";
+
+const screenItems = ['producttype', 'product', 'otherdetails', 'productprice'];
 
 const Component = (props) => {
     const { title } = props;
@@ -23,7 +25,7 @@ const Component = (props) => {
 
         let item = {}, tmp;
 
-        ['producttype', 'product', 'otherdetails', 'productprice'].forEach(elm => {
+        screenItems.forEach(elm => {
             let items = [];
             for (let prop of ProductJsonConfig[elm]) {
                 items.push({ ...prop, value: null });
@@ -34,14 +36,14 @@ const Component = (props) => {
         if (id) {
             global.Busy(true);
             // Get Product Details
-            let rslt = await GetProduct(id, "$expand=MainImage,ProductType,ProductPrice,OtherDetails,OtherImages");
+            let rslt = await Api.GetProduct(id, "$expand=MainImage,PType,SellingPrice,ODetails,OtherImages");
             if (rslt.status) {
 
                 const product = rslt.values;
 
                 for (let prop in product) {
                     const tItem = item['product'].find((x) => x.key === prop);
-                    if (tItem) {
+                    if (tItem && !Helper.IsNullValue(product[prop])) {
                         if (prop === 'UnitOfMeasurement') {
                             const dpItems = enums.find((z) => z.Name === tItem.source).Values;
                             const _value = dpItems.find((m) => m.Name === product[prop]).Value;
@@ -53,38 +55,39 @@ const Component = (props) => {
                 }
 
                 // Product Type
-                if (product.ProductType) {
-                    Object.keys(product.ProductType).forEach(x => {
-                        item['producttype'].find(z => z.key === x).value = product.ProductType[x];
+                if (product.PType) {
+                    Object.keys(product.PType).forEach(x => {
+                        item['producttype'].find(z => z.key === x).value = product.PType[x];
                     })
                 }
 
-                if (product.OtherDetails) {
-                    Object.keys(product.OtherDetails).forEach(prop => {
+                // Get Product Other Details
+                if (product.ODetails) {
+                    Object.keys(product.ODetails).forEach(prop => {
                         const tItem = item['otherdetails'].find((x) => x.key === prop);
                         if (tItem) {
                             if (prop === 'UnitOfMeasurement') {
                                 const dpItems = enums.find((z) => z.Name === tItem.source).Values;
-                                const _value = dpItems.find((m) => m.Name === product.OtherDetails[prop]).Value;
+                                const _value = dpItems.find((m) => m.Name === product.ODetails[prop]).Value;
                                 item['otherdetails'].find((x) => x.key === prop).value = parseInt(_value);
                             } else if (prop === 'AvailabilityStatus') {
                                 const dpItems = enums.find((z) => z.Name === tItem.source).Values;
-                                const _value = dpItems.find((m) => m.Name === product.OtherDetails[prop]).Value;
+                                const _value = dpItems.find((m) => m.Name === product.ODetails[prop]).Value;
                                 item['otherdetails'].find((x) => x.key === prop).value = parseInt(_value);
                             } else if (prop === 'ManufacturingDate') {
-                                let tmpDate = product.OtherDetails[prop].split('T');
+                                let tmpDate = product.ODetails[prop].split('T');
                                 item['otherdetails'].find((x) => x.key === prop).value = tmpDate[0];
                             } else {
-                                item['otherdetails'].find((x) => x.key === prop).value = product.OtherDetails[prop];
+                                item['otherdetails'].find((x) => x.key === prop).value = product.ODetails[prop];
                             }
                         }
                     })
                 }
 
                 // Product Price
-                if (product.ProductPrice) {
-                    Object.keys(product.ProductPrice).forEach(x => {
-                        item['productprice'].find(z => z.key === x).value = product.ProductPrice[x];
+                if (product.SellingPrice) {
+                    Object.keys(product.SellingPrice).forEach(x => {
+                        item['productprice'].find(z => z.key === x).value = product.SellingPrice[x];
                     })
                 }
 
@@ -96,7 +99,7 @@ const Component = (props) => {
                     });
 
                     if (tmp.DocId > 0) {
-                        rslt = await GetDocument(tmp.DocId, true, tmp.DocType);
+                        rslt = await Api.GetDocument(tmp.DocId, true, tmp.DocType);
                         if (rslt.status) tmp['DocData'] = rslt.values;
                     }
                     item['product'].find((x) => x.key === "MainImage").value = tmp;
@@ -113,7 +116,7 @@ const Component = (props) => {
                         ['DocData', 'DocId', 'DocName', 'DocType', 'DocExt'].forEach((x) => { tmp[x] = docItem[x] });
 
                         if (parseInt(tmp.DocId) > 0) {
-                            rslt = await GetDocument(tmp.DocId, true, tmp.DocType);
+                            rslt = await Api.GetDocument(tmp.DocId, true, tmp.DocType);
                             if (rslt.status) tmp['DocData'] = rslt.values;
                         }
 

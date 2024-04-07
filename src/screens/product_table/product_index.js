@@ -77,14 +77,14 @@ const Component = (props) => {
         }
 
         let _rows = [];
-        await Api.GetProducts(query, "ProductType")
+        await Api.GetProducts(query, "PType")
             .then(async (res) => {
                 if (res.status) {
                     _rows = res.values || [];
                     if (_rows.length > 0) {
                         _rows.forEach(x => {
                             x.id = Helper.GetGUID();
-                            x.ProductTypeDesc = x.ProductType?.ProductTypeDesc || 'NA';
+                            x.ProductTypeDesc = x.PType?.ProductTypeDesc || 'NA';
                         });
                     }
                 } else {

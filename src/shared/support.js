@@ -2,25 +2,12 @@ import {
     SetProduct, SetProductPrice, SetProductOtherImages,
     SetOtherDetails, SetDocument, GetDocument, SetProductTypes
 } from "./services";
-import Helper from "shared/helper";
 
 var fn = {};
 
 const numberItems = ['Price', 'Size', 'ProductOtherDetails', 'ProductProductType', 'Weight',
     'ProductProductPrice', 'Product_id', 'ProductMainImage', 'DocId', 'Id'];
 const defaultError = "Something went wrong while processing request!";
-
-
-/* fn.AddDocumentw = async (input, tagName) => {
-    return new Promise(async (resolve) => {
-        let status = false, id = null;
-
-
-        return resolve({ status, id });
-    });
-};
-
-*/
 
 fn.AddOrUpdateProductType = async (input, excludesItems) => {
     return new Promise(async (resolve) => {

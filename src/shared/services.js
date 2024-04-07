@@ -1,7 +1,7 @@
 import Helper from "shared/helper";
-import { apiUrl } from "config";
+import { apiUrl as serverApi } from "config";
 
-const serverApi = apiUrl;
+// const serverApi = apiUrl;
 // const serverApi = "http:/34.238.241.129:8081/ecom/";
 // const serverApi = "http://52.15.220.173:8081/ecom/";
 
@@ -294,9 +294,6 @@ const SetDocument = async (input, headers) => {
         if (headers.DocId && !input.Deleted) {
             method = "PATCH";
             url = `${serverApi}Documents(${headers.DocId})`;
-
-            method = "POST";
-            url = `${serverApi}Documents`;
         } else if (headers.DocId && input.Deleted) {
             method = "DELETE";
             url = `${serverApi}Documents(${headers.DocId})`;

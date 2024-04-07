@@ -34,13 +34,15 @@ const Component = (props) => {
             productId = rslt.id;
         } else { return; }
 
+        console.log(productId);
+
         // Add Product Type
         rslt = await Support.AddOrUpdateProductType(row['producttype']);
         if (rslt.status) {
             // Add Or Update Product
             data = [
                 { key: "Product_id", value: parseInt(productId) },
-                { key: "ProductProductType", value: parseInt(rslt.id) }
+                { key: "ProductPType", value: parseInt(rslt.id) }
             ];
             rslt = await Support.AddOrUpdateProduct(data, dropDownOptions);
             if (!rslt.status) return;
@@ -53,7 +55,7 @@ const Component = (props) => {
             // Add Or Update Product
             data = [
                 { key: "Product_id", value: parseInt(productId) },
-                { key: "ProductOtherDetails", value: parseInt(rslt.id) }
+                { key: "ProductODetails", value: parseInt(rslt.id) }
             ];
             rslt = await Support.AddOrUpdateProduct(data, dropDownOptions);
             if (!rslt.status) return;
@@ -65,12 +67,23 @@ const Component = (props) => {
         if (rslt.status) {
             data = [
                 { key: "Product_id", value: parseInt(productId) },
-                { key: "ProductProductPrice", value: parseInt(rslt.id) }
+                { key: "ProductSellingPrice", value: parseInt(rslt.id) }
             ];
             rslt = await Support.AddOrUpdateProduct(data, dropDownOptions);
             if (!rslt.status) return;
         } else { return; }
 
+        // Add Product Main Image
+        prodImages = product.find((x) => x.key === 'MainImage');
+        rslt = await Support.AddOrUpdateDocument(prodImages);
+        if (rslt.status) {
+            data = [
+                { key: "Product_id", value: parseInt(productId) },
+                { key: "ProductMainImage", value: parseInt(rslt.id) }
+            ];
+            rslt = await Support.AddOrUpdateProduct(data, dropDownOptions);
+            if (!rslt.status) return;
+        } else { return; }
 
         // Add Product Other Images
         prodImages = product.find((x) => x.key === 'OtherImages').value;
@@ -85,19 +98,6 @@ const Component = (props) => {
                 if (!rslt.status) return;
             }
         }
-
-        // Add Product Main Image
-        prodImages = product.find((x) => x.key === 'MainImage');
-        rslt = await Support.AddOrUpdateDocument(prodImages);
-        if (rslt.status) {
-            data = [
-                { key: "Product_id", value: parseInt(productId) },
-                { key: "ProductMainImage", value: parseInt(rslt.id) }
-            ];
-            rslt = await Support.AddOrUpdateProduct(data, dropDownOptions);
-            if (!rslt.status) return;
-        } else { return; }
-
 
         global.AlertPopup("success", "Product is created successfully!");
         setShowUpdate(false);

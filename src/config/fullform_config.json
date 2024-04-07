@@ -39,11 +39,11 @@
             "value": 27
         },
         {
-            "key": "ProductOtherDetails",
+            "key": "ProductODetails",
             "type": "keyid"
         },
         {
-            "key": "ProductProductPrice",
+            "key": "ProductSellingPrice",
             "type": "keyid"
         },
         {
@@ -51,7 +51,7 @@
             "type": "keyid"
         },
         {
-            "key": "ProductProductType",
+            "key": "ProductPType",
             "type": "keyid",
             "value": 19
         },

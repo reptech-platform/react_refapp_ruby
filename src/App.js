@@ -21,8 +21,6 @@ const Component = () => {
   const [customTheme, setCustomTheme] = React.useState(DefaultTheme);
   const [theme] = TimerSession('theme');
 
-  console.log(DefaultTheme);
-
   const OnDrawerClicked = () => { setOpen(!open); }
 
   React.useEffect(() => {

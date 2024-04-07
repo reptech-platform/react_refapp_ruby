@@ -1,11 +1,11 @@
 {
-    "ProductType": [
+    "PType": [
         {
             "key": "ProductTypeDesc",
             "default": "NA"
         }
     ],
-    "ProductPrice": [
+    "SellingPrice": [
         {
             "key": "Price",
             "default": 0

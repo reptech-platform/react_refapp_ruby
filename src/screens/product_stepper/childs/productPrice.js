@@ -24,7 +24,7 @@ const Component = React.forwardRef((props, ref) => {
             if (rslt.status) {
                 data = [
                     { key: "Product_id", value: parseInt(productId) },
-                    { key: "ProductProductPrice", value: parseInt(rslt.id) }
+                    { key: "ProductSellingPrice", value: parseInt(rslt.id) }
                 ];
                 rslt = await Support.AddOrUpdateProduct(data, enums);
                 if (!rslt.status) return resolve(false);

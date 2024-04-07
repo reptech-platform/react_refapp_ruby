@@ -66,8 +66,9 @@ const Component = (props) => {
             query = filters.join("&");
         }
 
+        // MainImage,PType,SellingPrice,ODetails,OtherImages
         let _rows = [];
-        const entityItems = "ProductType,ProductPrice,MainImage";
+        const entityItems = "PType,SellingPrice,MainImage";
         const nameItems = entityItems.split(",");
         await Api.GetProducts(query, entityItems)
             .then(async (res) => {
