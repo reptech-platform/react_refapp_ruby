@@ -9,14 +9,16 @@ import * as Api from "shared/services";
 import Support from "shared/support";
 import { ArrowLeft as ArrowLeftIcon } from '@mui/icons-material';
 import { GetMetaDataInfo } from "shared/common";
+import Helper from "shared/helper";
 
-const screenItems = ['product', 'producttype', 'otherdetails', 'productprice'];
+const screenItems = ['product', 'producttype', 'otherdetails', 'productvendor', 'productbuyingprice', 'productsellingprice'];
 
 const Component = (props) => {
 
     const [form, setForm] = useState(null);
     const [row, setRow] = useState({});
     const [initialized, setInitialized] = useState(false);
+    const [state, setState] = useState(false);
     const [showButton, setShowButton] = useState(true);
     const [dropDownOptions, setDropDownOptions] = useState([]);
     const NavigateTo = useNavigate();
@@ -107,61 +109,94 @@ const Component = (props) => {
     const OnInputChange = (e) => {
         const { name, value, location, ...others } = e;
         let _row = row;
-        let _index = row[location].findIndex((x) => x.key === name);
+        let _index = row[location].findIndex((x) => x.key === name && x.type !== "keyid");
         if (_index > -1) {
+            const item = _row[location][_index];
             _row[location][_index].value = value;
             setRow(_row);
             setShowUpdate(true);
+            if (!Helper.IsNullValue(item['mapitem'])) {
+                UpdateMappingPannel(item, value);
+            }
         }
     }
+
+    const UpdateMappingPannel = (item, value) => {
+        const { mapitem, source, valueId } = item;
+        const { Values } = dropDownOptions.find(x => x.Name === source);
+        const obj = Values.find(x => x[valueId] === value);
+        let _row = row[mapitem];
+        for (let i = 0; i < _row.length; i++) {
+            let _cValue = obj[_row[i].key];
+            if (_row[i].type === 'dropdown') {
+                const _dValues = dropDownOptions.find(x => x.Name === _row[i].source).Values;
+                _cValue = _dValues.find(x => x.Name === _cValue)[_row[i].valueId];
+            } else if (_row[i].type === 'date') {
+                _cValue = Helper.ToDate(_cValue, "YYYY-MM-DD");
+            }
+            _row[i].value = _cValue;
+        }
+        row[mapitem] = _row;
+        setRow(row);
+        setState(!state);
+    };
 
     const OnSubmitForm = (e) => {
         e.preventDefault();
         form.current.submit();
     }
 
-    const FetchProductTypes = async () => {
+    const FetchDropdownItems = async (items) => {
         return new Promise(async (resolve) => {
-            global.Busy(true);
-            await Api.GetProductTypes()
-                .then(async (res) => {
-                    if (res.status) {
-                        const pValues = res.values.map((x) => { return { Name: x.ProductTypeName, Value: x.PtId } });
-                        await GetMetaDataInfo()
-                            .then(async (res2) => {
-                                const enums = res2.filter((x) => x.Type === 'Enum') || [];
-                                enums.push({ Name: "ProductTypes", Type: 'Enum', Values: pValues });
-                                setDropDownOptions(enums);
-                                global.Busy(false);
-                                return resolve(true);
-                            });
 
-                    } else {
-                        global.Busy(false);
-                        console.log(res.statusText);
-                        return resolve(true);
+            global.Busy(true);
+
+            // Default get all enums list items
+            let res = await GetMetaDataInfo();
+
+            const enums = res.filter((x) => x.Type === 'Enum') || [];
+            const otherItems = items.filter(x => enums.findIndex(z => z.Name === x) === -1);
+
+            // Extract the required entities as enums
+            for (let i = 0; i < otherItems.length; i++) {
+                const item = otherItems[i];
+                await Api.GetEntityInfo(item + 's').then(rslt => {
+                    if (rslt.status) {
+                        enums.push({ Name: item, Type: 'Entity', Values: rslt.values });
                     }
                 });
+            }
 
+            setDropDownOptions(enums);
+            global.Busy(false);
+            return resolve(true);
         });
-    }
+    };
 
     const FetchProductDetails = async () => {
         let item = {};
-        screenItems.forEach(elm => {
-            let items = [];
-            for (let prop of ProductJsonConfig[elm]) {
-                items.push({ ...prop, value: null });
-                //items.push({ ...prop });
-            }
-            item[elm] = items;
+        return new Promise(async (resolve) => {
+            screenItems.forEach(elm => {
+                let items = [];
+                for (let prop of ProductJsonConfig[elm]) {
+                    items.push({ ...prop, value: null });
+                    //items.push({ ...prop });
+                }
+                item[elm] = items;
+            });
+            setRow(item);
+            return resolve(item);
         });
-        setRow(item);
     }
 
     const fetchData = async () => {
-        await FetchProductTypes().then(async () => {
-            await FetchProductDetails();
+        await FetchProductDetails().then(async (item) => {
+            let items = [];
+            Object.values(item).forEach(elm => {
+                items = [...items, ...elm];
+            });
+            items = Helper.RemoveDuplicatesFromArray(items.filter(x => x.type === "dropdown").map(z => z.source));
+            await FetchDropdownItems(items);
         });
     };
 

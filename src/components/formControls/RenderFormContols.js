@@ -3,7 +3,6 @@ import { TableContainer, Table, TableBody, TableCell, TableRow, Paper, Typograph
 import { TextInput, ColorPicker, FileInput, CheckInput, DropDown, DateTimePicker } from "components";
 import { Edit as EditIcon } from "@mui/icons-material";
 
-
 const RenderUploadDocument = (props) => {
 
     const { mode, name, type, acceptTypes, value, validators, validationMessages, width, onInputChange } = props;

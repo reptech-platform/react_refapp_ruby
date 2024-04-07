@@ -39,4 +39,8 @@ fn.CloneObject = (x) => {
     return JSON.parse(JSON.stringify(x));
 }
 
+fn.RemoveDuplicatesFromArray = (input) => {
+    return [...new Set(input)];
+};
+
 export default fn;

@@ -160,6 +160,62 @@
             "value": "#7e2020"
         },
         {
+            "key": "ProductBuyingPrice",
+            "label": "Product Buying Price",
+            "type": "dropdown",
+            "valueId": "PpId",
+            "nameId": "Price",
+            "contentId": "Price",
+            "source": "ProductPrice",
+            "mapitem": "productbuyingprice",
+            "editable": true,
+            "validators": [],
+            "validationMessages": [],
+            "value": 2
+        },
+        {
+            "key": "ProductSellingPrice",
+            "label": "Product Selling Price",
+            "type": "dropdown",
+            "valueId": "PpId",
+            "nameId": "Price",
+            "contentId": "Price",
+            "source": "ProductPrice",
+            "mapitem": "productsellingprice",
+            "editable": true,
+            "validators": [],
+            "validationMessages": [],
+            "value": 2
+        },
+        {
+            "key": "ProductProductVendor",
+            "label": "Product Vendor",
+            "type": "dropdown",
+            "valueId": "SId",
+            "nameId": "SupplierName",
+            "contentId": "SupplierName",
+            "source": "Supplier",
+            "mapitem": "productvendor",
+            "editable": true,
+            "validators": [],
+            "validationMessages": [],
+            "value": 2
+        },
+        {
+            "key": "ProductODetails",
+            "label": "Product Other Details",
+            "type": "dropdown",
+            "valueId": "OtherDetailsId",
+            "nameId": "UnitOfMeasurement",
+            "contentId": "UnitOfMeasurement",
+            "source": "OtherDetails",
+            "mapitem": "otherdetails",
+            "editable": true,
+            "validators": [],
+            "validationMessages": [],
+            "value": 2
+        },
+        {
             "key": "MainImage",
             "label": "MainImage",
             "width": "30%",
@@ -262,7 +318,90 @@
             "value": 2
         }
     ],
-    "productprice": [
+    "productvendor": [
+        {
+            "key": "SId",
+            "type": "keyid"
+        },
+        {
+            "key": "SupplierName",
+            "label": "Name",
+            "type": "text",
+            "editable": true,
+            "validators": [
+                "required"
+            ],
+            "validationMessages": [
+                "Supplier name is required"
+            ],
+            "value": "Test 002"
+        },
+        {
+            "key": "SupplierContact",
+            "label": "Contact",
+            "type": "text",
+            "editable": true,
+            "width": "30%",
+            "validators": [
+                "required"
+            ],
+            "validationMessages": [
+                "Supplier contact is required"
+            ],
+            "value": "Test 002 Description"
+        }
+    ],
+    "productbuyingprice": [
+        {
+            "key": "PpId",
+            "type": "keyid"
+        },
+        {
+            "key": "Price",
+            "label": "Price",
+            "type": "text",
+            "editable": true,
+            "validators": [
+                "required",
+                "isFloat",
+                "isPositive"
+            ],
+            "validationMessages": [
+                "Product price is required",
+                "Product price must be a number",
+                "Product price must be a pasitive number"
+            ],
+            "value": 25
+        },
+        {
+            "key": "DiscountGroup",
+            "label": "DiscountGroup",
+            "type": "text",
+            "editable": true,
+            "validators": [
+                "required"
+            ],
+            "validationMessages": [
+                "Product discount group is required"
+            ],
+            "value": "NoDiscount"
+        },
+        {
+            "key": "IsVatIncluded",
+            "label": "IsVatIncluded",
+            "type": "check",
+            "editable": true,
+            "default": false,
+            "validators": [
+                "isTruthy"
+            ],
+            "validationMessages": [
+                "Is product vat included?"
+            ],
+            "value": true
+        }
+    ],
+    "productsellingprice": [
         {
             "key": "PpId",
             "type": "keyid"
