@@ -156,6 +156,47 @@ const SetProductTypes = async (input) => {
     });
 }
 
+const SetProductVendor = async (input) => {
+    return new Promise(async (resolve) => {
+        let id = input.PtId;
+        let method = "POST";
+        let url = `${serverApi}Suppliers`;
+        if (input.PtId && !input.Deleted) {
+            method = "PATCH";
+            url = `${serverApi}Suppliers(${input.PtId})`;
+        } else if (input.PtId && input.Deleted) {
+            method = "DELETE";
+            url = `${serverApi}Suppliers(${input.PtId})`;
+        }
+
+        delete input['SId'];
+        delete input['Deleted'];
+
+        try {
+            const res = await fetch(url, {
+                method, body: JSON.stringify(input),
+                headers: {
+                    "Content-type": "application/json"
+                }
+            });
+
+            if (res.status === 201) {
+                const json = await res.json();
+                return resolve({ status: res.ok, id: json.SId });
+            } else if (res.status === 200 || res.status === 204) {
+                return resolve({ status: res.ok, id });
+            } else {
+                const json = await res.json();
+                return resolve({ status: false, statusText: json.error.message });
+            }
+
+        } catch (error) {
+            console.log(error);
+            return resolve({ status: false, statusText: error.message });
+        }
+    });
+}
+
 /* Product */
 const GetProductsCount = async (query) => {
     return new Promise(async (resolve) => {
@@ -654,7 +695,7 @@ export {
     GetMetaData, GetEntityInfo,
     GetProductTypesCount, GetProductTypes, SetProductTypes, GetProductStatus,
     GetDocument, SetDocument, GetProductType,
-    GetProductsCount, GetProducts, GetProduct, SetProduct,
+    GetProductsCount, GetProducts, GetProduct, SetProduct, SetProductVendor,
     GetOtherDetails, SetOtherDetails,
     GetProductOtherImages, SetProductOtherImages,
     GetProductPrice, SetProductPrice, GetProductOnBoardings

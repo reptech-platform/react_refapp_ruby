@@ -55,7 +55,7 @@ const Component = (props) => {
                             _row = { ..._row, unitOfMeasurement: _product.UnitOfMeasurement, weight: _product.Weight };
 
                             if (_product.ProductMainImage > 0) {
-                                await Api.GetDocument(_product.ProductMainImage, true, "image/jpeg").then((resI) => {
+                                await Api.GetDocument(_product.ProductMainImage, true).then((resI) => {
                                     _row = { ..._row, mainImage: resI.values };
                                 })
                             }
@@ -78,7 +78,7 @@ const Component = (props) => {
                             };
 
                             _product.MainImage &&
-                                await Api.GetDocument(_product.MainImage.DocId, true, _product.MainImage.DocType).then((resI) => {
+                                await Api.GetDocument(_product.MainImage.DocId, true).then((resI) => {
                                     _row = { ..._row, mainImage: resI.values };
                                 })
 

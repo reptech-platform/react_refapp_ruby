@@ -1,5 +1,5 @@
 import {
-    SetProduct, SetProductPrice, SetProductOtherImages,
+    SetProduct, SetProductPrice, SetProductOtherImages, SetProductVendor,
     SetOtherDetails, SetDocument, GetDocument, SetProductTypes
 } from "./services";
 
@@ -23,6 +23,33 @@ fn.AddOrUpdateProductType = async (input, excludesItems) => {
 
         global.Busy(true);
         let rslt = await SetProductTypes(data);
+        global.Busy(false);
+        if (rslt.status) {
+            id = rslt.id;
+            status = true;
+        } else {
+            const msg = rslt.statusText || defaultError;
+            global.AlertPopup("error", msg);
+        }
+
+        return resolve({ status, id });
+    });
+};
+
+fn.AddOrUpdateProductVendor = async (input, excludesItems) => {
+    return new Promise(async (resolve) => {
+        let status = false, id = null, data = {};
+        let excludes = excludesItems || [];
+
+        const tmp = Object.values(input);
+        tmp.filter((x) => x.value).map((x) => {
+            if (excludes.indexOf(x.key) === -1) {
+                data[x.key] = x.value;
+            }
+        });
+
+        global.Busy(true);
+        let rslt = await SetProductVendor(data);
         global.Busy(false);
         if (rslt.status) {
             id = rslt.id;

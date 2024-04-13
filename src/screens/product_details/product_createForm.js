@@ -25,6 +25,14 @@ const Component = (props) => {
     const [showUpdate, setShowUpdate] = useState(false);
     const { title } = props;
 
+    const navItems = [
+        { name: 'ProductPType', func: Support.AddOrUpdateProductType },
+        { name: 'ProductODetails', func: Support.AddOrUpdateOtherDetails },
+        { name: 'ProductSellingPrice', func: Support.AddOrUpdatePrice },
+        { name: 'ProductBuyingPrice', func: Support.AddOrUpdatePrice },
+        { name: 'ProductProductVendor', func: Support.AddOrUpdateProductVendor }
+    ];
+
     const OnSubmit = async () => {
         let rslt, data, prodImages, productId;
 
@@ -36,44 +44,22 @@ const Component = (props) => {
             productId = rslt.id;
         } else { return; }
 
-        console.log(productId);
+        for (let i = 0; i < navItems.length; i++) {
+            // Add or Update the product and navigation entity if it is deos not exist
+            let navItem = product.find(x => x.key === navItems[i].name);
+            if (!Helper.IsJSONEmpty(navItem) && Helper.IsNullValue(navItem.value)) {
+                rslt = await navItems[i].func(row[navItem.mapitem], dropDownOptions);
+                if (rslt.status) {
+                    data = [
+                        { key: "Product_id", value: parseInt(productId) },
+                        { key: navItem.key, value: parseInt(rslt.id) }
+                    ];
+                    rslt = await Support.AddOrUpdateProduct(data, dropDownOptions);
+                    if (!rslt.status) return;
 
-        // Add Product Type
-        rslt = await Support.AddOrUpdateProductType(row['producttype']);
-        if (rslt.status) {
-            // Add Or Update Product
-            data = [
-                { key: "Product_id", value: parseInt(productId) },
-                { key: "ProductPType", value: parseInt(rslt.id) }
-            ];
-            rslt = await Support.AddOrUpdateProduct(data, dropDownOptions);
-            if (!rslt.status) return;
-
-        } else { return; }
-
-        // Add Product Other Details
-        rslt = await Support.AddOrUpdateOtherDetails(row['otherdetails'], dropDownOptions);
-        if (rslt.status) {
-            // Add Or Update Product
-            data = [
-                { key: "Product_id", value: parseInt(productId) },
-                { key: "ProductODetails", value: parseInt(rslt.id) }
-            ];
-            rslt = await Support.AddOrUpdateProduct(data, dropDownOptions);
-            if (!rslt.status) return;
-
-        } else { return; }
-
-        // Add Or Update Product Price
-        rslt = await Support.AddOrUpdatePrice(row['productprice']);
-        if (rslt.status) {
-            data = [
-                { key: "Product_id", value: parseInt(productId) },
-                { key: "ProductSellingPrice", value: parseInt(rslt.id) }
-            ];
-            rslt = await Support.AddOrUpdateProduct(data, dropDownOptions);
-            if (!rslt.status) return;
-        } else { return; }
+                } else { return; }
+            }
+        }
 
         // Add Product Main Image
         prodImages = product.find((x) => x.key === 'MainImage');
@@ -112,32 +98,49 @@ const Component = (props) => {
         let _index = row[location].findIndex((x) => x.key === name && x.type !== "keyid");
         if (_index > -1) {
             const item = _row[location][_index];
-            _row[location][_index].value = value;
+            let tValue = Helper.IsNullValue(value) ? null : value;
+            if (tValue === 'CNONE') tValue = null;
+            _row[location][_index].value = tValue;
             setRow(_row);
             setShowUpdate(true);
             if (!Helper.IsNullValue(item['mapitem'])) {
-                UpdateMappingPannel(item, value);
+                UpdateMappingPannel(_row, item, tValue);
             }
         }
     }
 
-    const UpdateMappingPannel = (item, value) => {
+    const UpdateMappingPannel = (_row, item, value) => {
+
         const { mapitem, source, valueId } = item;
         const { Values } = dropDownOptions.find(x => x.Name === source);
-        const obj = Values.find(x => x[valueId] === value);
-        let _row = row[mapitem];
-        for (let i = 0; i < _row.length; i++) {
-            let _cValue = obj[_row[i].key];
-            if (_row[i].type === 'dropdown') {
-                const _dValues = dropDownOptions.find(x => x.Name === _row[i].source).Values;
-                _cValue = _dValues.find(x => x.Name === _cValue)[_row[i].valueId];
-            } else if (_row[i].type === 'date') {
-                _cValue = Helper.ToDate(_cValue, "YYYY-MM-DD");
+        const obj = value ? Values.find(x => x[valueId] === value) : null;
+        let _rowMap = _row[mapitem];
+
+        for (let i = 0; i < _rowMap.length; i++) {
+
+            let tmpField = _rowMap[i];
+            let bEditable = true;
+            let _cValue = null;
+
+            if (!Helper.IsNullValue(obj)) {
+                _cValue = obj[tmpField.key];
+                if (tmpField.type === 'dropdown') {
+                    const _dValues = dropDownOptions.find(x => x.Name === _rowMap[i].source).Values;
+                    _cValue = _dValues.find(x => x.Name === _cValue)[_rowMap[i].valueId];
+                } else if (tmpField.type === 'date') {
+                    _cValue = Helper.ToDate(_cValue, "YYYY-MM-DD");
+                }
+                bEditable = false;
             }
-            _row[i].value = _cValue;
+
+            tmpField.editable = bEditable;
+            tmpField.value = _cValue;
+
+            _rowMap[i] = tmpField;
+
         }
-        row[mapitem] = _row;
-        setRow(row);
+        _row[mapitem] = _rowMap;
+        setRow(_row);
         setState(!state);
     };
 

@@ -5,12 +5,15 @@ import Helper from "shared/helper";
 
 const Component = (props) => {
 
-    const { mode, id, name, value, nameId, valueId, contentId, sx, style, defaultLabel,
+    const { mode, id, name, value, nameId, valueId, contentId, sx, style, defaultLabel, createOption, createLabel,
         validators, validationMessages, options, onDropDownChange } = props;
+
     const label = defaultLabel || 'Select a column';
+    const clabel = createLabel || 'Create a column';
 
     const [inputValue, setInputValue] = React.useState(value);
-    const defValues = [{ id: -1, value: 'NONE', content: label }];
+    let defValues = [{ id: -1, value: 'NONE', content: label }];
+    if (createOption) defValues = [...defValues, { id: 0, value: 'CNONE', content: clabel }];
 
     const handleChange = (e) => {
         const { name, value } = e.target;

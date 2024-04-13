@@ -131,7 +131,7 @@ const Component = (props) => {
                                                 validationMessages={x.validationMessages} OnInputChange={OnInputChange} sx={{ width: x.width }} />
                                         )}
                                         {x.type === 'check' && (
-                                            <CheckInput mode={mode} label={x.label} id={x.key} name={x.key} value={x.value || x.default}
+                                            <CheckInput mode={mode} label={x.label} id={x.key} name={x.key} value={x.value || x.default} editable={x.editable}
                                                 validationMessages={x.validationMessages} OnInputChange={OnInputChange} sx={{ width: x.width }} />
                                         )}
 
@@ -158,7 +158,7 @@ const Component = (props) => {
                                         )}
                                         {x.type === 'dropdown' && (
                                             <DropDown mode={mode} id={x.key} name={x.key} value={x.value} options={GetDropDownOptions(x.source, x.nameId)} valueId={x.valueId} size="small"
-                                                nameId={x.nameId} contentId={x.contentId} defaultLabel={`Select ${x.label}`} sx={{ width: x.width }}
+                                                nameId={x.nameId} contentId={x.contentId} defaultLabel={`Select ${x.label}`} createOption={x.create} createLabel={`Create ${x.label}`} sx={{ width: x.width }}
                                                 validators={x.validators} validationMessages={x.validationMessages} onDropDownChange={OnInputChange} />
                                         )}
                                     </TableCell>

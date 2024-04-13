@@ -81,7 +81,7 @@ const Component = (props) => {
                             for (let prop of ProductJsonConfig[nameId]) {
                                 if (_rows[i][nameId]) {
                                     if (nameId === 'MainImage') {
-                                        await Api.GetDocument(_rows[i][nameId].DocId, true, _rows[i][nameId].DocType).then((rslt) => {
+                                        await Api.GetDocument(_rows[i][nameId].DocId, true).then((rslt) => {
                                             _rows[i].ProductMainImageData = rslt.values;
                                         })
                                     } else {
