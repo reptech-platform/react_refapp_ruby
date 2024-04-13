@@ -10,8 +10,6 @@ import ProductJsonConfig from "config/product_config.json";
 import RenderFormContols from "./child/formcontrols";
 import Helper from "shared/helper";
 
-const screenItems = ['producttype', 'product', 'otherdetails', 'productprice'];
-
 const Component = (props) => {
     const { title } = props;
     const theme = useTheme();
@@ -24,8 +22,9 @@ const Component = (props) => {
     const FetchProductDetails = async (enums) => {
 
         let item = {}, tmp;
+        const keyItems = Object.keys(ProductJsonConfig);
 
-        screenItems.forEach(elm => {
+        keyItems.forEach(elm => {
             let items = [];
             for (let prop of ProductJsonConfig[elm]) {
                 items.push({ ...prop, value: null });
@@ -36,7 +35,7 @@ const Component = (props) => {
         if (id) {
             global.Busy(true);
             // Get Product Details
-            let rslt = await Api.GetProduct(id, "$expand=MainImage,PType,SellingPrice,ODetails,OtherImages");
+            let rslt = await Api.GetProduct(id, "$expand=ODetails,OtherImages,MainImage,PType,SellingPrice,BuyingPrice,ProductVendor");
             if (rslt.status) {
 
                 const product = rslt.values;
@@ -84,10 +83,24 @@ const Component = (props) => {
                     })
                 }
 
-                // Product Price
+                // Product Selling Price
                 if (product.SellingPrice) {
                     Object.keys(product.SellingPrice).forEach(x => {
-                        item['productprice'].find(z => z.key === x).value = product.SellingPrice[x];
+                        item['productsellingprice'].find(z => z.key === x).value = product.SellingPrice[x];
+                    })
+                }
+
+                // Product Buying Price
+                if (product.BuyingPrice) {
+                    Object.keys(product.BuyingPrice).forEach(x => {
+                        item['productbuyingprice'].find(z => z.key === x).value = product.BuyingPrice[x];
+                    })
+                }
+
+                // Product Vendor
+                if (product.ProductVendor) {
+                    Object.keys(product.ProductVendor).forEach(x => {
+                        item['productvendor'].find(z => z.key === x).value = product.ProductVendor[x];
                     })
                 }
 
@@ -99,7 +112,7 @@ const Component = (props) => {
                     });
 
                     if (tmp.DocId > 0) {
-                        rslt = await Api.GetDocument(tmp.DocId, true, tmp.DocType);
+                        rslt = await Api.GetDocument(tmp.DocId, true);
                         if (rslt.status) tmp['DocData'] = rslt.values;
                     }
                     item['product'].find((x) => x.key === "MainImage").value = tmp;
@@ -116,7 +129,7 @@ const Component = (props) => {
                         ['DocData', 'DocId', 'DocName', 'DocType', 'DocExt'].forEach((x) => { tmp[x] = docItem[x] });
 
                         if (parseInt(tmp.DocId) > 0) {
-                            rslt = await Api.GetDocument(tmp.DocId, true, tmp.DocType);
+                            rslt = await Api.GetDocument(tmp.DocId, true);
                             if (rslt.status) tmp['DocData'] = rslt.values;
                         }
 
@@ -132,23 +145,48 @@ const Component = (props) => {
             setRow(item);
             global.Busy(false);
         }
+
     }
 
-    const FetchMetaDataInfo = async () => {
+    const FetchDropdownItems = async () => {
         return new Promise(async (resolve) => {
+
             global.Busy(true);
-            const rlst = await GetMetaDataInfo();
-            const enums = rlst.filter((x) => x.Type === 'Enum') || [];
+
+            let items = [];
+
+            Object.values(ProductJsonConfig).forEach(elm => {
+                items = [...items, ...elm];
+            });
+
+            items = Helper.RemoveDuplicatesFromArray(items.filter(x => x.type === "dropdown").map(z => z.source));
+
+            // Default get all enums list items
+            let res = await GetMetaDataInfo();
+
+            const enums = res.filter((x) => x.Type === 'Enum') || [];
+            const otherItems = items.filter(x => enums.findIndex(z => z.Name === x) === -1);
+
+            // Extract the required entities as enums
+            for (let i = 0; i < otherItems.length; i++) {
+                const item = otherItems[i];
+                await Api.GetEntityInfo(item + 's').then(rslt => {
+                    if (rslt.status) {
+                        enums.push({ Name: item, Type: 'Entity', Values: rslt.values });
+                    }
+                });
+            }
+
             setDropDownOptions(enums);
             global.Busy(false);
             return resolve(enums);
         });
-    }
+    };
 
     useEffect(() => {
         const fetchData = async () => {
             if (initialized) {
-                await FetchMetaDataInfo().then(async (enums) => {
+                await FetchDropdownItems().then(async (enums) => {
                     await FetchProductDetails(enums);
                 });
             }

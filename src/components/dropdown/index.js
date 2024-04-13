@@ -22,7 +22,10 @@ const Component = (props) => {
     }
 
     if (mode && mode === 'view') {
-        let tValue = options.find((x) => parseInt(x[valueId]) === parseInt(value)) || "";
+        let tValue = null;
+        if (!Helper.IsNullValue(value)) {
+            tValue = options.find((x) => parseInt(x[valueId]) === parseInt(value)) || "";
+        }
         if (tValue) tValue = tValue[contentId];
         return (
             <>

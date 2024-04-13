@@ -2,6 +2,7 @@ import * as React from "react";
 import { TableContainer, Table, TableBody, TableCell, TableRow, Paper, Typography, IconButton } from '@mui/material';
 import { TextInput, ColorPicker, FileInput, CheckInput, DropDown, DateTimePicker } from "components";
 import { Edit as EditIcon } from "@mui/icons-material";
+import Helper from "shared/helper";
 
 const RenderUploadDocument = (props) => {
 
@@ -77,8 +78,9 @@ const Component = (props) => {
         return e.findIndex((x) => x && x.toLowerCase() === 'required') > -1;
     }
 
-    const GetDropDownOptions = (e) => {
-        return options.find((x) => x.Name === e)?.Values;
+    const GetDropDownOptions = (source, nameId) => {
+        const tValues = options.find((x) => x.Name === source)?.Values || [];
+        return tValues.filter(x => !Helper.IsNullValue(x[nameId]));
     }
 
     const GetFilters = (e) => {
@@ -155,7 +157,7 @@ const Component = (props) => {
                                                 validationMessages={x.validationMessages} OnInputChange={OnInputChange} sx={{ width: x.width }} />
                                         )}
                                         {x.type === 'dropdown' && (
-                                            <DropDown mode={mode} id={x.key} name={x.key} value={x.value} options={GetDropDownOptions(x.source)} valueId={x.valueId} size="small"
+                                            <DropDown mode={mode} id={x.key} name={x.key} value={x.value} options={GetDropDownOptions(x.source, x.nameId)} valueId={x.valueId} size="small"
                                                 nameId={x.nameId} contentId={x.contentId} defaultLabel={`Select ${x.label}`} sx={{ width: x.width }}
                                                 validators={x.validators} validationMessages={x.validationMessages} onDropDownChange={OnInputChange} />
                                         )}

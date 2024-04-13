@@ -356,22 +356,15 @@ const SetDocument = async (input, headers) => {
     });
 }
 
-const GetDocument = async (id, value, type) => {
+const GetDocument = async (id, value) => {
     return new Promise(async (resolve) => {
-        let headers = { "Content-type": "application/json" };
         let url = `${serverApi}Documents(${id})`;
         if (value) {
             url = `${serverApi}Documents(${id})/$value`;
-            headers = null;
-            if (type) {
-                headers = { "Content-type": type };
-            }
         }
 
         try {
-            const res = await fetch(url, {
-                method: "GET", headers
-            });
+            const res = await fetch(url, { method: "GET" });
 
             if (res.status === 200) {
                 let data = null;

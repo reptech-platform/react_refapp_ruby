@@ -105,7 +105,7 @@ const Component = React.forwardRef((props, ref) => {
                 });
 
                 if (tmp.DocId > 0) {
-                    rslt = await Api.GetDocument(tmp.DocId, true, tmp.DocType);
+                    rslt = await Api.GetDocument(tmp.DocId, true);
                     if (rslt.status) tmp['DocData'] = rslt.values;
                 }
                 item['product'].find((x) => x.key === "MainImage").value = tmp;
@@ -122,7 +122,7 @@ const Component = React.forwardRef((props, ref) => {
                     ['DocData', 'DocId', 'DocName', 'DocType', 'DocExt'].forEach((x) => { tmp[x] = docItem[x] });
 
                     if (parseInt(tmp.DocId) > 0) {
-                        rslt = await Api.GetDocument(tmp.DocId, true, tmp.DocType);
+                        rslt = await Api.GetDocument(tmp.DocId, true);
                         if (rslt.status) tmp['DocData'] = rslt.values;
                     }
 
