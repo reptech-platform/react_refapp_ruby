@@ -31,26 +31,46 @@ const Component = (props) => {
         <Box sx={{ width: '100%' }}>
             <ValidatorForm ref={form} onSubmit={handleSubmit}>
                 <Box style={{ display: 'flex', width: '100%' }}>
-                    <Box sx={{ width: "100%", margin: 2, boxShadow, borderRadius }}>
-                        <RenderFormContols shadow={true} location="producttype" mode={props.mode} title={"Product Type"} controls={props.controls.producttype} options={props.options} onInputChange={OnInputChange} />
-                    </Box>
+                    {props.controls.producttype && <Box sx={{ width: "100%", margin: 2, boxShadow, borderRadius }}>
+                        <RenderFormContols shadow={true} location="producttype" mode={props.mode} title={"Product Type"}
+                            controls={props.controls.producttype} options={props.options} onInputChange={OnInputChange} />
+                    </Box>}
+
                 </Box>
                 <Box style={{ display: 'flex', width: '100%' }}>
-                    <Box sx={{ width: "100%", margin: 2, boxShadow, borderRadius }}>
-                        <RenderFormContols excludestepper={true} shadow={true} location="product" mode={props.mode} title={"Product"} controls={props.controls.product} options={props.options} onInputChange={OnInputChange} />
-                    </Box>
+                    {props.controls.product && <Box sx={{ width: "45%", margin: 2, boxShadow, borderRadius }}>
+                        <RenderFormContols shadow={true} location="product" mode={props.mode} title={"Product"}
+                            controls={props.controls.product} options={props.options} onInputChange={OnInputChange} />
+                    </Box>}
                 </Box>
                 <Box style={{ display: 'flex', width: '100%' }}>
-                    <Box sx={{ width: "100%", margin: 2, boxShadow, borderRadius }}>
-                        <RenderFormContols shadow={true} location="otherdetails" mode={props.mode} title={"Other Details"} controls={props.controls.otherdetails} options={props.options} onInputChange={OnInputChange} />
-                    </Box>
+                    {props.controls.otherdetails && <Box sx={{ width: "45%", margin: 2, boxShadow, borderRadius }}>
+                        <RenderFormContols shadow={true} location="otherdetails" mode={props.mode} title={"Other Details"}
+                            controls={props.controls.otherdetails} options={props.options} onInputChange={OnInputChange} />
+                    </Box>}
                 </Box>
+
                 <Box style={{ display: 'flex', width: '100%' }}>
-                    <Box sx={{ width: "100%", margin: 2, boxShadow, borderRadius }}>
-                        <RenderFormContols shadow={true} location="productprice" mode={props.mode} title={"Product Price"}
-                            controls={props.controls.productprice} options={props.options} onInputChange={OnInputChange} />
-                    </Box>
+                    {props.controls.productvendor && <Box sx={{ width: "45%", margin: 2, boxShadow, borderRadius }}>
+                        <RenderFormContols shadow={true} location="productvendor" mode={props.mode} title={"Product Vendor"}
+                            controls={props.controls.productvendor} options={props.options} onInputChange={OnInputChange} />
+                    </Box>}
                 </Box>
+
+                <Box style={{ display: 'flex', width: '100%' }}>
+                    {props.controls.productbuyingprice && <Box sx={{ width: "45%", margin: 2, boxShadow, borderRadius }}>
+                        <RenderFormContols shadow={true} location="productbuyingprice" mode={props.mode} title={"Product Buying Price"}
+                            controls={props.controls.productbuyingprice} options={props.options} onInputChange={OnInputChange} />
+                    </Box>}
+                </Box>
+
+                <Box style={{ display: 'flex', width: '100%' }}>
+                    {props.controls.productsellingprice && <Box sx={{ width: "45%", margin: 2, boxShadow, borderRadius }}>
+                        <RenderFormContols shadow={true} location="productsellingprice" mode={props.mode} title={"Product Selling Price"}
+                            controls={props.controls.productsellingprice} options={props.options} onInputChange={OnInputChange} />
+                    </Box>}
+                </Box>
+
             </ValidatorForm>
         </Box>
     );

@@ -1,16 +1,13 @@
 import { useEffect, useState } from "react";
 import { Box, Typography, Grid, Stack, Button, Divider } from '@mui/material';
 import Container from "screens/container";
-import ProductJsonConfig from "config/fullform_config.json";
 import RenderFormContols from "./child/formcontrols";
 import { useNavigate } from "react-router-dom";
-import * as Api from "shared/services";
 import Support from "shared/support";
 import { ArrowLeft as ArrowLeftIcon } from '@mui/icons-material';
-import { GetMetaDataInfo } from "shared/common";
 import Helper from "shared/helper";
 
-const screenItems = ['product', 'producttype', 'otherdetails', 'productprice'];
+import { Extract } from "../childs/extractproduct";
 
 const Component = (props) => {
     const [form, setForm] = useState(null);
@@ -34,42 +31,22 @@ const Component = (props) => {
             productId = rslt.id;
         } else { return; }
 
-        // Add Product Type
-        rslt = await Support.AddOrUpdateProductType(row['producttype']);
-        if (rslt.status) {
-            // Add Or Update Product
-            data = [
-                { key: "Product_id", value: parseInt(productId) },
-                { key: "ProductPType", value: parseInt(rslt.id) }
-            ];
-            rslt = await Support.AddOrUpdateProduct(data, dropDownOptions);
-            if (!rslt.status) return;
+        for (let i = 0; i < NavItems.length; i++) {
+            // Add or Update the product and navigation entity if it is deos not exist
+            let navItem = product.find(x => x.key === NavItems[i].name);
+            if (!Helper.IsJSONEmpty(navItem) && Helper.IsNullValue(navItem.value)) {
+                rslt = await NavItems[i].func(row[navItem.mapitem], dropDownOptions);
+                if (rslt.status) {
+                    data = [
+                        { key: "Product_id", value: parseInt(productId) },
+                        { key: navItem.key, value: parseInt(rslt.id) }
+                    ];
+                    rslt = await Support.AddOrUpdateProduct(data, dropDownOptions);
+                    if (!rslt.status) return;
 
-        } else { return; }
-
-        // Add Product Other Details
-        rslt = await Support.AddOrUpdateOtherDetails(row['otherdetails'], dropDownOptions);
-        if (rslt.status) {
-            // Add Or Update Product
-            data = [
-                { key: "Product_id", value: parseInt(productId) },
-                { key: "ProductODetails", value: parseInt(rslt.id) }
-            ];
-            rslt = await Support.AddOrUpdateProduct(data, dropDownOptions);
-            if (!rslt.status) return;
-
-        } else { return; }
-
-        // Add Or Update Product Price
-        rslt = await Support.AddOrUpdatePrice(row['productprice']);
-        if (rslt.status) {
-            data = [
-                { key: "Product_id", value: parseInt(productId) },
-                { key: "ProductSellingPrice", value: parseInt(rslt.id) }
-            ];
-            rslt = await Support.AddOrUpdateProduct(data, dropDownOptions);
-            if (!rslt.status) return;
-        } else { return; }
+                } else { return; }
+            }
+        }
 
         // Add Product Main Image
         prodImages = product.find((x) => x.key === 'MainImage');
@@ -103,120 +80,78 @@ const Component = (props) => {
     }
 
     const OnInputChange = (e) => {
-        const { name, value, location } = e;
-        if (name === "ProductOptionType") {
-            OnProductTypeChanged(e);
-        }
-        else {
-            let _row = row;
-            let _index = row[location].findIndex((x) => x.key === name);
-            if (_index > -1) {
-                _row[location][_index].value = value;
-                setRow(_row);
-                setShowUpdate(true);
+        const { name, value, location, ...others } = e;
+        let _row = row;
+        let _index = row[location].findIndex((x) => x.key === name && x.type !== "keyid");
+        if (_index > -1) {
+            const item = _row[location][_index];
+            let tValue = Helper.IsNullValue(value) ? null : value;
+            if (tValue === 'CNONE') tValue = null;
+            _row[location][_index].value = tValue;
+            setRow(_row);
+            setShowUpdate(true);
+            if (!Helper.IsNullValue(item['mapitem'])) {
+                UpdateMappingPannel(_row, item, tValue);
             }
         }
     }
 
-    const ResetValues = (location, name) => {
-        let _row = row;
-        const { TargetTypeName, TargetTypeId, TargetTypeDesc } = _row[location].find((x) => x.key == name);
-        _row[location].find((x) => x.key == TargetTypeId).value = null;
-        _row[location].find((x) => x.key == TargetTypeName).value = null;
-        _row[location].find((x) => x.key == TargetTypeDesc).value = null;
-        _row[location].find((x) => x.key == TargetTypeName).editable = true;
-        _row[location].find((x) => x.key == TargetTypeDesc).editable = true;
-        _row[location].find((x) => x.key == name).value = null;
-        setRow(_row);
-        return _row;
-    }
+    const UpdateMappingPannel = (_row, item, value) => {
 
-    const OnProductTypeChanged = async (e) => {
-        const { name, value, location, ...others } = e;
-        let _row = ResetValues(location, name);
-        const _prodType = _row[location].find((x) => x.key == name);
-        const { TargetTypeName, TargetTypeId, TargetTypeDesc } = _prodType;
+        const { mapitem, source, valueId } = item;
+        const { Values } = dropDownOptions.find(x => x.Name === source);
+        const obj = value ? Values.find(x => x[valueId] === value) : null;
+        let _rowMap = _row[mapitem];
 
-        if (!Helper.IsNullValue(value)) {
-            const { Name, Desc, Value } = dropDownOptions.find((x) => x.Name === 'ProductTypes').Values.find((x) => x.Value === value);
-            console.log(dropDownOptions);
-            _row[location].find((x) => x.key == TargetTypeId).value = Value;
-            _row[location].find((x) => x.key == TargetTypeName).value = Name;
-            _row[location].find((x) => x.key == TargetTypeName).editable = false;
-            _row[location].find((x) => x.key == TargetTypeDesc).value = Desc;
-            _row[location].find((x) => x.key == TargetTypeDesc).editable = false;
-            _row[location].find((x) => x.key == name).value = value;
-        } else {
-            _row[location].find((x) => x.key == name).editable = true;
-            _row[location].find((x) => x.key == name).value = null;
+        for (let i = 0; i < _rowMap.length; i++) {
+
+            let tmpField = _rowMap[i];
+            let bEditable = true;
+            let _cValue = null;
+
+            if (!Helper.IsNullValue(obj)) {
+                _cValue = obj[tmpField.key];
+                if (tmpField.type === 'dropdown') {
+                    const _dValues = dropDownOptions.find(x => x.Name === _rowMap[i].source).Values;
+                    _cValue = _dValues.find(x => x.Name === _cValue)[_rowMap[i].valueId];
+                } else if (tmpField.type === 'date') {
+                    _cValue = Helper.ToDate(_cValue, "YYYY-MM-DD");
+                }
+                bEditable = false;
+            }
+
+            tmpField.editable = bEditable;
+            tmpField.value = _cValue;
+
+            _rowMap[i] = tmpField;
+
         }
-        setShowUpdate(true);
+        _row[mapitem] = _rowMap;
         setRow(_row);
         setState(!state);
-    }
+    };
 
     const OnSubmitForm = (e) => {
         e.preventDefault();
         form.current.submit();
     }
 
-    const FetchProductTypes = async () => {
-        return new Promise(async (resolve) => {
-            global.Busy(true);
-            await Api.GetProductTypes()
-                .then(async (res) => {
-                    if (res.status) {
-                        const pValues = res.values.map((x) => { return { Name: x.ProductTypeName, Value: x.PtId, Desc: x.ProductTypeDesc } });
-                        await GetMetaDataInfo()
-                            .then(async (res2) => {
-                                const enums = res2.filter((x) => x.Type === 'Enum') || [];
-                                enums.push({ Name: "ProductTypes", Type: 'Enum', Values: pValues });
-                                setDropDownOptions(enums);
-                                global.Busy(false);
-                                return resolve(true);
-                            });
-
-                    } else {
-                        global.Busy(false);
-                        console.log(res.statusText);
-                        return resolve(true);
-                    }
-                });
-
-        });
-    }
-
-    const FetchProductDetails = async () => {
-        let item = {};
-        screenItems.forEach(elm => {
-            let items = [];
-            for (let prop of ProductJsonConfig[elm]) {
-                items.push({ ...prop, value: null });
-            }
-            item[elm] = items;
-        });
-
-        setRow(item);
-    }
-
-    const fetchData = async () => {
-        await FetchProductTypes().then(async () => {
-            await FetchProductDetails();
-        });
-    };
-
     useEffect(() => {
         setShowButton(true);
     }, []);
 
-    if (initialized) {
-        setInitialized(false);
-        fetchData();
-    }
+    const fetchData = async () => {
+        await Extract().then(rslt => {
+            const { row, options } = rslt;
+            setRow(row);
+            setDropDownOptions(options);
+            setState(!state);
+        })
+    };
 
-    useEffect(() => {
-        setInitialized(true);
-    }, []);
+    if (initialized) { setInitialized(false); fetchData(); }
+
+    useEffect(() => { setInitialized(true); }, []);
 
     return (
 
