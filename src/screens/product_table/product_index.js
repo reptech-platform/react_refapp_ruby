@@ -157,7 +157,7 @@ const Component = (props) => {
                     <Stack direction="row">
                         <Grid container sx={{ justifyContent: 'flex-end' }}>
                             <SearchInput searchStr={searchStr} onSearchChanged={OnSearchChanged} />
-                            <ToggleButtons viewName='DETAILS' OnViewChanged={(e) => OnViewChanged(e)} />
+                            {/* <ToggleButtons viewName='DETAILS' OnViewChanged={(e) => OnViewChanged(e)} /> */}
                             <IconButton
                                 size="medium"
                                 edge="start"
