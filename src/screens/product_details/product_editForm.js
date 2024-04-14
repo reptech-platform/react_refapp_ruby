@@ -4,19 +4,18 @@ import { ArrowLeft as ArrowLeftIcon } from '@mui/icons-material';
 import { useTheme } from '@mui/material/styles';
 import Container from "screens/container";
 import { useNavigate, useParams } from "react-router-dom";
-import * as Api from "shared/services";
-import { GetMetaDataInfo } from "shared/common";
-import ProductJsonConfig from "config/product_config.json";
+//import * as Api from "shared/services";
+//import { GetMetaDataInfo } from "shared/common";
+//import ProductJsonConfig from "config/product_config.json";
 import RenderFormContols from "./child/formcontrols";
 import Support from "shared/support";
 import Helper from "shared/helper";
 
-const screenItems = ['producttype', 'product', 'otherdetails', 'productprice'];
+import { Extract, MapItems } from "./child/extractproduct";
 
 const Component = (props) => {
     const { title } = props;
     const [form, setForm] = useState(null);
-    const theme = useTheme();
     const NavigateTo = useNavigate();
     const { id } = useParams();
     const [initialized, setInitialized] = useState(false);
@@ -58,146 +57,6 @@ const Component = (props) => {
         return changes;
     }
 
-    const FetchProductDetails = async (enums) => {
-
-        let item = {}, tmp;
-
-        screenItems.forEach(elm => {
-            let items = [];
-            for (let prop of ProductJsonConfig[elm]) {
-                items.push({ ...prop, value: null });
-            }
-            item[elm] = items;
-        });
-
-        if (id) {
-            global.Busy(true);
-            // Get Product Details
-            let rslt = await Api.GetProduct(id, "$expand=MainImage,PType,SellingPrice,ODetails,OtherImages");
-            if (rslt.status) {
-
-                const product = rslt.values;
-
-                for (let prop in product) {
-                    const tItem = item['product'].find((x) => x.key === prop);
-                    if (tItem && !Helper.IsNullValue(product[prop])) {
-                        if (prop === 'UnitOfMeasurement') {
-                            const dpItems = enums.find((z) => z.Name === tItem.source).Values;
-                            const _value = dpItems.find((m) => m.Name === product[prop]).Value;
-                            item['product'].find((x) => x.key === prop).value = parseInt(_value);
-                        } else {
-                            item['product'].find((x) => x.key === prop).value = product[prop];
-                        }
-                    }
-                }
-
-                // Product Type
-                if (product.PType) {
-                    Object.keys(product.PType).forEach(x => {
-                        item['producttype'].find(z => z.key === x).value = product.PType[x];
-                    })
-                }
-
-                if (product.ODetails) {
-                    Object.keys(product.ODetails).forEach(prop => {
-                        const tItem = item['otherdetails'].find((x) => x.key === prop);
-                        if (tItem) {
-                            if (prop === 'UnitOfMeasurement') {
-                                const dpItems = enums.find((z) => z.Name === tItem.source).Values;
-                                const _value = dpItems.find((m) => m.Name === product.ODetails[prop]).Value;
-                                item['otherdetails'].find((x) => x.key === prop).value = parseInt(_value);
-                            } else if (prop === 'AvailabilityStatus') {
-                                const dpItems = enums.find((z) => z.Name === tItem.source).Values;
-                                const _value = dpItems.find((m) => m.Name === product.ODetails[prop]).Value;
-                                item['otherdetails'].find((x) => x.key === prop).value = parseInt(_value);
-                            } else if (prop === 'ManufacturingDate') {
-                                let tmpDate = product.ODetails[prop].split('T');
-                                item['otherdetails'].find((x) => x.key === prop).value = tmpDate[0];
-                            } else {
-                                item['otherdetails'].find((x) => x.key === prop).value = product.ODetails[prop];
-                            }
-                        }
-                    })
-                }
-
-                // Product Price
-                if (product.SellingPrice) {
-                    Object.keys(product.SellingPrice).forEach(x => {
-                        item['productprice'].find(z => z.key === x).value = product.SellingPrice[x];
-                    })
-                }
-
-                // Main Image
-                if (product.MainImage) {
-                    tmp = {};
-                    ['DocData', 'DocId', 'DocName', 'DocType', 'DocExt'].forEach((x) => {
-                        tmp[x] = product.MainImage[x]
-                    });
-
-                    if (tmp.DocId > 0) {
-                        rslt = await Api.GetDocument(tmp.DocId, true);
-                        if (rslt.status) tmp['DocData'] = rslt.values;
-                    }
-                    item['product'].find((x) => x.key === "MainImage").value = tmp;
-                }
-
-                // Get Product Other Images
-                if (!Helper.IsJSONEmpty(product.OtherImages) && product.OtherImages.length > 0) {
-                    let _document = [];
-                    rslt = await Api.GetProductOtherImages(null, `Product_id eq ${product.Product_id}`);
-                    let productOtherImagesList = rslt.values;
-
-                    for (let i = 0; i < product.OtherImages.length; i++) {
-                        let docItem = product.OtherImages[i];
-
-                        const { Id } = productOtherImagesList.find(x => parseInt(x.DocId) === parseInt(docItem.DocId));
-                        docItem.ProductOtherImagesId = Id;
-
-                        let tmp = {};
-
-                        ['ProductOtherImagesId', 'DocData', 'DocId', 'DocName', 'DocType', 'DocExt'].forEach((x) => {
-                            tmp[x] = docItem[x]
-                        });
-
-                        if (parseInt(tmp.DocId) > 0) {
-                            rslt = await Api.GetDocument(tmp.DocId, true);
-                            if (rslt.status) tmp['DocData'] = rslt.values;
-                        }
-
-                        tmp['index'] = i;
-                        _document.push(tmp);
-                    }
-
-                    item['product'].find((x) => x.key === "OtherImages").value = _document;
-                }
-
-            }
-
-            let bItem = {};
-            screenItems.forEach(elm => {
-                let bItems = [];
-                for (let prop of item[elm]) {
-                    bItems.push({ key: prop.key, value: prop.value });
-                }
-                bItem[elm] = bItems;
-            });
-            setRow(item);
-            setBackupRow(Helper.CloneObject(bItem));
-            global.Busy(false);
-        }
-    }
-
-    const FetchMetaDataInfo = async () => {
-        return new Promise(async (resolve) => {
-            global.Busy(true);
-            const rlst = await GetMetaDataInfo();
-            const enums = rlst.filter((x) => x.Type === 'Enum') || [];
-            setDropDownOptions(enums);
-            global.Busy(false);
-            return resolve(enums);
-        });
-    }
-
     const UpdateBackUp = (name) => {
         let obj = Helper.CloneObject(row[name]);
         let bItems = [];
@@ -209,86 +68,30 @@ const Component = (props) => {
     }
 
     const OnSubmit = async () => {
-        let rslt, data, changes = [];
-        let productId, otherDetailsId, priceId;
+        let rslt, data, changes = [], productId;
 
-        let product = row['product'];
+        productId = row['product'].find((x) => x.type === 'keyid').value;
 
-        // Update Product
-        changes = TrackChanges('product');
-        if (changes.length > 0) {
-            // Check the product details are changed other than the images
-            const filters = ['MainImage', 'OtherImages'];
-            let tmp = changes.filter((x) => filters.indexOf(x) === -1);
-            if (tmp.length > 0) {
-                rslt = await Support.AddOrUpdateProduct(product, dropDownOptions, ["MainImage", "OtherImages"]);
-                if (rslt.status) {
-                    product.find((x) => x.key === 'Product_id').value = rslt.id;
-                    // Update Back for next tracking purpose
-                    UpdateBackUp('product');
-                } else { return; }
+        for (let i = 0; i < MapItems.length; i++) {
+
+            // Check is there any changes
+            const mapItem = MapItems[i];
+            let newObject = row[mapItem.target];
+
+            changes = TrackChanges(mapItem.target);
+            if (changes.length > 0) {
+                // Check any excluded items are configured
+                let tmp = changes.filter((x) => mapItem.exclude.indexOf(x) === -1);
+                if (tmp.length > 0) {
+                    rslt = await mapItem.func(newObject, dropDownOptions, mapItem.exclude);
+                    if (rslt.status) {
+                        newObject.find((x) => x.type === 'keyid').value = rslt.id;
+                        if (Helper.IsNullValue(mapItem.source)) productId = rslt.id;
+                        // Update Back for next tracking purpose
+                        UpdateBackUp(mapItem.target);
+                    } else { return; }
+                }
             }
-        }
-
-        productId = product.find((x) => x.key === 'Product_id').value || 0;
-
-        // Update Product Type
-        changes = TrackChanges('producttype');
-        if (changes.length > 0) {
-            rslt = await Support.AddOrUpdateProductType(row['producttype']);
-            if (rslt.status) {
-                // Add Or Update Product
-                data = [
-                    { key: "Product_id", value: parseInt(productId) },
-                    { key: "ProductPType", value: parseInt(rslt.id) }
-                ];
-                rslt = await Support.AddOrUpdateProduct(data, dropDownOptions);
-                if (!rslt.status) return;
-                row['producttype'].find((x) => x.key === 'PtId').value = parseInt(rslt.id);
-                row['product'].find((x) => x.key === 'ProductPType').value = parseInt(rslt.id);
-                // Update Back for next tracking purpose
-                UpdateBackUp('producttype');
-            } else { return; }
-        }
-
-        changes = TrackChanges('otherdetails');
-        if (changes.length > 0) {
-            rslt = await Support.AddOrUpdateOtherDetails(row['otherdetails'], dropDownOptions);
-            if (rslt.status) {
-                otherDetailsId = parseInt(rslt.id);
-                data = [
-                    { key: "Product_id", value: parseInt(productId) },
-                    { key: "ProductODetails", value: otherDetailsId }
-                ];
-                rslt = await Support.AddOrUpdateProduct(data, dropDownOptions);
-                if (!rslt.status) return;
-
-                row['otherdetails'].find((x) => x.key === 'OtherDetailsId').value = rslt.id;
-                row['product'].find((x) => x.key === 'ProductODetails').value = otherDetailsId;
-
-                // Update Back for next tracking purpose
-                UpdateBackUp('otherdetails');
-
-            } else { return; }
-        }
-
-        changes = TrackChanges('productprice');
-        if (changes.length > 0) {
-            rslt = await Support.AddOrUpdatePrice(row['productprice']);
-            if (rslt.status) {
-                priceId = praseInt(rslt.id);
-                data = [
-                    { key: "Product_id", value: parseInt(productId) },
-                    { key: "ProductSellingPrice", value: priceId }
-                ];
-                rslt = await Support.AddOrUpdateProduct(data, dropDownOptions);
-                if (!rslt.status) return;
-                row['productprice'].find((x) => x.key === 'PpId').value = priceId;
-                row['product'].find((x) => x.key === 'ProductSellingPrice').value = priceId;
-                // Update Back for next tracking purpose              
-                UpdateBackUp('productprice');
-
-            } else { return; }
 
         }
 
@@ -360,28 +163,70 @@ const Component = (props) => {
     const OnInputChange = (e) => {
         const { name, value, location, ...others } = e;
         let _row = row;
-        let _index = row[location].findIndex((x) => x.key === name);
+        let _index = row[location].findIndex((x) => x.key === name && x.type !== "keyid");
         if (_index > -1) {
+            const item = _row[location][_index];
+            let tValue = Helper.IsNullValue(value) ? null : value;
+            if (tValue === 'CNONE') tValue = null;
             _row[location][_index].value = value;
             setRow(_row);
             setShowUpdate(true);
+            if (!Helper.IsNullValue(item['mapitem'])) {
+                UpdateMappingPannel(_row, item, tValue);
+            }
         }
     }
 
-    useEffect(() => {
-        const fetchData = async () => {
-            if (initialized) {
-                await FetchMetaDataInfo().then(async (enums) => {
-                    await FetchProductDetails(enums);
-                });
-            }
-        };
-        fetchData();
-    }, [initialized]);
+    const UpdateMappingPannel = (_row, item, value) => {
 
-    useEffect(() => {
-        setInitialized(true);
-    }, [id]);
+        const { mapitem, source, valueId } = item;
+        const { Values } = dropDownOptions.find(x => x.Name === source);
+        const obj = value ? Values.find(x => x[valueId] === value) : null;
+        let _rowMap = _row[mapitem];
+
+        for (let i = 0; i < _rowMap.length; i++) {
+
+            let tmpField = _rowMap[i];
+            let bEditable = true;
+            let _cValue = null;
+
+            if (!Helper.IsNullValue(obj)) {
+                _cValue = obj[tmpField.key];
+                if (tmpField.type === 'dropdown') {
+                    const _dValues = dropDownOptions.find(x => x.Name === _rowMap[i].source).Values;
+                    _cValue = _dValues.find(x => x.Name === _cValue)[_rowMap[i].valueId];
+                } else if (tmpField.type === 'date') {
+                    _cValue = Helper.ToDate(_cValue, "YYYY-MM-DD");
+                }
+                bEditable = false;
+            }
+
+            tmpField.editable = bEditable;
+            tmpField.value = _cValue;
+
+            _rowMap[i] = tmpField;
+
+        }
+        _row[mapitem] = _rowMap;
+        setRow(_row);
+        setState(!state);
+    };
+
+    const fetchData = async () => {
+
+        await Extract(id).then(rslt => {
+            const { row, options, backRow } = rslt;
+            setRow(row);
+            setDropDownOptions(options);
+            setBackupRow(backRow);
+            setState(!state);
+        })
+
+    };
+
+    if (initialized) { setInitialized(false); fetchData(); }
+
+    useEffect(() => { setInitialized(true); }, [id]);
 
     return (
 

@@ -2,16 +2,21 @@
 import { useEffect, useState } from "react";
 import { Box, Typography, Grid, Stack, Button, Divider } from '@mui/material';
 import Container from "screens/container";
-import ProductJsonConfig from "config/product_config.json";
 import RenderFormContols from "./child/formcontrols";
 import { useNavigate } from "react-router-dom";
-import * as Api from "shared/services";
 import Support from "shared/support";
 import { ArrowLeft as ArrowLeftIcon } from '@mui/icons-material';
-import { GetMetaDataInfo } from "shared/common";
 import Helper from "shared/helper";
 
-const screenItems = ['product', 'producttype', 'otherdetails', 'productvendor', 'productbuyingprice', 'productsellingprice'];
+import { Extract } from "./child/extractproduct";
+
+const NavItems = [
+    { name: 'ProductPType', func: Support.AddOrUpdateProductType },
+    { name: 'ProductODetails', func: Support.AddOrUpdateOtherDetails },
+    { name: 'ProductSellingPrice', func: Support.AddOrUpdatePrice },
+    { name: 'ProductBuyingPrice', func: Support.AddOrUpdatePrice },
+    { name: 'ProductProductVendor', func: Support.AddOrUpdateProductVendor }
+];
 
 const Component = (props) => {
 
@@ -25,14 +30,6 @@ const Component = (props) => {
     const [showUpdate, setShowUpdate] = useState(false);
     const { title } = props;
 
-    const navItems = [
-        { name: 'ProductPType', func: Support.AddOrUpdateProductType },
-        { name: 'ProductODetails', func: Support.AddOrUpdateOtherDetails },
-        { name: 'ProductSellingPrice', func: Support.AddOrUpdatePrice },
-        { name: 'ProductBuyingPrice', func: Support.AddOrUpdatePrice },
-        { name: 'ProductProductVendor', func: Support.AddOrUpdateProductVendor }
-    ];
-
     const OnSubmit = async () => {
         let rslt, data, prodImages, productId;
 
@@ -44,11 +41,11 @@ const Component = (props) => {
             productId = rslt.id;
         } else { return; }
 
-        for (let i = 0; i < navItems.length; i++) {
+        for (let i = 0; i < NavItems.length; i++) {
             // Add or Update the product and navigation entity if it is deos not exist
-            let navItem = product.find(x => x.key === navItems[i].name);
+            let navItem = product.find(x => x.key === NavItems[i].name);
             if (!Helper.IsJSONEmpty(navItem) && Helper.IsNullValue(navItem.value)) {
-                rslt = await navItems[i].func(row[navItem.mapitem], dropDownOptions);
+                rslt = await NavItems[i].func(row[navItem.mapitem], dropDownOptions);
                 if (rslt.status) {
                     data = [
                         { key: "Product_id", value: parseInt(productId) },
@@ -149,58 +146,13 @@ const Component = (props) => {
         form.current.submit();
     }
 
-    const FetchDropdownItems = async (items) => {
-        return new Promise(async (resolve) => {
-
-            global.Busy(true);
-
-            // Default get all enums list items
-            let res = await GetMetaDataInfo();
-
-            const enums = res.filter((x) => x.Type === 'Enum') || [];
-            const otherItems = items.filter(x => enums.findIndex(z => z.Name === x) === -1);
-
-            // Extract the required entities as enums
-            for (let i = 0; i < otherItems.length; i++) {
-                const item = otherItems[i];
-                await Api.GetEntityInfo(item + 's').then(rslt => {
-                    if (rslt.status) {
-                        enums.push({ Name: item, Type: 'Entity', Values: rslt.values });
-                    }
-                });
-            }
-
-            setDropDownOptions(enums);
-            global.Busy(false);
-            return resolve(true);
-        });
-    };
-
-    const FetchProductDetails = async () => {
-        let item = {};
-        return new Promise(async (resolve) => {
-            screenItems.forEach(elm => {
-                let items = [];
-                for (let prop of ProductJsonConfig[elm]) {
-                    items.push({ ...prop, value: null });
-                    //items.push({ ...prop });
-                }
-                item[elm] = items;
-            });
-            setRow(item);
-            return resolve(item);
-        });
-    }
-
     const fetchData = async () => {
-        await FetchProductDetails().then(async (item) => {
-            let items = [];
-            Object.values(item).forEach(elm => {
-                items = [...items, ...elm];
-            });
-            items = Helper.RemoveDuplicatesFromArray(items.filter(x => x.type === "dropdown").map(z => z.source));
-            await FetchDropdownItems(items);
-        });
+        await Extract().then(rslt => {
+            const { row, options } = rslt;
+            setRow(row);
+            setDropDownOptions(options);
+            setState(!state);
+        })
     };
 
     useEffect(() => { setShowButton(true); }, []);
