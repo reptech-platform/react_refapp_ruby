@@ -11,7 +11,7 @@ import RenderFormContols from "./child/formcontrols";
 import Support from "shared/support";
 import Helper from "shared/helper";
 
-import { Extract, MapItems } from "./child/extractproduct";
+import { Extract, MapItems } from "../childs/extractproduct";
 
 const Component = (props) => {
     const { title } = props;

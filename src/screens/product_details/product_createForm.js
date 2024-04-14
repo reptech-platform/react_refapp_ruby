@@ -8,7 +8,7 @@ import Support from "shared/support";
 import { ArrowLeft as ArrowLeftIcon } from '@mui/icons-material';
 import Helper from "shared/helper";
 
-import { Extract } from "./child/extractproduct";
+import { Extract } from "../childs/extractproduct";
 
 const NavItems = [
     { name: 'ProductPType', func: Support.AddOrUpdateProductType },
