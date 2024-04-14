@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import Container from "screens/container";
 import { DataList } from '../childs';
 import * as Api from "shared/services";
-import { SearchInput, ToggleButtons } from "components";
+import { SearchInput } from "components";
 import { Add as AddBoxIcon } from '@mui/icons-material';
 import ProductJsonConfig from "config/product_list_config.json";
 
@@ -120,7 +120,6 @@ const Component = (props) => {
                     <Stack direction="row">
                         <Grid container sx={{ justifyContent: 'flex-end' }}>
                             <SearchInput searchStr={searchStr} onSearchChanged={OnSearchChanged} />
-                            <ToggleButtons viewName='LIST' OnViewChanged={(e) => OnViewChanged(e)} />
                             <IconButton
                                 size="medium"
                                 edge="start"

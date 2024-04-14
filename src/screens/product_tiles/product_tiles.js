@@ -6,7 +6,7 @@ import { DataGrid } from '../childs';
 import * as Api from "shared/services";
 import ProductJsonConfig from "config/product_tiles_config.json";
 
-import { SearchInput, ToggleButtons, CustomDialog } from "components";
+import { SearchInput, CustomDialog } from "components";
 import Helper from "shared/helper";
 import { Add as AddBoxIcon } from '@mui/icons-material';
 
@@ -162,7 +162,6 @@ const Component = (props) => {
                     <Stack direction="row">
                         <Grid container sx={{ justifyContent: 'flex-end' }}>
                             <SearchInput searchStr={searchStr} onSearchChanged={OnSearchChanged} />
-                            <ToggleButtons viewName='TILES' OnViewChanged={(e) => OnViewChanged(e)} />
                             <IconButton
                                 size="medium"
                                 edge="start"

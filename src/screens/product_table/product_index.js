@@ -5,7 +5,7 @@ import Container from "screens/container";
 import { DataTable } from '../childs';
 import * as Api from "shared/services";
 
-import { SearchInput, ToggleButtons, CustomDialog } from "components";
+import { SearchInput, CustomDialog } from "components";
 import Helper from "shared/helper";
 import { Add as AddBoxIcon } from '@mui/icons-material';
 
@@ -157,7 +157,6 @@ const Component = (props) => {
                     <Stack direction="row">
                         <Grid container sx={{ justifyContent: 'flex-end' }}>
                             <SearchInput searchStr={searchStr} onSearchChanged={OnSearchChanged} />
-                            {/* <ToggleButtons viewName='DETAILS' OnViewChanged={(e) => OnViewChanged(e)} /> */}
                             <IconButton
                                 size="medium"
                                 edge="start"

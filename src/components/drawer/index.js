@@ -115,7 +115,7 @@ const Component = (props) => {
                         <ListItemButton onClick={() => NavigateTo("/productlist")} sx={{ height: 50 }}>
                             <ListItemIcon sx={{ minWidth: 30 }}>
                                 <Tooltip title="List Layout">
-                                    <GridViewIcon />
+                                    <Toc />
                                 </Tooltip>
                             </ListItemIcon>
                             {open && <ListItemText primary="List Layout" sx={{ pl: 1 }} />}
