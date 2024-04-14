@@ -1,27 +1,32 @@
-{
-    "product": [
-        {
-            "key": "Product_id",
-            "target": "productId"
-        },
-        {
-            "key": "Product_description",
-            "target": "description"
-        },
-        {
-            "key": "Name",
-            "target": "name"
-        },
-        {
-            "key": "UnitOfMeasurement",
-            "target": "unitOfMeasurement"
-        },
-        {
-            "key": "Weight",
-            "target": "weight"
-        },
-        {
-            "key": "MainImage"
-        }
-    ]
-}
+[
+    {
+        "key": "Product_id",
+        "source": "Products",
+        "target": "keyId"
+    },
+    {
+        "key": "Name",
+        "target": "property1"
+    },
+    {
+        "key": "Product_description",
+        "target": "property2"
+    },
+    {
+        "key": "ProductPType",
+        "target": "property3"
+    },
+    {
+        "key": "Weight",
+        "target": "property4"
+    },
+    {
+        "key": "UnitOfMeasurement",
+        "target": "property5"
+    },
+    {
+        "key": "MainImage",
+        "type": "doc",
+        "target": "property6"
+    }
+]

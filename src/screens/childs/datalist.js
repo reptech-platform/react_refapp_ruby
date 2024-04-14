@@ -33,18 +33,18 @@ const Component = (props) => {
                     <React.Fragment key={index}>
                         <ListItem alignItems="flex-start">
                             <ListItemAvatar>
-                                <Avatar alt="Travis Howard" src={x.mainImage}><ImageNotSupportedIcon /></Avatar>
+                                <Avatar alt="Travis Howard" src={x.property6}><ImageNotSupportedIcon /></Avatar>
                             </ListItemAvatar>
                             <ListItemText sx={{ width: "50%" }}
                                 primary={
                                     <Typography variant="h6" component="span">
-                                        {x.name}
+                                        {x.property1}
                                     </Typography>
                                 }
                                 secondary={
                                     <React.Fragment>
                                         <Typography component="span" variant="body2">
-                                            {x.description}
+                                            {x.property2}
                                         </Typography>
                                     </React.Fragment>
                                 } />
@@ -52,7 +52,7 @@ const Component = (props) => {
                                 primary={
                                     <React.Fragment>
                                         <Typography component="span" variant="body2">
-                                            &nbsp;{x.weight}
+                                            &nbsp;{x.property3}
                                         </Typography>
                                     </React.Fragment>
                                 }
@@ -60,12 +60,12 @@ const Component = (props) => {
                                     <React.Fragment>
                                         <Typography paragraph component="span">&nbsp;</Typography>
                                         <Typography component="span" variant="body2">
-                                            {x.unitOfMeasurement}
+                                            {x.property4}
                                         </Typography>
                                         <br />
                                         <Typography paragraph component="span">&nbsp;</Typography>
-                                        <Typography variant={x.status && x.status.toLowerCase()} component="span">
-                                            {x.status}
+                                        <Typography variant={x.property5 && x.property5.toLowerCase()} component="span">
+                                            {x.property5}
                                         </Typography>
                                     </React.Fragment>
                                 } />
