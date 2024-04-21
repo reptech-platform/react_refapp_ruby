@@ -1,17 +1,13 @@
 import { useEffect, useState } from "react";
 import { Typography, Grid, Stack, Button, Box, Divider } from '@mui/material';
 import { ArrowLeft as ArrowLeftIcon } from '@mui/icons-material';
-import { useTheme } from '@mui/material/styles';
 import Container from "screens/container";
 import { useNavigate, useParams } from "react-router-dom";
-//import * as Api from "shared/services";
-//import { GetMetaDataInfo } from "shared/common";
-//import ProductJsonConfig from "config/product_config.json";
 import RenderFormContols from "./child/formcontrols";
 import Support from "shared/support";
 import Helper from "shared/helper";
 
-import { Extract, MapItems } from "../childs/extractproduct";
+import { Extract, MapItems } from "./child/extract";
 
 const Component = (props) => {
     const { title } = props;
@@ -74,19 +70,20 @@ const Component = (props) => {
 
         for (let i = 0; i < MapItems.length; i++) {
 
+            debugger;
             // Check is there any changes
             const mapItem = MapItems[i];
-            let newObject = row[mapItem.target];
 
-            changes = TrackChanges(mapItem.target);
+            changes = TrackChanges(mapItem.uicomponent);
             if (changes.length > 0) {
                 // Check any excluded items are configured
                 let tmp = changes.filter((x) => mapItem.exclude.indexOf(x) === -1);
                 if (tmp.length > 0) {
+                    let newObject = row[mapItem.uicomponent];
                     rslt = await mapItem.func(newObject, dropDownOptions, mapItem.exclude);
                     if (rslt.status) {
                         newObject.find((x) => x.type === 'keyid').value = rslt.id;
-                        if (Helper.IsNullValue(mapItem.source)) productId = rslt.id;
+                        if (Helper.IsNullValue(mapItem.navpropname)) productId = rslt.id;
                         // Update Back for next tracking purpose
                         UpdateBackUp(mapItem.target);
                     } else { return; }

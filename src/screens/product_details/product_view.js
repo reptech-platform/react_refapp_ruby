@@ -5,7 +5,7 @@ import Container from "screens/container";
 import { useNavigate, useParams } from "react-router-dom";
 import RenderFormContols from "./child/formcontrols";
 
-import { Extract } from "../childs/extractproduct";
+import { Extract } from "./child/extract";
 
 const Component = (props) => {
     const { title } = props;
