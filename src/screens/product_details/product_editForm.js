@@ -64,13 +64,12 @@ const Component = (props) => {
     }
 
     const OnSubmit = async () => {
-        let rslt, data, changes = [], productId;
+        let rslt, data, changes = [], productId, product;
 
+        product = row['product'];
         productId = row['product'].find((x) => x.type === 'keyid').value;
 
         for (let i = 0; i < MapItems.length; i++) {
-
-            debugger;
             // Check is there any changes
             const mapItem = MapItems[i];
 
