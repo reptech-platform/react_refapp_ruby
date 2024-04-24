@@ -54,13 +54,15 @@ const Component = (props) => {
     }
 
     const UpdateBackUp = (name) => {
-        let obj = Helper.CloneObject(row[name]);
-        let bItems = [];
-        for (let prop of obj) {
-            bItems.push({ key: prop.key, value: prop.value });
+        if (name) {
+            let obj = Helper.CloneObject(row[name]);
+            let bItems = [];
+            for (let prop of obj) {
+                bItems.push({ key: prop.key, value: prop.value });
+            }
+            setBackupRow((prev) => ({ ...prev, [name]: bItems }));
+            setState(!state);
         }
-        setBackupRow((prev) => ({ ...prev, [name]: bItems }));
-        setState(!state);
     }
 
     const OnSubmit = async () => {
