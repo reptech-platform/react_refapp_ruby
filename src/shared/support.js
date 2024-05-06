@@ -72,7 +72,7 @@ fn.AddOrUpdateProduct = async (input, enums, excludesItems) => {
             if (excludes.indexOf(x.key) === -1) {
                 data[x.key] = x.value;
                 if (x.type === 'dropdown') {
-                    data[x.key] = enums.find((z) => z.Name === x.source).Values.find((m) => parseInt(m.Value) === parseInt(x.value)).Name;
+                    data[x.key] = enums.find((z) => z.Name === x.source).Values.find((m) => parseInt(m[x.valueId]) === parseInt(x.value))[x.valueId];
                 } else if (numberItems.indexOf(x.key) > -1) {
                     if (x.value) data[x.key] = parseFloat(x.value);
                 } else {
@@ -136,7 +136,7 @@ fn.AddOrUpdateOtherDetails = async (input, enums, excludesItems) => {
             .map((x) => {
                 if (excludes.indexOf(x.key) === -1) {
                     if (x.type === 'dropdown') {
-                        data[x.key] = enums.find((z) => z.Name === x.source).Values.find((m) => parseInt(m.Value) === parseInt(x.value)).Name;
+                        data[x.key] = enums.find((z) => z.Name === x.source).Values.find((m) => parseInt(m[x.valueId]) === parseInt(x.value))[x.valueId];
                     } else if (x.key === 'ManufacturingDate') {
                         if (x.value) data[x.key] = `${x.value}T00:00:00+00:00`;
                     } else if (numberItems.indexOf(x.key) > -1) {
