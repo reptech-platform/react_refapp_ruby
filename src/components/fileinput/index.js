@@ -192,7 +192,7 @@ const Component = (props) => {
                 </>
             )}
             {/* {mode && mode !== 'view' && inputValue && <Image sx={{ width: 200, height: 200, m: 2 }} alt={"Product Image"} src={inputValue} />} */}
-            {Images.indexOf(iDocType) > -1 && iDocData && !Helper.IsNullValue(iDocData) &&
+            {!Helper.IsNullValue(iDocData) &&
                 <Image borderRadius="4px" sx={{ width: 300, border: '1px solid #ddd', p: 1, mt: 2 }} alt={alt || "Product Image"} src={iDocData} />
             }
 

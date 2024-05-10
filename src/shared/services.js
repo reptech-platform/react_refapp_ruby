@@ -359,13 +359,13 @@ const SetDocument = async (input, headers) => {
         let id = headers.DocId;
         let method = "POST";
         let url = `${serverApi}Documents`;
-        if (headers.DocId && !input.Deleted) {
+        /* if (headers.DocId && !input.Deleted) {
             method = "PATCH";
             url = `${serverApi}Documents(${headers.DocId})`;
         } else if (headers.DocId && input.Deleted) {
             method = "DELETE";
             url = `${serverApi}Documents(${headers.DocId})`;
-        }
+        } */
         delete headers['DocId'];
         delete headers['Deleted'];
 
