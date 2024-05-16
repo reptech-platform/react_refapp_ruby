@@ -21,8 +21,7 @@ const FetchProductInfo = async () => {
         keyItems.forEach(elm => {
             let items = [];
             for (let prop of ProductJsonConfig[elm]) {
-                //items.push({ ...prop, value: null });
-                items.push({ ...prop });
+                items.push({ ...prop, value: null });
             }
             item[elm] = items;
         });
