@@ -26,7 +26,7 @@
         "target": "property5"
     },
     {
-        "key": "MainImage",
+        "key": "ProductMainImage",
         "type": "doc",
         "target": "property6"
     }

@@ -86,11 +86,17 @@ const Component = (props) => {
                         let _row = {};
                         for (let j = 0; j < navItems.length; j++) {
                             let tNav = navItems[j];
-                            if (tNav.expand) {
-                                let navItem = _value[tNav.expand] || {};
-                                _row[tNav.target] = navItem[tNav.key];
+                            if (tNav.type === 'doc' && !Helper.IsNullValue(_value[tNav.key])) {
+                                await Api.GetDocument(_value[tNav.key], true).then((rslt) => {
+                                    _row[tNav.target] = rslt.values;
+                                })
                             } else {
-                                _row[tNav.target] = _value[tNav.key];
+                                if (tNav.expand) {
+                                    let navItem = _value[tNav.expand] || {};
+                                    _row[tNav.target] = navItem[tNav.key];
+                                } else {
+                                    _row[tNav.target] = _value[tNav.key];
+                                }
                             }
                         }
                         _rows.push(_row);
