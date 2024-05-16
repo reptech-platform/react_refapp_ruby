@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { Box, Typography, Grid, Stack, Button, Divider } from '@mui/material';
 import Container from "screens/container";
@@ -7,21 +8,23 @@ import Support from "shared/support";
 import { ArrowLeft as ArrowLeftIcon } from '@mui/icons-material';
 import Helper from "shared/helper";
 
-import { Extract } from "../childs/extractproduct";
+import { Extract, MapItems } from "./child/extract";
 
 const Component = (props) => {
+
     const [form, setForm] = useState(null);
     const [row, setRow] = useState({});
     const [initialized, setInitialized] = useState(false);
+    const [state, setState] = useState(false);
     const [showButton, setShowButton] = useState(true);
     const [dropDownOptions, setDropDownOptions] = useState([]);
     const NavigateTo = useNavigate();
     const [showUpdate, setShowUpdate] = useState(false);
-    const [state, setState] = useState(false);
     const { title } = props;
 
     const OnSubmit = async () => {
         let rslt, data, prodImages, productId;
+        const mapItems = MapItems;
 
         let product = row['product'];
 
@@ -31,11 +34,11 @@ const Component = (props) => {
             productId = rslt.id;
         } else { return; }
 
-        for (let i = 0; i < NavItems.length; i++) {
+        for (let i = 0; i < mapItems.length; i++) {
             // Add or Update the product and navigation entity if it is deos not exist
-            let navItem = product.find(x => x.key === NavItems[i].name);
+            let navItem = product.find(x => x.uicomponent === mapItems[i].uicomponent);
             if (!Helper.IsJSONEmpty(navItem) && Helper.IsNullValue(navItem.value)) {
-                rslt = await NavItems[i].func(row[navItem.mapitem], dropDownOptions);
+                rslt = await mapItems[i].func(row[navItem.uicomponent], dropDownOptions);
                 if (rslt.status) {
                     data = [
                         { key: "Product_id", value: parseInt(productId) },
@@ -50,27 +53,31 @@ const Component = (props) => {
 
         // Add Product Main Image
         prodImages = product.find((x) => x.key === 'MainImage');
-        rslt = await Support.AddOrUpdateDocument(prodImages);
-        if (rslt.status) {
-            data = [
-                { key: "Product_id", value: parseInt(productId) },
-                { key: "ProductMainImage", value: parseInt(rslt.id) }
-            ];
-            rslt = await Support.AddOrUpdateProduct(data, dropDownOptions);
-            if (!rslt.status) return;
-        } else { return; }
-
-        // Add Product Other Images
-        prodImages = product.find((x) => x.key === 'OtherImages').value;
-        for (let i = 0; i < prodImages.length; i++) {
-            rslt = await Support.AddOrUpdateDocument({ value: prodImages[i] });
+        if (prodImages && !Helper.IsNullValue(prodImages.value)) {
+            rslt = await Support.AddOrUpdateDocument(prodImages);
             if (rslt.status) {
                 data = [
                     { key: "Product_id", value: parseInt(productId) },
-                    { key: "DocId", value: parseInt(rslt.id) }
+                    { key: "ProductMainImage", value: parseInt(rslt.id) }
                 ];
-                rslt = await Support.AddOrUpdateProductOtherImages(data);
+                rslt = await Support.AddOrUpdateProduct(data, dropDownOptions);
                 if (!rslt.status) return;
+            } else { return; }
+        }
+
+        // Add Product Other Images
+        prodImages = product.find((x) => x.key === 'OtherImages').value;
+        if (prodImages && !Helper.IsNullValue(prodImages.value)) {
+            for (let i = 0; i < prodImages.length; i++) {
+                rslt = await Support.AddOrUpdateDocument({ value: prodImages[i] });
+                if (rslt.status) {
+                    data = [
+                        { key: "Product_id", value: parseInt(productId) },
+                        { key: "DocId", value: parseInt(rslt.id) }
+                    ];
+                    rslt = await Support.AddOrUpdateProductOtherImages(data);
+                    if (!rslt.status) return;
+                }
             }
         }
 
@@ -90,7 +97,7 @@ const Component = (props) => {
             _row[location][_index].value = tValue;
             setRow(_row);
             setShowUpdate(true);
-            if (!Helper.IsNullValue(item['mapitem'])) {
+            if (!Helper.IsNullValue(item['uicomponent'])) {
                 UpdateMappingPannel(_row, item, tValue);
             }
         }
@@ -98,10 +105,10 @@ const Component = (props) => {
 
     const UpdateMappingPannel = (_row, item, value) => {
 
-        const { mapitem, source, valueId } = item;
+        const { uicomponent, source, valueId } = item;
         const { Values } = dropDownOptions.find(x => x.Name === source);
         const obj = value ? Values.find(x => x[valueId] === value) : null;
-        let _rowMap = _row[mapitem];
+        let _rowMap = _row[uicomponent];
 
         for (let i = 0; i < _rowMap.length; i++) {
 
@@ -126,7 +133,7 @@ const Component = (props) => {
             _rowMap[i] = tmpField;
 
         }
-        _row[mapitem] = _rowMap;
+        _row[uicomponent] = _rowMap;
         setRow(_row);
         setState(!state);
     };

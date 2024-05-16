@@ -15,7 +15,7 @@
             "validationMessages": [
                 "Product type is required"
             ],
-            "value": "Test 002"
+            "value": "Dummy Product Type"
         },
         {
             "key": "ProductTypeDesc",
@@ -29,31 +29,28 @@
             "validationMessages": [
                 "Description is required"
             ],
-            "value": "Test 002 Description"
+            "value": "Dummy Product Type Description"
         }
     ],
     "product": [
         {
             "key": "Product_id",
-            "type": "keyid",
-            "value": 27
-        },
-        {
-            "key": "ProductODetails",
-            "type": "keyid"
-        },
-        {
-            "key": "ProductSellingPrice",
-            "type": "keyid"
-        },
-        {
-            "key": "ProductMainImage",
             "type": "keyid"
         },
         {
             "key": "ProductPType",
-            "type": "keyid",
-            "value": 19
+            "label": "Product Type",
+            "type": "dropdown",
+            "valueId": "PtId",
+            "nameId": "ProductTypeName",
+            "contentId": "ProductTypeName",
+            "source": "ProductType",
+            "uicomponent": "producttype",
+            "editable": true,
+            "create": true,
+            "validators": [],
+            "validationMessages": [],
+            "value": null
         },
         {
             "key": "Name",
@@ -66,7 +63,7 @@
             "validationMessages": [
                 "Product name is required"
             ],
-            "value": "Product 002"
+            "value": "Dummy Product"
         },
         {
             "key": "Product_description",
@@ -80,7 +77,7 @@
             "validationMessages": [
                 "Product description is required"
             ],
-            "value": "Product 002 Description"
+            "value": "Dummy Product Description"
         },
         {
             "key": "Manufacturer",
@@ -93,7 +90,7 @@
             "validationMessages": [
                 "Product image is required"
             ],
-            "value": "Product 002 Manufacturer"
+            "value": "Dummy Product Manufacturer"
         },
         {
             "key": "UnitOfMeasurement",
@@ -162,18 +159,74 @@
             "value": "#7e2020"
         },
         {
+            "key": "ProductBuyingPrice",
+            "label": "Product Buying Price",
+            "type": "dropdown",
+            "valueId": "PpId",
+            "nameId": "Price",
+            "contentId": "Price",
+            "source": "ProductPrice",
+            "uicomponent": "productbuyingprice",
+            "editable": true,
+            "create": true,
+            "validators": [],
+            "validationMessages": [],
+            "value": null
+        },
+        {
+            "key": "ProductSellingPrice",
+            "label": "Product Selling Price",
+            "type": "dropdown",
+            "valueId": "PpId",
+            "nameId": "Price",
+            "contentId": "Price",
+            "source": "ProductPrice",
+            "uicomponent": "productsellingprice",
+            "editable": true,
+            "create": true,
+            "validators": [],
+            "validationMessages": [],
+            "value": null
+        },
+        {
+            "key": "ProductProductVendor",
+            "label": "Product Vendor",
+            "type": "dropdown",
+            "valueId": "SId",
+            "nameId": "SupplierName",
+            "contentId": "SupplierName",
+            "source": "Supplier",
+            "uicomponent": "productvendor",
+            "editable": true,
+            "create": true,
+            "validators": [],
+            "validationMessages": [],
+            "value": null
+        },
+        {
+            "key": "ProductODetails",
+            "label": "Product Other Details",
+            "type": "dropdown",
+            "valueId": "OtherDetailsId",
+            "nameId": "UnitOfMeasurement",
+            "contentId": "UnitOfMeasurement",
+            "source": "OtherDetails",
+            "uicomponent": "otherdetails",
+            "editable": true,
+            "create": true,
+            "validators": [],
+            "validationMessages": [],
+            "value": null
+        },
+        {
             "key": "MainImage",
             "label": "MainImage",
             "width": "30%",
             "type": "doc",
             "accept": ".JPG,.JPEG,.PNG",
             "editable": true,
-            "validators": [
-                "required"
-            ],
-            "validationMessages": [
-                "Product main image is required"
-            ]
+            "validators": [],
+            "validationMessages": []
         },
         {
             "key": "OtherImages",
@@ -183,12 +236,8 @@
             "accept": ".JPG,.JPEG,.PNG",
             "editable": true,
             "multiple": true,
-            "validators": [
-                "required"
-            ],
-            "validationMessages": [
-                "Product other image is required"
-            ]
+            "validators": [],
+            "validationMessages": []
         }
     ],
     "otherdetails": [
@@ -264,7 +313,40 @@
             "value": 2
         }
     ],
-    "productprice": [
+    "productvendor": [
+        {
+            "key": "SId",
+            "type": "keyid"
+        },
+        {
+            "key": "SupplierName",
+            "label": "Name",
+            "type": "text",
+            "editable": true,
+            "validators": [
+                "required"
+            ],
+            "validationMessages": [
+                "Supplier name is required"
+            ],
+            "value": "Dummy Product Vendor"
+        },
+        {
+            "key": "SupplierContact",
+            "label": "Contact",
+            "type": "text",
+            "editable": true,
+            "width": "30%",
+            "validators": [
+                "required"
+            ],
+            "validationMessages": [
+                "Supplier contact is required"
+            ],
+            "value": "Dummy Product Contact"
+        }
+    ],
+    "productbuyingprice": [
         {
             "key": "PpId",
             "type": "keyid"
@@ -297,7 +379,57 @@
             "validationMessages": [
                 "Product discount group is required"
             ],
-            "value": "NoDiscount"
+            "value": "Dummy Product Buying Price"
+        },
+        {
+            "key": "IsVatIncluded",
+            "label": "IsVatIncluded",
+            "type": "check",
+            "editable": true,
+            "default": false,
+            "validators": [
+                "isTruthy"
+            ],
+            "validationMessages": [
+                "Is product vat included?"
+            ],
+            "value": true
+        }
+    ],
+    "productsellingprice": [
+        {
+            "key": "PpId",
+            "type": "keyid"
+        },
+        {
+            "key": "Price",
+            "label": "Price",
+            "type": "text",
+            "editable": true,
+            "validators": [
+                "required",
+                "isFloat",
+                "isPositive"
+            ],
+            "validationMessages": [
+                "Product price is required",
+                "Product price must be a number",
+                "Product price must be a pasitive number"
+            ],
+            "value": 25
+        },
+        {
+            "key": "DiscountGroup",
+            "label": "DiscountGroup",
+            "type": "text",
+            "editable": true,
+            "validators": [
+                "required"
+            ],
+            "validationMessages": [
+                "Product discount group is required"
+            ],
+            "value": "Dummy Product Selling Price"
         },
         {
             "key": "IsVatIncluded",
