@@ -23,7 +23,7 @@ const Component = (props) => {
     };
 
     const handleChangeRowsPerPage = (event) => {
-        /* setPageInfo({ page: 0, pageSize: parseInt(event.target.value, 5) }); */
+        onPageClicked({ page: 0, pageSize: parseInt(event.target.value) });
     };
 
     return (

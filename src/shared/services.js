@@ -5,7 +5,6 @@ import { apiUrl as serverApi } from "config";
 // const serverApi = "http:/34.238.241.129:8081/ecom/";
 // const serverApi = "http://52.15.220.173:8081/ecom/";
 
-
 const GetEntityInfo = async (name) => {
     return new Promise(async (resolve) => {
         let url = `${serverApi}${name}`;
@@ -21,6 +20,32 @@ const GetEntityInfo = async (name) => {
             const json = await res.json();
             if (res.status === 200) {
                 return resolve({ status: res.ok, values: json.value || [] });
+            }
+
+            return resolve({ status: false, statusText: json.error.message });
+
+        } catch (error) {
+            console.log(error);
+            return resolve({ status: false, statusText: error.message });
+        }
+    });
+}
+
+const GetEntityInfoCount = async (name) => {
+    return new Promise(async (resolve) => {
+        let url = `${serverApi}${name}`;
+
+        try {
+            const res = await fetch(url, {
+                method: "GET",
+                headers: {
+                    "Content-type": "application/json"
+                }
+            });
+
+            const json = await res.json();
+            if (res.status === 200) {
+                return resolve({ status: res.ok, values: json || 0 });
             }
 
             return resolve({ status: false, statusText: json.error.message });
@@ -692,7 +717,7 @@ const GetProductOnBoardings = async () => {
 }
 
 export {
-    GetMetaData, GetEntityInfo,
+    GetMetaData, GetEntityInfo, GetEntityInfoCount,
     GetProductTypesCount, GetProductTypes, SetProductTypes, GetProductStatus,
     GetDocument, SetDocument, GetProductType,
     GetProductsCount, GetProducts, GetProduct, SetProduct, SetProductVendor,

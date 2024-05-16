@@ -13,8 +13,9 @@
         "target": "property2"
     },
     {
-        "key": "ProductPType",
-        "target": "property3"
+        "key": "ProductTypeName",
+        "target": "property3",
+        "expand": "PType"
     },
     {
         "key": "Weight",
