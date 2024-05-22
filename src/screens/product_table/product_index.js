@@ -10,14 +10,14 @@ import Helper from "shared/helper";
 import { Add as AddBoxIcon } from '@mui/icons-material';
 
 const columns = [
-    { headerName: "Name", field: "Name", flex: 1 },
-    { headerName: "Type", field: "ProductTypeDesc", flex: 1 },
-    { headerName: "Description", field: "Product_description", flex: 1 },
-    { headerName: "Manufacturer", field: "Manufacturer", flex: 1 },
-    { headerName: "UOM", field: "UnitOfMeasurement", flex: 1 },
-    { headerName: "Weight", field: "Weight", flex: 1 },
-    { headerName: "Size", field: "Size", flex: 1 },
-    { headerName: "Color", field: "Color", flex: 1 }
+    { headerName: "Name", field: "Name", sortField: "Name", flex: 1 },
+    { headerName: "Type", field: "ProductTypeDesc", sortField: "ProductPType", flex: 1 },
+    { headerName: "Description", field: "Product_description", sortField: "Product_description", flex: 1 },
+    { headerName: "Manufacturer", field: "Manufacturer", sortField: "Manufacturer", flex: 1 },
+    { headerName: "UOM", field: "UnitOfMeasurement", sortField: "UnitOfMeasurement", flex: 1 },
+    { headerName: "Weight", field: "Weight", sortField: "Weight", flex: 1 },
+    { headerName: "Size", field: "Size", sortField: "Size", flex: 1 },
+    { headerName: "Color", field: "Color", sortField: "Color", flex: 1 }
 ];
 
 const defaultError = "Something went wroing while creating record!";
@@ -47,7 +47,7 @@ const Component = (props) => {
         global.Busy(true);
 
         if (!Helper.IsNullValue(searchStr)) {
-            filters.push(`$filter=contains(Product_description, '${searchStr}')`);
+            filters.push(`$filter=contains(Product_description, '${searchStr}') or contains(Name, '${searchStr}')`);
         }
 
         if (!Helper.IsJSONEmpty(filters)) {
@@ -64,7 +64,8 @@ const Component = (props) => {
             });
 
         if (!Helper.IsJSONEmpty(sortBy)) {
-            filters.push(`$orderby=${sortBy.field} ${sortBy.sort}`);
+            const sortByField = columns.find(x => x.field == sortBy.field)?.sortField || sortBy.field;
+            filters.push(`$orderby=${sortByField} ${sortBy.sort}`);
         }
 
         const _top = pageInfo.pageSize;

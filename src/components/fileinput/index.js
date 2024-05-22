@@ -16,7 +16,7 @@ const Component = (props) => {
     const [inputValue, setInputValue] = React.useState("");
 
     const [iDocId, setIDocId] = React.useState();
-    const [iDocType, setIDocType] = React.useState();
+    //const [iDocType, setIDocType] = React.useState();
     const [iDocData, setIDocData] = React.useState();
 
     const [error, setError] = React.useState(null);
@@ -63,8 +63,7 @@ const Component = (props) => {
                     name,
                     value: {
                         index, DocId: iDocId, DocName: iDocName,
-                        DocExt: iDocExt, DocType: tDocType, DocData: tDocData,
-                        ProductOtherImagesId: value['ProductOtherImagesId']
+                        DocExt: iDocExt, DocType: tDocType, DocData: tDocData
                     },
                     type
                 });
@@ -81,12 +80,12 @@ const Component = (props) => {
         if (onDeleteClicked) onDeleteClicked(e, index);
     }
 
-    React.useEffect(() => {
+    /* React.useEffect(() => {
         setIDocType(null);
         if (inputValue) {
             let tmp = inputValue.split(".").pop().toUpperCase(); setIDocType(tmp);
         }
-    }, [inputValue]);
+    }, [inputValue]); */
 
     React.useEffect(() => {
         let tValue = "";
@@ -94,7 +93,7 @@ const Component = (props) => {
             tValue = value.DocName && value.DocExt && `${value.DocName}.${value.DocExt}`;
             setInputValue(tValue);
             setIDocId(value.DocId);
-            setIDocType(value.DocExt);
+            //setIDocType(value.DocExt);
             setIDocData(value.DocData);
         }
     }, [value]);
@@ -107,7 +106,6 @@ const Component = (props) => {
                 </>
             ) : (
                 <>
-
                     <Table sx={{ display: 'table', width: '100%', p: 0, m: 0, border: 0, ...sx }}>
                         <TableBody>
                             <TableRow>

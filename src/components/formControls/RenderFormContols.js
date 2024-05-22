@@ -41,7 +41,9 @@ const RenderUploadDocument = (props) => {
     }
 
     React.useEffect(() => {
-        let tmp = value || [{ index: 0 }];
+        let tmp = [{ index: 0 }];
+        let tLength = value && value.length || 0;
+        if (tLength > 0) tmp = value;
         setValues(tmp);
     }, [value]);
 
