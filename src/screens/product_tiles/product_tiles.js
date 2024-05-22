@@ -37,7 +37,7 @@ const Component = (props) => {
         global.Busy(true);
 
         if (!Helper.IsNullValue(searchStr)) {
-            filters.push(`$filter=contains(ProductDescription, '${searchStr}')`);
+            filters.push(`$filter=contains(Product_description, '${searchStr}') or contains(Name, '${searchStr}')`);
         }
 
         if (!Helper.IsJSONEmpty(filters)) {
