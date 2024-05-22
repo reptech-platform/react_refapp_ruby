@@ -7,7 +7,6 @@ import { GridContainer, CardItem } from "components";
 const Component = (props) => {
 
     const { rowsCount, rows, pageInfo, onActionClicked, onPageClicked } = props;
-
     const handleChangePage = (event, newPage) => {
         const _page = { page: newPage, pageSize: pageInfo.pageSize };
         if (onPageClicked) onPageClicked(_page);
@@ -33,6 +32,15 @@ const Component = (props) => {
                             </Typography>
                             <Typography variant="caption" color="text.secondary">
                                 <strong>Price:</strong>&nbsp;₹{x.Price}
+                            </Typography>
+                            <Typography variant="caption" color="text.secondary" style={{ display: 'flex', alignItems: 'center',}}>
+                                <strong>Colour:</strong>&nbsp;<span style={{ display: 'inline-block', width: '20px', height: '20px', backgroundColor: x.Color,borderRadius:"50%"}}></span>
+                            </Typography>
+                            <Typography variant="caption" color="text.secondary">
+                                <strong>Unit Of Measurement:</strong>&nbsp;{x.UnitOfMeasurement}
+                            </Typography>
+                            <Typography variant="caption" color="text.secondary">
+                                <strong>Manufacturer:</strong>&nbsp;{x.Manufacturer}
                             </Typography>
                         </Grid>
                     </CardItem>
