@@ -110,7 +110,6 @@ const Component = (props) => {
                 let newValues = product.find((x) => x.key === 'MainImage').value;
                 newValues = { ...newValues, DocId: newImageId };
                 row['product'].find((x) => x.key === 'MainImage').value = newValues
-                row['product'].find((x) => x.key === 'ProductMainImage').value = newImageId;
                 // Update Back for next tracking purpose
                 UpdateBackUp('product');
 
