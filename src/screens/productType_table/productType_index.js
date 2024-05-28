@@ -5,10 +5,11 @@ import Container from "screens/container";
 import { SearchInput, CustomDialog, TextInput } from "components";
 import { GetProductTypes, GetProductTypesCount, SetProductTypes } from "shared/services";
 import Helper from "shared/helper";
-import { DataTable } from '../childs';
+import { DataTable, CustomTable } from '../childs';
 import { ValidatorForm } from 'react-material-ui-form-validator';
 
 const columns = [
+    { headerName: "PtId", field: "PtId", flex: 1, editable: false, key: true },
     { headerName: "Name", field: "ProductTypeName", flex: 1, editable: false },
     { headerName: "Description", field: "ProductTypeDesc", flex: 1, editable: true }
 ];
@@ -148,92 +149,14 @@ const Component = (props) => {
         });
     }
 
-    if (initialize) { setInitialize(false); LoadData(); }
+    /* if (initialize) { setInitialize(false); LoadData(); }
     useEffect(() => { setInitialize(true); }, [sortBy, pageInfo, searchStr]);
-    useEffect(() => { setInitialize(true); }, []);
+    useEffect(() => { setInitialize(true); }, []); */
 
     return (
         <>
             <Container {...props}>
-                <Box style={{ width: '100%', paddingBottom: 5 }}>
-                    <Typography noWrap variant="subheader" component="div">
-                        {title}
-                    </Typography>
-                    <Stack direction="row">
-                        <Grid container sx={{ justifyContent: 'flex-end' }}>
-                            <SearchInput searchStr={searchStr} onSearchChanged={OnSearchChanged} />
-                            <IconButton
-                                size="medium"
-                                edge="start"
-                                color="inherit"
-                                aria-label="Add"
-                                sx={{
-                                    marginLeft: "2px",
-                                    borderRadius: "4px",
-                                    border: theme.borderBottom
-                                }}
-                                onClick={() => OnActionClicked(undefined, 'add')}
-                            >
-                                <AddBoxIcon />
-                            </IconButton>
-                        </Grid>
-                    </Stack>
-                </Box>
-                <Divider />
-                <Box style={{ width: '100%' }}>
-                    <DataTable keyId={'PtId'} columns={columns} rowsCount={rowsCount} rows={rows} noView={true}
-                        sortBy={sortBy} pageInfo={pageInfo} onActionClicked={OnActionClicked}
-                        onSortClicked={OnSortClicked} onPageClicked={OnPageClicked} />
-                </Box>
-
-                <CustomDialog open={actions.action == 'delete'} title={"Confirmation"} onCloseClicked={OnCloseClicked}>
-                    <Typography gutterBottom>
-                        Are you sure? You want to delete?
-                    </Typography>
-                </CustomDialog>
-
-                <CustomDialog width="auto" open={actions.action == 'add'} title={"Add Product Type"} onCloseClicked={OnCloseClicked}>
-                    <ValidatorForm ref={form} onSubmit={handleSubmit}>
-                        <Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
-                            <Grid item xs={6}>
-                                <Typography noWrap gutterBottom>Enter Product Name</Typography>
-                            </Grid>
-                            <Grid item xs={6}>
-                                <TextInput editable={true} id={"ProductTypeName"} name={"ProductTypeName"} value={product.ProductTypeName} validators={['required']}
-                                    validationMessages={['Name is required']} OnInputChange={OnInputChange} />
-                            </Grid>
-                            <Grid item xs={6}>
-                                <Typography noWrap gutterBottom>Enter Product Description</Typography>
-                            </Grid>
-                            <Grid item xs={6}>
-                                <TextInput editable={true} id={"ProductTypeDesc"} name={"ProductTypeDesc"} value={product.ProductTypeDesc} validators={['required']}
-                                    validationMessages={['Description is required']} OnInputChange={OnInputChange} />
-                            </Grid>
-                        </Grid>
-                    </ValidatorForm>
-                </CustomDialog>
-
-                <CustomDialog width="auto" open={actions.action == 'edit'} title={"Edit Product Type"} onCloseClicked={OnCloseClicked}>
-                    <ValidatorForm ref={form} onSubmit={handleSubmit}>
-                        <Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
-                            <Grid item xs={6}>
-                                <Typography noWrap gutterBottom>Enter Product Name</Typography>
-                            </Grid>
-                            <Grid item xs={6}>
-                                <TextInput editable={true} id={"ProductTypeName"} name={"ProductTypeName"} value={product.ProductTypeName} validators={['required']}
-                                    validationMessages={['Name is required']} OnInputChange={OnInputChange} />
-                            </Grid>
-                            <Grid item xs={6}>
-                                <Typography noWrap gutterBottom>Enter Product Description</Typography>
-                            </Grid>
-                            <Grid item xs={6}>
-                                <TextInput editable={true} id={"ProductTypeDesc"} name={"ProductTypeDesc"} value={product.ProductTypeDesc} validators={['required']}
-                                    validationMessages={['Description is required']} OnInputChange={OnInputChange} />
-                            </Grid>
-                        </Grid>
-                    </ValidatorForm>
-                </CustomDialog>
-
+                <CustomTable {...props} configFile={"product_type_config.json"} />
             </Container>
         </>
     )

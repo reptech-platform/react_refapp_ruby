@@ -1,0 +1,153 @@
+{
+    "parent": [
+        {
+            "key": "PtId",
+            "type": "keyid",
+            "entityName":"producttype",
+            "entitylabel":"Product Type"
+        },
+        {
+            "key": "ProductTypeName",
+            "label": "Type",
+            "type": "text",
+            "editable": true,
+            "validators": [
+                "required"
+            ],
+            "validationMessages": [
+                "Product type is required"
+            ],
+            "value": "Dummy Product Type"
+        },
+        {
+            "key": "ProductTypeDesc",
+            "label": "Description",
+            "type": "text",
+            "editable": true,
+            "width": "30%",
+            "validators": [
+                "required"
+            ],
+            "validationMessages": [
+                "Description is required"
+            ],
+            "value": "Dummy Product Type Description"
+        }
+    ],
+    "product": [
+        {
+            "key": "Product_id",
+            "type": "keyid",
+            "entityName":"product",
+            "entitylabel":"Product"
+        },
+        {
+            "field": "Name",
+            "headerName":"Name",
+            "type": "text",
+            "editable": true,
+            "validators": [
+                "required"
+            ],
+            "validationMessages": [
+                "Product name is required"
+            ],
+            "value": "Dummy Product"
+        },
+        {
+            "field": "ProductPType",
+            "headerName":"Product Type",
+            "type": "dropdown",
+            "valueId": "PtId",
+            "nameId": "ProductTypeName",
+            "contentId": "ProductTypeName",
+            "source": "ProductType",
+            "uicomponent": "producttype",
+            "editable": true,
+            "create": true,
+            "validators": [],
+            "validationMessages": [],
+            "value": null
+        },
+        {
+            "field": "Product_description",
+            "headerName": "Description",
+            "type": "text",
+            "editable": true,
+            "width": "30%",
+            "validators": [
+                "required"
+            ],
+            "validationMessages": [
+                "Product description is required"
+            ],
+            "value": "Dummy Product Description"
+        },
+        {
+            "field": "Manufacturer",
+            "headerName": "Manufacturer",
+            "type": "text",
+            "editable": true,
+            "validators": [
+                "required"
+            ],
+            "validationMessages": [
+                "Product image is required"
+            ],
+            "value": "Dummy Product Manufacturer"
+        },
+        {
+            "field": "UnitOfMeasurement",
+            "headerName": "Unit Of Measurement",
+            "type": "dropdown",
+            "valueId": "Value",
+            "nameId": "Name",
+            "contentId": "Name",
+            "source": "Weight",
+            "editable": true,
+            "validators": [
+                "required",
+                "isNumber"
+            ],
+            "validationMessages": [
+                "Unit Of Measurement is required",
+                "Unit Of Measurement is required"
+            ],
+            "value": 2
+        },
+        {
+            "field": "Weight",
+            "headerName": "Weight",
+            "type": "text",
+            "editable": true,
+            "validators": [
+                "required",
+                "isFloat",
+                "isPositive"
+            ],
+            "validationMessages": [
+                "Product weight is required",
+                "Product weight should be number",
+                "Product weight should be positive number"
+            ],
+            "value": 10.25
+        },
+        {
+            "field": "Size",
+            "headerName": "Size",
+            "type": "text",
+            "editable": true,
+            "validators": [
+                "required",
+                "isNumber",
+                "isPositive"
+            ],
+            "validationMessages": [
+                "Size is required",
+                "Size must be a number",
+                "Size must be a pasitive number"
+            ],
+            "value": 10
+        }
+    ]
+}

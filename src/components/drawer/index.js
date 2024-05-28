@@ -2,7 +2,7 @@ import React from 'react';
 import { Toolbar, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Tooltip } from '@mui/material';
 import MuiDrawer from '@mui/material/Drawer';
 import { styled, useTheme } from '@mui/material/styles';
-import { ShoppingBasket, Toc, EditNote, Checklist, Tab, GridView as GridViewIcon } from '@mui/icons-material';
+import { ShoppingBasket, Toc, EditNote, Checklist, Tab, GridView, SettingsEthernet } from '@mui/icons-material';
 import { DRAWER_WIDTH } from "config";
 import { useNavigate } from 'react-router-dom';
 
@@ -107,7 +107,7 @@ const Component = (props) => {
                         <ListItemButton onClick={() => NavigateTo("/producttiles")} sx={{ height: 50 }}>
                             <ListItemIcon sx={{ minWidth: 30 }}>
                                 <Tooltip title="Tiles Layout">
-                                    <GridViewIcon />
+                                    <GridView />
                                 </Tooltip>
                             </ListItemIcon>
                             {open && <ListItemText primary="Tiles Layout" sx={{ pl: 1 }} />}
@@ -119,6 +119,14 @@ const Component = (props) => {
                                 </Tooltip>
                             </ListItemIcon>
                             {open && <ListItemText primary="List Layout" sx={{ pl: 1 }} />}
+                        </ListItemButton>
+                        <ListItemButton onClick={() => NavigateTo("/productmany")} sx={{ height: 50 }}>
+                            <ListItemIcon sx={{ minWidth: 30 }}>
+                                <Tooltip title="One to many Layout">
+                                    <SettingsEthernet />
+                                </Tooltip>
+                            </ListItemIcon>
+                            {open && <ListItemText primary="One to many" sx={{ pl: 1 }} />}
                         </ListItemButton>
                     </List>
                 </ListItem>

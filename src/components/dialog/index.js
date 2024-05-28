@@ -15,7 +15,7 @@ const BootstrapDialog = styled(Dialog)(({ theme }) => ({
 
 const Component = (props) => {
 
-    const { open, width, height, title, onCloseClicked, children } = props;
+    const { open, width, height, title, onCloseClicked, children, sxContent } = props;
 
     const handleStateChange = (e, bState) => {
         if (onCloseClicked) onCloseClicked(bState);
@@ -34,7 +34,9 @@ const Component = (props) => {
             <DialogTitle sx={{ m: 0, p: 2 }} id="customized-dialog-title">
                 {title}
             </DialogTitle>
-            <DialogContent dividers sx={{ display: "flex", alignItems: "center" }}>
+            <DialogContent dividers sx={{
+                ...sxContent, display: "flex", alignItems: "center"
+            }}>
                 {children}
             </DialogContent>
             <DialogActions>
