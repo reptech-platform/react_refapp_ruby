@@ -136,15 +136,18 @@ const Component = (props) => {
     const OnInputChange = (e) => { setNewItem((prev) => ({ ...prev, [e.name]: e.value })); }
 
     const OnActionClicked = (id, type) => {
+
         ClearSettings();
-        setActions({ id, action: type });
         if (type === 'edit' || type === 'delete') {
-            //const { PtId, ProductTypeName, ProductTypeDesc } = rows.find((x) => x.PtId === id);
-            //setProduct({ PtId, ProductTypeName, ProductTypeDesc });
+            const selectedRow = rows.find((x) => x[keyIdName] === id);
+            configInfo.forEach(x => x.value = selectedRow[x.key]);
+            setNewItem(selectedRow);
         }
+        setActions({ id, action: type });
     }
 
     const ClearSettings = () => {
+        configInfo.forEach(x => x.Value = null);
         setActions({ id: 0, action: null });
         setNewItem(null);
     }
@@ -165,8 +168,8 @@ const Component = (props) => {
         const httpMethod = httpMethods[actions.action] || null;
         await DoAction({ httpMethod, ...newItem })
             .then((status) => {
+                ClearSettings();
                 if (status) {
-                    ClearSettings();
                     setInitializeRows(true);
                     setPageInfo({ page: 0, pageSize: 5 });
                 }

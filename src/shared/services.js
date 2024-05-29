@@ -70,6 +70,7 @@ const SetEntityInfo = async (name, keyId, input) => {
             url = `${serverApi}${name}s(${input[keyId]})`;
         }
 
+        delete input['id'];
         delete input[keyId];
         delete input['Deleted'];
 
