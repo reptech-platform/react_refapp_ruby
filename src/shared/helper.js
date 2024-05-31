@@ -43,4 +43,9 @@ fn.RemoveDuplicatesFromArray = (input) => {
     return [...new Set(input)];
 };
 
+fn.ToFirstCharCapital = (e) => {
+    if (fn.IsNullValue(e)) return "";
+    return e.charAt(0).toUpperCase() + e.slice(1);
+}
+
 export default fn;
