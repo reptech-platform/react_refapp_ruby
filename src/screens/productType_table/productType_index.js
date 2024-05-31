@@ -189,13 +189,13 @@ const Component = (props) => {
                         onSortClicked={OnSortClicked} onPageClicked={OnPageClicked} />
                 </Box>
 
-                <CustomDialog open={actions.action == 'delete'} title={"Confirmation"} onCloseClicked={OnCloseClicked}>
+                <CustomDialog open={actions.action == 'delete'} title={"Confirmation"} action={actions.action} onCloseClicked={OnCloseClicked}>
                     <Typography gutterBottom>
                         Are you sure? You want to delete?
                     </Typography>
                 </CustomDialog>
 
-                <CustomDialog width="auto" open={actions.action == 'add'} title={"Add Product Type"} onCloseClicked={OnCloseClicked}>
+                <CustomDialog width="auto" open={actions.action == 'add'} action={actions.action} title={"Add Product Type"} onCloseClicked={OnCloseClicked}>
                     <ValidatorForm ref={form} onSubmit={handleSubmit}>
                         <Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
                             <Grid item xs={6}>
@@ -216,7 +216,7 @@ const Component = (props) => {
                     </ValidatorForm>
                 </CustomDialog>
 
-                <CustomDialog width="auto" open={actions.action == 'edit'} title={"Edit Product Type"} onCloseClicked={OnCloseClicked}>
+                <CustomDialog width="auto" open={actions.action == 'edit'} action={actions.action} title={"Edit Product Type"} onCloseClicked={OnCloseClicked}>
                     <ValidatorForm ref={form} onSubmit={handleSubmit}>
                         <Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
                             <Grid item xs={6}>
