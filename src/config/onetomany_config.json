@@ -1,140 +1,120 @@
 {
-    "parent": [
+    "order": [
         {
-            "key": "PtId",
-            "type": "keyid",
-            "entityName":"producttype",
-            "entitylabel":"Product Type"
+            "title": "Order",
+            "entityName": "Order",
+            "sortField": "VendorAccountNumber",
+            "key": "OrderId",
+            "type": "keyid"
         },
         {
-            "key": "ProductTypeName",
-            "label": "Type",
+            "key": "Date",
+            "label": "Date",
+            "type": "date",
+            "editable": true,
+            "validators": [
+                "required"
+            ],
+            "validationMessages": [
+                "Order date is required"
+            ],
+            "value": "2024-05-30"
+        },
+        {
+            "key": "CompanyCode",
+            "label": "Company Code",
             "type": "text",
             "editable": true,
             "validators": [
                 "required"
             ],
             "validationMessages": [
-                "Product type is required"
+                "Company Code is required"
             ],
-            "value": "Dummy Product Type"
+            "value": "MAY302024"
         },
         {
-            "key": "ProductTypeDesc",
-            "label": "Description",
-            "type": "text",
-            "editable": true,
-            "width": "30%",
-            "validators": [
-                "required"
-            ],
-            "validationMessages": [
-                "Description is required"
-            ],
-            "value": "Dummy Product Type Description"
-        }
-    ],
-    "product": [
-        {
-            "key": "Product_id",
-            "type": "keyid",
-            "entityName":"product",
-            "entitylabel":"Product"
-        },
-        {
-            "field": "Name",
-            "headerName":"Name",
+            "key": "VendorAccountNumber",
+            "label": "Vendor Account Number",
             "type": "text",
             "editable": true,
             "validators": [
                 "required"
             ],
             "validationMessages": [
-                "Product name is required"
+                "Vendor Account Number is required"
             ],
-            "value": "Dummy Product"
+            "value": "ACT123456"
         },
         {
-            "field": "ProductPType",
-            "headerName":"Product Type",
-            "type": "dropdown",
-            "valueId": "PtId",
-            "nameId": "ProductTypeName",
-            "contentId": "ProductTypeName",
-            "source": "ProductType",
-            "uicomponent": "producttype",
-            "editable": true,
-            "create": true,
-            "validators": [],
-            "validationMessages": [],
-            "value": null
-        },
-        {
-            "field": "Product_description",
-            "headerName": "Description",
-            "type": "text",
-            "editable": true,
-            "width": "30%",
-            "validators": [
-                "required"
-            ],
-            "validationMessages": [
-                "Product description is required"
-            ],
-            "value": "Dummy Product Description"
-        },
-        {
-            "field": "Manufacturer",
-            "headerName": "Manufacturer",
-            "type": "text",
+            "key": "StartDateOfValidity",
+            "label": "Start Date Of Validity",
+            "type": "date",
             "editable": true,
             "validators": [
                 "required"
             ],
             "validationMessages": [
-                "Product image is required"
+                "Start Date Of Validity is required"
             ],
-            "value": "Dummy Product Manufacturer"
+            "value": "2024-05-30"
         },
         {
-            "field": "UnitOfMeasurement",
-            "headerName": "Unit Of Measurement",
-            "type": "dropdown",
-            "valueId": "Value",
-            "nameId": "Name",
-            "contentId": "Name",
-            "source": "Weight",
+            "key": "EndDateOfValidity",
+            "label": "End Date Of Validity",
+            "type": "date",
             "editable": true,
             "validators": [
-                "required",
-                "isNumber"
+                "required"
             ],
             "validationMessages": [
-                "Unit Of Measurement is required",
-                "Unit Of Measurement is required"
+                "End Date Of Validity is required"
             ],
-            "value": 2
+            "value": "2024-05-30"
         },
         {
-            "field": "Weight",
-            "headerName": "Weight",
+            "key": "PoCategory",
+            "label": "Po Category",
             "type": "text",
             "editable": true,
             "validators": [
-                "required",
-                "isFloat",
-                "isPositive"
+                "required"
             ],
             "validationMessages": [
-                "Product weight is required",
-                "Product weight should be number",
-                "Product weight should be positive number"
+                "PoCategory is required"
             ],
-            "value": 10.25
+            "value": "ACT123456"
         },
         {
-            "field": "Size",
-            "headerName": "Size",
+            "key": "ShippingType",
+            "label": "Shipping Type",
+            "type": "text",
+            "editable": true,
+            "validators": [
+                "required"
+            ],
+            "validationMessages": [
+                "Shipping Type is required"
+            ],
+            "value": "ACT123456"
+        },
+        {
+            "key": "IsApproved",
+            "label": "Is Approved",
+            "type": "check",
+            "editable": true,
+            "default": false,
+            "validators": [
+                "isTruthy"
+            ],
+            "validationMessages": [
+                "Is Approved is required"
+            ],
+            "value": true
+        },
+        {
+            "key": "DestinationCityCode",
+            "label": "Destination City Code",
             "type": "text",
             "editable": true,
             "validators": [
@@ -143,11 +123,246 @@
                 "isPositive"
             ],
             "validationMessages": [
-                "Size is required",
-                "Size must be a number",
-                "Size must be a pasitive number"
+                "Destination City Code is required",
+                "Destination City Code must be a number",
+                "Destination City Code must be a pasitive number"
             ],
-            "value": 10
+            "value": 27
+        },
+        {
+            "key": "VendorTelephoneNumber",
+            "label": "Vendor Telephone Number",
+            "type": "text",
+            "editable": true,
+            "validators": [
+                "required",
+                "isNumber",
+                "isPositive"
+            ],
+            "validationMessages": [
+                "Vendor Telephone Number is required",
+                "Vendor Telephone Number must be a number",
+                "Vendor Telephone Number must be a pasitive number"
+            ],
+            "value": 98
+        }
+    ],
+    "shippingaddress": [
+        {
+            "title": "Shipping Address",
+            "entityName": "address",
+            "sortField": "Area",
+            "key": "AddressId",
+            "type": "keyid"
+        },
+        {
+            "key": "Area",
+            "label": "Area",
+            "type": "text",
+            "editable": true,
+            "validators": [
+                "required"
+            ],
+            "validationMessages": [
+                "Area is required"
+            ],
+            "value": "MAY302024"
+        },
+        {
+            "key": "Street",
+            "label": "Street",
+            "type": "text",
+            "editable": true,
+            "validators": [
+                "required"
+            ],
+            "validationMessages": [
+                "Street is required"
+            ],
+            "value": "MAY302024"
+        },
+        {
+            "key": "HouseNumber",
+            "label": "HouseNumber",
+            "type": "text",
+            "editable": true,
+            "validators": [
+                "required"
+            ],
+            "validationMessages": [
+                "HouseNumber is required"
+            ],
+            "value": "MAY302024"
+        },
+        {
+            "key": "AddressLine2",
+            "label": "AddressLine2",
+            "type": "text",
+            "editable": true,
+            "validators": [
+                "required"
+            ],
+            "validationMessages": [
+                "AddressLine2 is required"
+            ],
+            "value": "MAY302024"
+        },
+        {
+            "key": "State",
+            "label": "State",
+            "type": "text",
+            "editable": true,
+            "validators": [
+                "required"
+            ],
+            "validationMessages": [
+                "State is required"
+            ],
+            "value": "MAY302024"
+        },
+        {
+            "key": "Country",
+            "label": "Country",
+            "type": "text",
+            "editable": true,
+            "validators": [
+                "required"
+            ],
+            "validationMessages": [
+                "Country is required"
+            ],
+            "value": "MAY302024"
+        },
+        {
+            "key": "Pincode",
+            "label": "Pincode",
+            "type": "text",
+            "editable": true,
+            "validators": [
+                "required",
+                "isNumber",
+                "isPositive"
+            ],
+            "validationMessages": [
+                "Pincode is required",
+                "Pincode must be a number",
+                "Pincode must be a pasitive number"
+            ],
+            "value": 560100
+        }
+    ],
+    "orderitem": [
+        {
+            "title": "Order Items",
+            "entityName": "OrderItem",
+            "sortField": "Other_order_item_details",
+            "key": "Order_item_id",
+            "type": "keyid",
+            "parentKeyId": "OrderId",
+            "child": true
+        },
+        {
+            "key": "Order_item_price",
+            "label": "Order Item Price",
+            "type": "text",
+            "editable": true,
+            "validators": [
+                "required",
+                "isFloat",
+                "isPositive"
+            ],
+            "validationMessages": [
+                "Order Item Price is required",
+                "Order Item Price should be number",
+                "Order Item Price should be positive number"
+            ],
+            "value": null
+        },
+        {
+            "key": "Other_order_item_details",
+            "label": "Other Order Item Details",
+            "type": "text",
+            "editable": true,
+            "validators": [
+                "required"
+            ],
+            "validationMessages": [
+                "Other Order Item Details is required"
+            ],
+            "value": null
+        },
+        {
+            "key": "Order_item_status",
+            "label": "Order Item Status",
+            "type": "text",
+            "editable": true,
+            "validators": [
+                "required"
+            ],
+            "validationMessages": [
+                "Order Item Status is required"
+            ],
+            "value": null
+        },
+        {
+            "key": "RMA_issued_by",
+            "label": "RMA Issued By",
+            "type": "text",
+            "editable": true,
+            "validators": [
+                "required"
+            ],
+            "validationMessages": [
+                "RMA Issued By is required"
+            ],
+            "value": "RMA"
+        },
+        {
+            "key": "RMA_issued_date",
+            "label": "RMA Issued Date",
+            "type": "date",
+            "editable": true,
+            "validators": [
+                "required"
+            ],
+            "validationMessages": [
+                "RMA Issued Date is required"
+            ],
+            "value": null
+        },
+        {
+            "key": "Order_item_quantity",
+            "label": "Order Item Quantity",
+            "type": "text",
+            "editable": true,
+            "validators": [
+                "required",
+                "isNumber",
+                "isPositive"
+            ],
+            "validationMessages": [
+                "Order Item Quantity is required",
+                "Order Item Quantity must be a number",
+                "Order Item Quantity must be a pasitive number"
+            ],
+            "value": null
+        },
+        {
+            "key": "RMA_number",
+            "label": "RMA Number",
+            "type": "text",
+            "editable": true,
+            "validators": [
+                "required",
+                "isNumber",
+                "isPositive"
+            ],
+            "validationMessages": [
+                "RMA Number is required",
+                "RMA Number must be a number",
+                "RMA Number must be a pasitive number"
+            ],
+            "value": null
         }
     ]
 }

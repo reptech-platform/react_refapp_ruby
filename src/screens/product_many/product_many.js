@@ -1,33 +1,59 @@
 
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Box, Typography, Grid, Stack, Button, Divider } from '@mui/material';
+import { ValidatorForm } from 'react-material-ui-form-validator';
 import Container from "screens/container";
-import RenderFormContols from "./child/formcontrols";
+import RenderFormContols from "components/formControls/RenderFormContols";
 import { useNavigate } from "react-router-dom";
-import Support from "shared/support";
 import { ArrowLeft as ArrowLeftIcon } from '@mui/icons-material';
 import Helper from "shared/helper";
+import CustomTable from './child/customtable';
+import { Extract } from "./child/extract";
+import { SetOrders } from "shared/services";
 
-import { Extract, MapItems } from "./child/extract";
-
+const numberItems = ['VendorTelephoneNumber', 'DestinationCityCode', 'Pincode', 'Order_item_price', 'Order_item_quantity', 'RMA_number'];
 
 const RenderTableComponent = (props) => {
-    const { row } = props;
+    const { dataRows, row, title, onTableRowUpdated } = props;
 
+    return (
+        <>
+            <Box sx={{ float: "left", minWidth: "95%", margin: 2 }}>
+                <CustomTable {...props} title={title} configData={row} rows={dataRows} onTableRowUpdated={onTableRowUpdated} />
+            </Box>
+        </>
+    )
+}
 
-    useEffect(() => {
+const RenderFormComponent = (props) => {
+    const { row, title, location, onInputChange } = props;
 
+    const boxShadow = "0 1px 5px rgba(0,0,0,.15) !important";
+    const borderRadius = "3px !important";
+
+    const OnInputChange = (e) => {
+        if (onInputChange) onInputChange({ ...e, location });
+    }
+
+    React.useEffect(() => {
+        ValidatorForm.addValidationRule('isTruthy', value => value);
     }, []);
 
     return (
-        <div>Table Component</div>
+        <>
+            <Box sx={{ float: "left", minWidth: "95%", margin: 2, boxShadow, borderRadius }}>
+                <RenderFormContols shadow={true} location="producttype" title={title} onInputChange={OnInputChange}
+                    controls={row} />
+            </Box>
+        </>
     )
 }
 
 const Component = (props) => {
 
-    const [form, setForm] = useState(null);
     const [row, setRow] = useState({});
+    const [rowItems, setRowItems] = useState([]);
+    const [collections, setCollections] = useState([]);
     const [initialized, setInitialized] = useState(false);
     const [state, setState] = useState(false);
     const [showButton, setShowButton] = useState(true);
@@ -35,73 +61,88 @@ const Component = (props) => {
     const NavigateTo = useNavigate();
     const [showUpdate, setShowUpdate] = useState(false);
     const { title } = props;
+    const form = React.useRef(null);
 
-    const OnSubmit = async () => {
-        let rslt, data, prodImages, productId;
-        const mapItems = MapItems;
-
-        let product = row['product'];
-
-        // Add Or Update Product
-        rslt = await Support.AddOrUpdateProduct(product, dropDownOptions, ['MainImage', 'OtherImages']);
-        if (rslt.status) {
-            productId = rslt.id;
-        } else { return; }
-
-        for (let i = 0; i < mapItems.length; i++) {
-            // Add or Update the product and navigation entity if it is deos not exist
-            let navItem = product.find(x => x.uicomponent === mapItems[i].uicomponent);
-            if (!Helper.IsJSONEmpty(navItem) && Helper.IsNullValue(navItem.value)) {
-                rslt = await mapItems[i].func(row[navItem.uicomponent], dropDownOptions);
-                if (rslt.status) {
-                    data = [
-                        { key: "Product_id", value: parseInt(productId) },
-                        { key: navItem.key, value: parseInt(rslt.id) }
-                    ];
-                    rslt = await Support.AddOrUpdateProduct(data, dropDownOptions);
-                    if (!rslt.status) return;
-
-                } else { return; }
-            }
+    const OnTableRowUpdated = (e) => {
+        const { id, keyIdName, action, data } = e;
+        if (action === 'add') {
+            const guid = Helper.GetGUID();
+            setRowItems(r => [...r, { id: guid, [keyIdName]: guid, ...data }]);
+        } else if (action === 'edit') {
+            const updatedItems = [...rowItems];
+            const index = updatedItems.findIndex(x => x.id === id);
+            updatedItems[index] = data;
+            setRowItems(updatedItems);
         }
-
-        // Add Product Main Image
-        prodImages = product.find((x) => x.key === 'MainImage');
-        if (prodImages && !Helper.IsNullValue(prodImages.value)) {
-            rslt = await Support.AddOrUpdateDocument(prodImages);
-            if (rslt.status) {
-                data = [
-                    { key: "Product_id", value: parseInt(productId) },
-                    { key: "ProductMainImage", value: parseInt(rslt.id) }
-                ];
-                rslt = await Support.AddOrUpdateProduct(data, dropDownOptions);
-                if (!rslt.status) return;
-            } else { return; }
+        else if (action === 'delete') {
+            let updatedItems = [...rowItems];
+            updatedItems = updatedItems.filter(x => x.id !== id);
+            setRowItems(updatedItems);
         }
+    }
 
-        // Add Product Other Images
-        prodImages = product.find((x) => x.key === 'OtherImages').value;
-        if (prodImages && !Helper.IsNullValue(prodImages.value)) {
-            for (let i = 0; i < prodImages.length; i++) {
-                rslt = await Support.AddOrUpdateDocument({ value: prodImages[i] });
-                if (rslt.status) {
-                    data = [
-                        { key: "Product_id", value: parseInt(productId) },
-                        { key: "DocId", value: parseInt(rslt.id) }
-                    ];
-                    rslt = await Support.AddOrUpdateProductOtherImages(data);
-                    if (!rslt.status) return;
+    const ExtractObject = (input, enums, excludesItems) => {
+
+        let data = {};
+        let excludes = excludesItems || [];
+
+        const tmp = Object.values(input);
+
+        tmp.filter((x) => x.value).map((x) => {
+            if (excludes.indexOf(x.key) === -1) {
+                data[x.key] = x.value;
+                if (x.type === 'dropdown') {
+                    data[x.key] = enums.find((z) => z.Name === x.source).Values.find((m) => parseInt(m[x.valueId]) === parseInt(x.value))[x.valueId];
+                } else if (numberItems.indexOf(x.key) > -1) {
+                    if (x.value) data[x.key] = parseFloat(x.value);
+                } else {
+                    data[x.key] = x.value;
                 }
             }
+        });
+
+        return data;
+    }
+
+    const handleSubmit = async () => {
+
+        let order = row['order'];
+        if (Helper.IsNullValue(rowItems) || rowItems.length === 0) {
+            global.AlertPopup("error", "Atleast add one order item!");
+            return;
         }
 
-        global.AlertPopup("success", "Product is created successfully!");
-        setShowUpdate(false);
-        NavigateTo("/products");
+        order.filter(x => x.type === 'date').forEach(m => { m.value = `${m.value}T00:00:00.000`; });
+
+        let orderitems = [];
+        let keyIdName = row['orderitem'].find(k => k.type === 'keyid').key;
+        rowItems.forEach(x => {
+            let _orderItem = Helper.CloneObject(row['orderitem']);
+            for (let p in x) {
+                let index = _orderItem.findIndex(m => m.key === p);
+                if (index > -1) _orderItem[index].value = x[p];
+            }
+            orderitems.push(ExtractObject(_orderItem, dropDownOptions, [keyIdName]));
+        })
+
+        let data = ExtractObject(order, dropDownOptions);
+        data.Items = orderitems;
+        data.ShippingAddress = ExtractObject(row['shippingaddress'], dropDownOptions);
+
+        global.Busy(true);
+        let rslt = await SetOrders(data);
+        global.Busy(false);
+        if (rslt.status) {
+            global.AlertPopup("success", "Order is created successfully!");
+            setInitialized(true);
+        } else {
+            const msg = rslt.statusText || defaultError;
+            global.AlertPopup("error", msg);
+        }
     }
 
     const OnInputChange = (e) => {
-        const { name, value, location, ...others } = e;
+        const { name, value, location } = e;
         let _row = row;
         let _index = row[location].findIndex((x) => x.key === name && x.type !== "keyid");
         if (_index > -1) {
@@ -111,46 +152,8 @@ const Component = (props) => {
             _row[location][_index].value = tValue;
             setRow(_row);
             setShowUpdate(true);
-            if (!Helper.IsNullValue(item['uicomponent'])) {
-                UpdateMappingPannel(_row, item, tValue);
-            }
         }
     }
-
-    const UpdateMappingPannel = (_row, item, value) => {
-
-        const { uicomponent, source, valueId } = item;
-        const { Values } = dropDownOptions.find(x => x.Name === source);
-        const obj = value ? Values.find(x => x[valueId] === value) : null;
-        let _rowMap = _row[uicomponent];
-
-        for (let i = 0; i < _rowMap.length; i++) {
-
-            let tmpField = _rowMap[i];
-            let bEditable = true;
-            let _cValue = null;
-
-            if (!Helper.IsNullValue(obj)) {
-                _cValue = obj[tmpField.key];
-                if (tmpField.type === 'dropdown') {
-                    const _dValues = dropDownOptions.find(x => x.Name === _rowMap[i].source).Values;
-                    _cValue = _dValues.find(x => x.Name === _cValue)[_rowMap[i].valueId];
-                } else if (tmpField.type === 'date') {
-                    _cValue = Helper.ToDate(_cValue, "YYYY-MM-DD");
-                }
-                bEditable = false;
-            }
-
-            tmpField.editable = bEditable;
-            tmpField.value = _cValue;
-
-            _rowMap[i] = tmpField;
-
-        }
-        _row[uicomponent] = _rowMap;
-        setRow(_row);
-        setState(!state);
-    };
 
     const OnSubmitForm = (e) => {
         e.preventDefault();
@@ -162,9 +165,12 @@ const Component = (props) => {
     }, []);
 
     const fetchData = async () => {
+        setCollections([]);
+        setRow([]);
+        setDropDownOptions([]);
         await Extract().then(rslt => {
-            const { row, options } = rslt;
-            console.log(rslt);
+            const { collections, row, options } = rslt;
+            setCollections(collections);
             setRow(row);
             setDropDownOptions(options);
             setState(!state);
@@ -194,7 +200,21 @@ const Component = (props) => {
                     </Stack>
                 </Box>
                 <Divider />
-                <RenderTableComponent {...props} row={row?.product} />
+                <Box sx={{ width: '100%' }}>
+                    <ValidatorForm ref={form} onSubmit={handleSubmit}>
+                        <Box style={{ display: 'block', width: '100%', marginBottom: 5 }}>
+                            {collections && collections.length > 0 && collections.map((x, index) => {
+                                if (x.child) {
+                                    return <RenderTableComponent onTableRowUpdated={OnTableRowUpdated} dataRows={rowItems}
+                                        shadow={true} key={index} {...props} title={x.title} row={row[x.name]} />
+                                } else {
+                                    return <RenderFormComponent location={x.name} key={index} {...props} onInputChange={OnInputChange}
+                                        title={x.title} row={row[x.name]} />
+                                }
+                            })}
+                        </Box>
+                    </ValidatorForm>
+                </Box>
 
                 {showUpdate && (
                     <>
