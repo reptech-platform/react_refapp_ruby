@@ -15,7 +15,7 @@ const BootstrapDialog = styled(Dialog)(({ theme }) => ({
 
 const Component = (props) => {
 
-    const { open, width, height, title, onCloseClicked, children, sxContent } = props;
+    const { open, width, height, title, onCloseClicked, children, sxContent, action } = props;
 
     const handleStateChange = (e, bState) => {
         if (onCloseClicked) onCloseClicked(bState);
@@ -40,11 +40,11 @@ const Component = (props) => {
                 {children}
             </DialogContent>
             <DialogActions>
-                <Button variant="contained" startIcon={<DoneIcon />} onClick={(e) => handleStateChange(e, true)}>
-                    Yes
-                </Button>
+                {action === 'add' && <Button variant="contained" startIcon={<DoneIcon />} onClick={(e) => handleStateChange(e, true)}>Add</Button>}
+                {action === 'edit' && <Button variant="contained" startIcon={<DoneIcon />} onClick={(e) => handleStateChange(e, true)}>Update</Button>}
+                {action === 'delete' && <Button variant="contained" startIcon={<DoneIcon />} onClick={(e) => handleStateChange(e, true)}>Ok</Button>}
                 <Button variant="outlined" startIcon={<CloseIcon />} onClick={(e) => handleStateChange(e, false)}>
-                    No
+                    Cancel
                 </Button>
             </DialogActions>
         </BootstrapDialog>
