@@ -8,11 +8,15 @@ import ProductTypes from "./productType_table/productType_index.js";
 import InformatForm from "./product_information_form/product_information_form.js";
 import StepperForm from "./product_stepper/product_stepper_index.js";
 import TabbedLayout from "./product_tabbed/product_tabbed.js";
-import ProductMany from "./product_many/product_many.js";
+import OrderList from "./order/order_list.js";
+import OrderNew from "./order/order_new.js";
+import OrderView from "./order/order_view.js";
+import OrderEdit from "./order/order_edit.js";
 
 export {
-    ProductCreate, ProductMany,
+    ProductCreate,
     Products, ProductTiles, ProductList,
     ProductEdit, ProductView, ProductTypes,
-    InformatForm, StepperForm, TabbedLayout
+    InformatForm, StepperForm, TabbedLayout,
+    OrderList, OrderNew, OrderView, OrderEdit
 };

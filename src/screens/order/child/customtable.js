@@ -7,12 +7,14 @@ import { ValidatorForm } from 'react-material-ui-form-validator';
 import RenderFormContols from "components/formControls/RenderFormContols";
 import Helper from "shared/helper";
 
+/* getRowId={(row) => row.statId} */
+
 const Component = (props) => {
-    const { title, configData, rows, onTableRowUpdated } = props;
+    const { title, configData, rows, onTableRowUpdated, mode } = props;
     const theme = useTheme();
 
     const [initialize, setInitialize] = useState(false);
-
+    const [state, setState] = useState(false);
     const [pageInfo, setPageInfo] = useState({ page: 0, pageSize: 5 });
     const [searchStr, setSearchStr] = useState("");
     const [sortBy, setSortBy] = useState(null);
@@ -22,6 +24,7 @@ const Component = (props) => {
     const [columns, setColumns] = useState([]);
     const [keyIdName, setKeyIdName] = useState(null);
     const [newItem, setNewItem] = useState(null);
+    const [configBackInfo, setConfigBackInfo] = useState(null);
 
     const form = React.useRef(null);
 
@@ -29,9 +32,11 @@ const Component = (props) => {
         let _columns = configData.filter(x => x.type !== 'keyid').map(z => {
             return { headerName: z.label, field: z.key, flex: 1, flexGrow: 1, flexShrink: 1 };
         });
+
         const _keyItem = configData.find(x => x.type === 'keyid');
         setKeyIdName(_keyItem.key);
         setColumns(_columns);
+        setConfigBackInfo(Helper.CloneObject(configData));
         setConfigInfo(configData);
     }
 
@@ -45,14 +50,17 @@ const Component = (props) => {
         ClearSettings();
         if (type === 'edit' || type === 'view' || type === 'delete') {
             const selectedRow = rows.find((x) => x[keyIdName] === id);
-            configInfo.forEach(x => x.value = selectedRow[x.key]);
+            let tmpInfo = configInfo;
+            tmpInfo.forEach(x => x.value = selectedRow[x.key]);
+            setConfigInfo(tmpInfo);
             setNewItem(selectedRow);
+            setState(!state);
         }
         setActions({ id, action: type });
     }
 
     const ClearSettings = () => {
-        configInfo.forEach(x => x.Value = null);
+        setConfigInfo(Helper.CloneObject(configBackInfo));
         setActions({ id: 0, action: null });
         setNewItem(null);
     }
@@ -100,25 +108,27 @@ const Component = (props) => {
                     </Typography>
                     <Grid container sx={{ justifyContent: 'flex-end' }}>
                         <SearchInput searchStr={searchStr} onSearchChanged={OnSearchChanged} />
-                        <IconButton
-                            size="medium"
-                            edge="start"
-                            color="inherit"
-                            aria-label="Add"
-                            sx={{
-                                marginLeft: "2px",
-                                borderRadius: "4px",
-                                border: theme.borderBottom
-                            }}
-                            onClick={() => OnActionClicked(undefined, 'add')}
-                        >
-                            <AddBoxIcon />
-                        </IconButton>
+                        {mode !== 'view' && (
+                            <IconButton
+                                size="medium"
+                                edge="start"
+                                color="inherit"
+                                aria-label="Add"
+                                sx={{
+                                    marginLeft: "2px",
+                                    borderRadius: "4px",
+                                    border: theme.borderBottom
+                                }}
+                                onClick={() => OnActionClicked(undefined, 'add')}
+                            >
+                                <AddBoxIcon />
+                            </IconButton>
+                        )}
                     </Grid>
                 </Stack>
             </Box>
             <Box style={{ width: '100%' }}>
-                <DataTable keyId={keyIdName} columns={columns} rowsCount={rows ? rows.length : 0} rows={rows || []}
+                <DataTable keyId={keyIdName} columns={columns} rowsCount={rows ? rows.length : 0} rows={rows || []} noActions={mode === 'view'}
                     sortBy={sortBy} pageInfo={pageInfo} onActionClicked={OnActionClicked} localPaginationMode={true} localSorting={true}
                     onSortClicked={OnSortClicked} onPageClicked={OnPageClicked} />
             </Box>
