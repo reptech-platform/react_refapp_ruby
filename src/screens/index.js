@@ -8,9 +8,10 @@ import ProductTypes from "./productType_table/productType_index.js";
 import InformatForm from "./product_information_form/product_information_form.js";
 import StepperForm from "./product_stepper/product_stepper_index.js";
 import TabbedLayout from "./product_tabbed/product_tabbed.js";
+import ProductOneToMany from "./product_one2many/product_many_create.js";
 
 export {
-    ProductCreate,
+    ProductCreate, ProductOneToMany,
     Products, ProductTiles, ProductList,
     ProductEdit, ProductView, ProductTypes,
     InformatForm, StepperForm, TabbedLayout
