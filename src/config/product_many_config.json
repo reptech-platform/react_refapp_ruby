@@ -1,0 +1,640 @@
+{
+    "product": [
+        {
+            "key": "Product_id",
+            "type": "keyid",
+            "UIComponentTitle": "Product"
+        },
+        {
+            "key": "ProductPType",
+            "label": "Product Type",
+            "type": "dropdown",
+            "valueId": "PtId",
+            "nameId": "ProductTypeName",
+            "contentId": "ProductTypeName",
+            "source": "ProductType",
+            "uicomponent": "producttype",
+            "editable": true,
+            "create": true,
+            "validators": [],
+            "validationMessages": [],
+            "value": null
+        },
+        {
+            "key": "Name",
+            "label": "Name",
+            "type": "text",
+            "editable": true,
+            "validators": [
+                "required"
+            ],
+            "validationMessages": [
+                "Product name is required"
+            ],
+            "value": "Dummy Product"
+        },
+        {
+            "key": "Product_description",
+            "label": "Description",
+            "type": "text",
+            "editable": true,
+            "width": "30%",
+            "validators": [
+                "required"
+            ],
+            "validationMessages": [
+                "Product description is required"
+            ],
+            "value": "Dummy Product Description"
+        },
+        {
+            "key": "Manufacturer",
+            "label": "Manufacturer",
+            "type": "text",
+            "editable": true,
+            "validators": [
+                "required"
+            ],
+            "validationMessages": [
+                "Product image is required"
+            ],
+            "value": "Dummy Product Manufacturer"
+        },
+        {
+            "key": "UnitOfMeasurement",
+            "label": "Unit Of Measurement",
+            "type": "dropdown",
+            "valueId": "Value",
+            "nameId": "Name",
+            "contentId": "Name",
+            "source": "Weight",
+            "editable": true,
+            "validators": [
+                "required",
+                "isNumber"
+            ],
+            "validationMessages": [
+                "Unit Of Measurement is required",
+                "Unit Of Measurement is required"
+            ],
+            "value": 2
+        },
+        {
+            "key": "Weight",
+            "label": "Weight",
+            "type": "text",
+            "editable": true,
+            "validators": [
+                "required",
+                "isFloat",
+                "isPositive"
+            ],
+            "validationMessages": [
+                "Product weight is required",
+                "Product weight should be number",
+                "Product weight should be positive number"
+            ],
+            "value": 10.25
+        },
+        {
+            "key": "Size",
+            "label": "Size",
+            "type": "text",
+            "editable": true,
+            "validators": [
+                "required",
+                "isNumber",
+                "isPositive"
+            ],
+            "validationMessages": [
+                "Size is required",
+                "Size must be a number",
+                "Size must be a pasitive number"
+            ],
+            "value": 10
+        },
+        {
+            "key": "Color",
+            "label": "Color",
+            "type": "color",
+            "editable": true,
+            "validators": [
+                "required"
+            ],
+            "validationMessages": [
+                "Product color is required"
+            ],
+            "value": "#7e2020"
+        },
+        {
+            "key": "ProductBuyingPrice",
+            "label": "Product Buying Price",
+            "type": "dropdown",
+            "valueId": "PpId",
+            "nameId": "Price",
+            "contentId": "Price",
+            "source": "ProductPrice",
+            "uicomponent": "productbuyingprice",
+            "editable": true,
+            "create": true,
+            "validators": [],
+            "validationMessages": [],
+            "value": null
+        },
+        {
+            "key": "ProductSellingPrice",
+            "label": "Product Selling Price",
+            "type": "dropdown",
+            "valueId": "PpId",
+            "nameId": "Price",
+            "contentId": "Price",
+            "source": "ProductPrice",
+            "uicomponent": "productsellingprice",
+            "editable": true,
+            "create": true,
+            "validators": [],
+            "validationMessages": [],
+            "value": null
+        },
+        {
+            "key": "ProductProductVendor",
+            "label": "Product Vendor",
+            "type": "dropdown",
+            "valueId": "SId",
+            "nameId": "SupplierName",
+            "contentId": "SupplierName",
+            "source": "Supplier",
+            "uicomponent": "productvendor",
+            "editable": true,
+            "create": true,
+            "validators": [],
+            "validationMessages": [],
+            "value": null
+        },
+        {
+            "key": "ProductODetails",
+            "label": "Product Other Details",
+            "type": "dropdown",
+            "valueId": "OtherDetailsId",
+            "nameId": "UnitOfMeasurement",
+            "contentId": "UnitOfMeasurement",
+            "source": "OtherDetails",
+            "uicomponent": "otherdetails",
+            "editable": true,
+            "create": true,
+            "validators": [],
+            "validationMessages": [],
+            "value": null
+        },
+        {
+            "key": "MainImage",
+            "label": "MainImage",
+            "width": "30%",
+            "type": "doc",
+            "accept": ".JPG,.JPEG,.PNG",
+            "editable": true,
+            "validators": [],
+            "validationMessages": []
+        },
+        {
+            "key": "OtherImages",
+            "label": "OtherImages",
+            "type": "doc",
+            "width": "30%",
+            "accept": ".JPG,.JPEG,.PNG",
+            "editable": true,
+            "multiple": true,
+            "validators": [],
+            "validationMessages": []
+        }
+    ],
+    "producttype": [
+        {
+            "key": "PtId",
+            "type": "keyid",
+            "UIComponentTitle": "Product Type"
+        },
+        {
+            "key": "ProductTypeName",
+            "label": "Type",
+            "type": "text",
+            "editable": true,
+            "validators": [
+                "required"
+            ],
+            "validationMessages": [
+                "Product type is required"
+            ],
+            "value": "Dummy Product Type"
+        },
+        {
+            "key": "ProductTypeDesc",
+            "label": "Description",
+            "type": "text",
+            "editable": true,
+            "width": "30%",
+            "validators": [
+                "required"
+            ],
+            "validationMessages": [
+                "Description is required"
+            ],
+            "value": "Dummy Product Type Description"
+        }
+    ],
+    "productvendor": [
+        {
+            "key": "SId",
+            "type": "keyid",
+            "UIComponentTitle": "Product Vendor"
+        },
+        {
+            "key": "SupplierName",
+            "label": "Name",
+            "type": "text",
+            "editable": true,
+            "validators": [
+                "required"
+            ],
+            "validationMessages": [
+                "Supplier name is required"
+            ],
+            "value": "Dummy Product Vendor"
+        },
+        {
+            "key": "SupplierContact",
+            "label": "Contact",
+            "type": "text",
+            "editable": true,
+            "width": "30%",
+            "validators": [
+                "required"
+            ],
+            "validationMessages": [
+                "Supplier contact is required"
+            ],
+            "value": "Dummy Product Contact"
+        }
+    ],
+    "order": [
+        {
+            "UIComponentTitle": "Order",
+            "key": "OrderId",
+            "type": "keyid"
+        },
+        {
+            "key": "Date",
+            "label": "Date",
+            "type": "date",
+            "editable": true,
+            "validators": [
+                "required"
+            ],
+            "validationMessages": [
+                "Order date is required"
+            ],
+            "value": "2024-05-30"
+        },
+        {
+            "key": "CompanyCode",
+            "label": "Company Code",
+            "type": "text",
+            "editable": true,
+            "validators": [
+                "required"
+            ],
+            "validationMessages": [
+                "Company Code is required"
+            ],
+            "value": "MAY302024"
+        },
+        {
+            "key": "VendorAccountNumber",
+            "label": "Vendor Account Number",
+            "type": "text",
+            "editable": true,
+            "validators": [
+                "required"
+            ],
+            "validationMessages": [
+                "Vendor Account Number is required"
+            ],
+            "value": "ACT123456"
+        },
+        {
+            "key": "StartDateOfValidity",
+            "label": "Start Date Of Validity",
+            "type": "date",
+            "editable": true,
+            "validators": [
+                "required"
+            ],
+            "validationMessages": [
+                "Start Date Of Validity is required"
+            ],
+            "value": "2024-05-30"
+        },
+        {
+            "key": "EndDateOfValidity",
+            "label": "End Date Of Validity",
+            "type": "date",
+            "editable": true,
+            "validators": [
+                "required"
+            ],
+            "validationMessages": [
+                "End Date Of Validity is required"
+            ],
+            "value": "2024-05-30"
+        },
+        {
+            "key": "PoCategory",
+            "label": "Po Category",
+            "type": "text",
+            "editable": true,
+            "validators": [
+                "required"
+            ],
+            "validationMessages": [
+                "PoCategory is required"
+            ],
+            "value": "ACT123456"
+        },
+        {
+            "key": "ShippingType",
+            "label": "Shipping Type",
+            "type": "text",
+            "editable": true,
+            "validators": [
+                "required"
+            ],
+            "validationMessages": [
+                "Shipping Type is required"
+            ],
+            "value": "ACT123456"
+        },
+        {
+            "key": "IsApproved",
+            "label": "Is Approved",
+            "type": "check",
+            "editable": true,
+            "default": false,
+            "validators": [
+                "isTruthy"
+            ],
+            "validationMessages": [
+                "Is Approved is required"
+            ],
+            "value": true
+        },
+        {
+            "key": "DestinationCityCode",
+            "label": "Destination City Code",
+            "type": "text",
+            "editable": true,
+            "validators": [
+                "required",
+                "isNumber",
+                "isPositive"
+            ],
+            "validationMessages": [
+                "Destination City Code is required",
+                "Destination City Code must be a number",
+                "Destination City Code must be a pasitive number"
+            ],
+            "value": 27
+        },
+        {
+            "key": "VendorTelephoneNumber",
+            "label": "Vendor Telephone Number",
+            "type": "text",
+            "editable": true,
+            "validators": [
+                "required",
+                "isNumber",
+                "isPositive"
+            ],
+            "validationMessages": [
+                "Vendor Telephone Number is required",
+                "Vendor Telephone Number must be a number",
+                "Vendor Telephone Number must be a pasitive number"
+            ],
+            "value": 98
+        }
+    ],
+    "shippingaddress": [
+        {
+            "UIComponentTitle": "Shipping Address",
+            "key": "AddressId",
+            "subset": "order",
+            "type": "keyid"
+        },
+        {
+            "key": "Area",
+            "label": "Area",
+            "type": "text",
+            "editable": true,
+            "validators": [
+                "required"
+            ],
+            "validationMessages": [
+                "Area is required"
+            ],
+            "value": "MAY302024"
+        },
+        {
+            "key": "Street",
+            "label": "Street",
+            "type": "text",
+            "editable": true,
+            "validators": [
+                "required"
+            ],
+            "validationMessages": [
+                "Street is required"
+            ],
+            "value": "MAY302024"
+        },
+        {
+            "key": "HouseNumber",
+            "label": "HouseNumber",
+            "type": "text",
+            "editable": true,
+            "validators": [
+                "required"
+            ],
+            "validationMessages": [
+                "HouseNumber is required"
+            ],
+            "value": "MAY302024"
+        },
+        {
+            "key": "AddressLine2",
+            "label": "AddressLine2",
+            "type": "text",
+            "editable": true,
+            "validators": [
+                "required"
+            ],
+            "validationMessages": [
+                "AddressLine2 is required"
+            ],
+            "value": "MAY302024"
+        },
+        {
+            "key": "State",
+            "label": "State",
+            "type": "text",
+            "editable": true,
+            "validators": [
+                "required"
+            ],
+            "validationMessages": [
+                "State is required"
+            ],
+            "value": "MAY302024"
+        },
+        {
+            "key": "Country",
+            "label": "Country",
+            "type": "text",
+            "editable": true,
+            "validators": [
+                "required"
+            ],
+            "validationMessages": [
+                "Country is required"
+            ],
+            "value": "MAY302024"
+        },
+        {
+            "key": "Pincode",
+            "label": "Pincode",
+            "type": "text",
+            "editable": true,
+            "validators": [
+                "required",
+                "isNumber",
+                "isPositive"
+            ],
+            "validationMessages": [
+                "Pincode is required",
+                "Pincode must be a number",
+                "Pincode must be a pasitive number"
+            ],
+            "value": 560100
+        }
+    ],
+    "orderitem": [
+        {
+            "UIComponentTitle": "Order Items",
+            "key": "Order_item_id",
+            "type": "keyid",
+            "parentKeyId": "OrderId",
+            "child": true
+        },
+        {
+            "key": "Order_item_price",
+            "label": "Order Item Price",
+            "type": "text",
+            "editable": true,
+            "validators": [
+                "required",
+                "isFloat",
+                "isPositive"
+            ],
+            "validationMessages": [
+                "Order Item Price is required",
+                "Order Item Price should be number",
+                "Order Item Price should be positive number"
+            ],
+            "value": null
+        },
+        {
+            "key": "Other_order_item_details",
+            "label": "Other Order Item Details",
+            "type": "text",
+            "editable": true,
+            "validators": [
+                "required"
+            ],
+            "validationMessages": [
+                "Other Order Item Details is required"
+            ],
+            "value": null
+        },
+        {
+            "key": "Order_item_status",
+            "label": "Order Item Status",
+            "type": "text",
+            "editable": true,
+            "validators": [
+                "required"
+            ],
+            "validationMessages": [
+                "Order Item Status is required"
+            ],
+            "value": null
+        },
+        {
+            "key": "RMA_issued_by",
+            "label": "RMA Issued By",
+            "type": "text",
+            "editable": true,
+            "validators": [
+                "required"
+            ],
+            "validationMessages": [
+                "RMA Issued By is required"
+            ],
+            "value": "RMA"
+        },
+        {
+            "key": "RMA_issued_date",
+            "label": "RMA Issued Date",
+            "type": "date",
+            "editable": true,
+            "validators": [
+                "required"
+            ],
+            "validationMessages": [
+                "RMA Issued Date is required"
+            ],
+            "value": null
+        },
+        {
+            "key": "Order_item_quantity",
+            "label": "Order Item Quantity",
+            "type": "text",
+            "editable": true,
+            "validators": [
+                "required",
+                "isNumber",
+                "isPositive"
+            ],
+            "validationMessages": [
+                "Order Item Quantity is required",
+                "Order Item Quantity must be a number",
+                "Order Item Quantity must be a pasitive number"
+            ],
+            "value": null
+        },
+        {
+            "key": "RMA_number",
+            "label": "RMA Number",
+            "type": "text",
+            "editable": true,
+            "validators": [
+                "required",
+                "isNumber",
+                "isPositive"
+            ],
+            "validationMessages": [
+                "RMA Number is required",
+                "RMA Number must be a number",
+                "RMA Number must be a pasitive number"
+            ],
+            "value": null
+        }
+    ]
+}
