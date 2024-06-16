@@ -10,6 +10,7 @@ import Helper from "shared/helper";
 // <CustomTable location={x} title={UIComponentTitle} controls={props.controls[x]} rows={dataRows} options={props.options} />
 const Component = (props) => {
     const { title, location, controls, options, rows, onTableRowUpdated, mode } = props;
+
     const theme = useTheme();
 
     const [initialize, setInitialize] = useState(false);
@@ -78,7 +79,7 @@ const Component = (props) => {
 
     const handleSubmit = async () => {
         if (onTableRowUpdated) {
-            onTableRowUpdated({ ...actions, keyIdName, data: newItem });
+            onTableRowUpdated({ ...actions, rows, keyIdName, location, data: newItem });
             ClearSettings();
         }
     }
