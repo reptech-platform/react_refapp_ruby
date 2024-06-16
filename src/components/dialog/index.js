@@ -2,7 +2,6 @@ import * as React from 'react';
 import { Button, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import { Done as DoneIcon, Close as CloseIcon } from '@mui/icons-material';
 import { styled } from '@mui/material/styles';
-import { ValidatorForm } from 'react-material-ui-form-validator';
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
     '& .MuiDialogContent-root': {

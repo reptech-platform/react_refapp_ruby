@@ -184,10 +184,11 @@ const Extract = async (productId) => {
 
             rtnObj.collections = [];
             Object.values(oKeys).forEach(elm => {
-                const { entityName, key, child, title } = item[elm].find(x => x.type === 'keyid');
-                rtnObj.collections.push({ name: elm, title, entityName, key, child });
+                const { parent, child, property } = item[elm].find(x => x.type === 'keyid');
+                if (!Helper.IsNullValue(parent)) {
+                    rtnObj.collections.push({ name: elm, parent, child, property });
+                }
             });
-            console.log(rtnObj);
 
             let items = [];
             Object.values(item).forEach(elm => {

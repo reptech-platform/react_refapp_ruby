@@ -3,10 +3,11 @@ import { Box } from '@mui/material';
 import { ValidatorForm } from 'react-material-ui-form-validator';
 import RenderFormContols from "components/formControls/RenderFormContols";
 import CustomTable from "./customtable";
+import Helper from "shared/helper";
 
 const Component = (props) => {
 
-    const { onInputChange, onSubmit, shadow } = props;
+    const { onInputChange, onSubmit, shadow, onTableRowUpdated } = props;
     const form = React.useRef(null);
 
     const boxShadow = shadow ? "0 1px 5px rgba(0,0,0,.15) !important" : null;
@@ -19,6 +20,26 @@ const Component = (props) => {
 
     const OnInputChange = (e) => {
         if (onInputChange) onInputChange(e);
+    }
+
+    const OnTableRowUpdated = (e) => {
+        const { id, rows, keyIdName, action, data, location } = e;
+        let items = rows || [];
+        if (action === 'add') {
+            const guid = Helper.GetGUID();
+            items = [...items, { action, id: guid, [keyIdName]: guid, ...data }];
+        } else if (action === 'edit') {
+            const updatedItems = [...items];
+            const index = updatedItems.findIndex(x => x.id === id);
+            updatedItems[index] = { action, ...data };
+            items = updatedItems;
+        }
+        else if (action === 'delete') {
+            let updatedItems = [...items];
+            updatedItems = updatedItems.filter(x => x.id !== id);
+            items = updatedItems;
+        }
+        if (onTableRowUpdated) onTableRowUpdated({ location, items });
     }
 
     React.useEffect(() => {
@@ -35,11 +56,12 @@ const Component = (props) => {
                 <Box style={{ display: 'block', width: '100%', marginBottom: 5 }}>
 
                     {elementKeys && elementKeys.map((x, index) => {
-                        const { child, UIComponentTitle } = props.controls[x].find(z => z.type === 'keyid');
+                        const { child, UIComponentTitle, values } = props.controls[x].find(z => z.type === 'keyid');
                         if (child) {
                             return (
                                 <Box key={index} sx={{ float: "left", minWidth: "95%", margin: 2, boxShadow, borderRadius }}>
-                                    <CustomTable location={x} title={UIComponentTitle} mode={props.mode} controls={props.controls[x]} options={props.options} />
+                                    <CustomTable location={x} title={UIComponentTitle} mode={props.mode}
+                                        controls={props.controls[x]} rows={values} options={props.options} onTableRowUpdated={OnTableRowUpdated} />
                                 </Box>
                             )
                         }

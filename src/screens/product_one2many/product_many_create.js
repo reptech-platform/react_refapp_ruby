@@ -10,6 +10,8 @@ import Helper from "shared/helper";
 
 import { Extract, MapItems } from "./child/extract";
 
+const numberItems = ['Pincode'];
+
 const Component = (props) => {
 
     const [form, setForm] = useState(null);
@@ -18,6 +20,7 @@ const Component = (props) => {
     const [state, setState] = useState(false);
     const [showButton, setShowButton] = useState(true);
     const [dropDownOptions, setDropDownOptions] = useState([]);
+    const [childCollections, setChildCollections] = useState([]);
     const NavigateTo = useNavigate();
     const [showUpdate, setShowUpdate] = useState(false);
     const { title } = props;
@@ -26,7 +29,33 @@ const Component = (props) => {
         let rslt, data, prodImages, productId;
         const mapItems = MapItems;
 
+        // Attach inline objects
         let product = row['product'];
+        let inlineObjs = childCollections.filter(x => !x.child);
+        inlineObjs.forEach(x => {
+            let vObj = {};
+            let obj = row[x.name];
+            const tmp = Object.values(obj);
+            tmp.filter((x) => x.value).map((x) => {
+                if (x.type === 'dropdown') {
+                    vObj[x.key] = dropDownOptions.find((z) => z.Name === x.source).Values.find((m) => parseInt(m[x.valueId]) === parseInt(x.value))[x.valueId];
+                } else if (numberItems.indexOf(x.key) > -1) {
+                    if (x.value) vObj[x.key] = parseFloat(x.value);
+                } else {
+                    vObj[x.key] = x.value;
+                }
+            });
+            product.push({ key: x.property, value: vObj, type: "inline" });
+        });
+
+        inlineObjs = childCollections.filter(x => x.child);
+        inlineObjs.forEach(x => {
+            let _values = row[x.name].find(z => z.type === 'keyid')?.values;
+            _values.forEach(m => {
+                ['action', 'CompId', 'id'].forEach(z => delete m[z]);
+            });
+            product.push({ key: x.property, value: _values, type: "collections" });
+        });
 
         // Add Or Update Product
         rslt = await Support.AddOrUpdateProduct(product, dropDownOptions, ['MainImage', 'OtherImages']);
@@ -66,7 +95,7 @@ const Component = (props) => {
         }
 
         // Add Product Other Images
-        prodImages = product.find((x) => x.key === 'OtherImages').value;
+        prodImages = product.find((x) => x.key === 'OtherImages');
         if (prodImages && !Helper.IsNullValue(prodImages.value)) {
             for (let i = 0; i < prodImages.length; i++) {
                 rslt = await Support.AddOrUpdateDocument({ value: prodImages[i] });
@@ -145,13 +174,21 @@ const Component = (props) => {
 
     const fetchData = async () => {
         await Extract().then(rslt => {
-            const { row, options } = rslt;
-            console.log(rslt);
+            const { row, options, collections } = rslt;
             setRow(row);
+            setChildCollections(collections);
             setDropDownOptions(options);
             setState(!state);
         })
     };
+
+    const OnTableRowUpdated = (e) => {
+        const { location, items } = e;
+        let _row = { ...row };
+        _row[location].find(x => x.type === 'keyid').values = items;
+        setRow(_row);
+        setShowUpdate(true);
+    }
 
     useEffect(() => { setShowButton(true); }, []);
     if (initialized) { setInitialized(false); fetchData(); }
@@ -176,7 +213,7 @@ const Component = (props) => {
                     </Stack>
                 </Box>
                 <Divider />
-                <RenderFormContols shadow={true} {...props} setForm={setForm} onInputChange={OnInputChange}
+                <RenderFormContols shadow={true} {...props} setForm={setForm} onInputChange={OnInputChange} onTableRowUpdated={OnTableRowUpdated}
                     controls={row} onSubmit={OnSubmit} options={dropDownOptions} />
                 {showUpdate && (
                     <>

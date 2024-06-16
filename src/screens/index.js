@@ -8,11 +8,15 @@ import ProductTypes from "./productType_table/productType_index.js";
 import InformatForm from "./product_information_form/product_information_form.js";
 import StepperForm from "./product_stepper/product_stepper_index.js";
 import TabbedLayout from "./product_tabbed/product_tabbed.js";
-import ProductOneToMany from "./product_one2many/product_many_create.js";
+
+import ProductOneToMany from "./product_one2many/product_many_list.js";
+import ProductOneToManyCreate from "./product_one2many/product_many_create.js";
+import ProductOneToManyEdit from "./product_one2many/product_many_create.js";
+import ProductOneToManyView from "./product_one2many/product_many_create.js";
 
 export {
-    ProductCreate, ProductOneToMany,
-    Products, ProductTiles, ProductList,
+    Products, ProductCreate, ProductTiles, ProductList,
     ProductEdit, ProductView, ProductTypes,
-    InformatForm, StepperForm, TabbedLayout
+    InformatForm, StepperForm, TabbedLayout,
+    ProductOneToMany, ProductOneToManyCreate, ProductOneToManyEdit, ProductOneToManyView
 };
