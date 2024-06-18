@@ -315,6 +315,7 @@ const GetProduct = async (id, params, expands) => {
             url = `${serverApi}Products(${id})?${params}`;
         }
         if (expands) url = params ? `${url}&$expand=${expands}` : `${url}?&$expand=${expands}`;
+        console.log(url);
 
         try {
             const res = await fetch(url, {
