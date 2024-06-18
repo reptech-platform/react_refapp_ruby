@@ -11,7 +11,10 @@ const MapItems = [
     { navpropname: "ODetails", uicomponent: "otherdetails", expand: "ODetails", exclude: [], func: Support.AddOrUpdateOtherDetails },
     { navpropname: "SellingPrice", uicomponent: "productsellingprice", expand: "SellingPrice", exclude: [], func: Support.AddOrUpdatePrice },
     { navpropname: "BuyingPrice", uicomponent: "productbuyingprice", expand: "BuyingPrice", exclude: [], func: Support.AddOrUpdatePrice },
-    { navpropname: "ProductVendor", uicomponent: "productvendor", expand: "ProductVendor", exclude: [], func: Support.AddOrUpdateProductVendor }
+    { navpropname: "ProductVendor", uicomponent: "productvendor", expand: "ProductVendor", exclude: [], func: Support.AddOrUpdateProductVendor },
+    { navpropname: "PComponent", uicomponent: "pcomponent", expand: "PComponents", exclude: [] },
+    { navpropname: "VendorAddress", uicomponent: "vendoraddress" }
+
 ];
 
 const FetchProductInfo = async () => {
@@ -52,6 +55,8 @@ const FetchProductDetails = async (productId, enums) => {
             if (rslt.status) {
 
                 const product = rslt.values;
+
+                debugger;
 
                 for (let i = 0; i < MapItems.length; i++) {
 

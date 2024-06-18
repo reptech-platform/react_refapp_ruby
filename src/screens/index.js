@@ -12,7 +12,7 @@ import TabbedLayout from "./product_tabbed/product_tabbed.js";
 import ProductOneToMany from "./product_one2many/product_many_list.js";
 import ProductOneToManyCreate from "./product_one2many/product_many_create.js";
 import ProductOneToManyEdit from "./product_one2many/product_many_create.js";
-import ProductOneToManyView from "./product_one2many/product_many_create.js";
+import ProductOneToManyView from "./product_one2many/product_many_view.js";
 
 export {
     Products, ProductCreate, ProductTiles, ProductList,
