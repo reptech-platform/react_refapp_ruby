@@ -12,8 +12,8 @@ const MapItems = [
     { navpropname: "SellingPrice", uicomponent: "productsellingprice", expand: "SellingPrice", exclude: [], func: Support.AddOrUpdatePrice },
     { navpropname: "BuyingPrice", uicomponent: "productbuyingprice", expand: "BuyingPrice", exclude: [], func: Support.AddOrUpdatePrice },
     { navpropname: "ProductVendor", uicomponent: "productvendor", expand: "ProductVendor", exclude: [], func: Support.AddOrUpdateProductVendor },
-    { navpropname: "PComponent", uicomponent: "pcomponent", expand: "PComponents", exclude: [] },
-    { navpropname: "VendorAddress", uicomponent: "vendoraddress" }
+    { navpropname: "PComponents", uicomponent: "pcomponent", expand: "PComponents", exclude: [], parent: "product", child: true },
+    { navpropname: "VendorAddress", uicomponent: "vendoraddress", parent: "product" }
 
 ];
 
@@ -50,44 +50,48 @@ const FetchProductDetails = async (productId, enums) => {
         if (productId) {
             global.Busy(true);
             // Get Product Details
-            const $expand = MapItems.map(x => x.expand).join(",");
+            const $expand = MapItems.filter(z => z.expand).map(x => x.expand).join(",");
             let rslt = await Api.GetProduct(productId, `$expand=${$expand}`);
             if (rslt.status) {
 
                 const product = rslt.values;
 
-                debugger;
-
                 for (let i = 0; i < MapItems.length; i++) {
 
                     const source = MapItems[i].navpropname;
                     const target = MapItems[i].uicomponent;
+                    const parent = MapItems[i].parent;
+                    const child = MapItems[i].child;
 
                     const sourceObj = Helper.IsNullValue(source) ? product : product[source];
+                    if (parent && child) {
+                        sourceObj.forEach(x => x.id = Helper.GetGUID());
+                        item[target].find((x) => x.type === "keyid").values = sourceObj;
+                    } else {
+                        for (let prop in sourceObj) {
+                            const tItem = item[target].find((x) => x.key === prop);
+                            if (tItem && !Helper.IsNullValue(sourceObj[prop])) {
 
-                    for (let prop in sourceObj) {
-                        const tItem = item[target].find((x) => x.key === prop);
-                        if (tItem && !Helper.IsNullValue(sourceObj[prop])) {
+                                let _nValue = null;
+                                if (tItem.type === 'dropdown') {
+                                    const { Values } = enums.find((z) => z.Name === tItem.source);
+                                    const _value = Values.find((m) => m[tItem.contentId] === sourceObj[prop] || m[tItem.valueId] === sourceObj[prop]) || {};
+                                    _nValue = _value[tItem.valueId];
 
-                            let _nValue = null;
-                            if (tItem.type === 'dropdown') {
-                                const { Values } = enums.find((z) => z.Name === tItem.source);
-                                const _value = Values.find((m) => m[tItem.contentId] === sourceObj[prop] || m[tItem.valueId] === sourceObj[prop]) || {};
-                                _nValue = _value[tItem.valueId];
+                                    if (!Helper.IsNullValue(_nValue) && item[tItem.mapitem]) {
+                                        item[tItem.mapitem].forEach(x => x.editable = false);
+                                    }
 
-                                if (!Helper.IsNullValue(_nValue) && item[tItem.mapitem]) {
-                                    item[tItem.mapitem].forEach(x => x.editable = false);
+                                } else if (tItem.type === 'date') {
+                                    let tmpDate = sourceObj[prop].split('T');
+                                    _nValue = tmpDate[0];
+                                } else {
+                                    _nValue = sourceObj[prop];
                                 }
 
-                            } else if (tItem.type === 'date') {
-                                let tmpDate = sourceObj[prop].split('T');
-                                _nValue = tmpDate[0];
-                            } else {
-                                _nValue = sourceObj[prop];
+                                item[target].find((x) => x.key === prop).value = _nValue;
+
                             }
-
-                            item[target].find((x) => x.key === prop).value = _nValue;
-
                         }
                     }
 
