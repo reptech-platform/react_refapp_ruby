@@ -19,7 +19,6 @@ const Component = (props) => {
     const [childCollections, setChildCollections] = useState([]);
 
     const fetchData = async () => {
-        console.log(id);
         await Extract(id).then(rslt => {
             console.log(rslt);
             const { row, options, collections } = rslt;
