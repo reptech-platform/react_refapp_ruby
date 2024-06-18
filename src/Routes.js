@@ -24,7 +24,7 @@ const Component = (props) => {
             <Route path="/productsmany" element={<ProductOneToMany {...props} title={'Products One To Many'} />} />
             <Route path="/productsmany/create" element={<ProductOneToManyCreate {...props} title={'Create Products One To Many'} />} />
             <Route path="/productsmany/view/:id" element={<ProductOneToManyView {...props} title={'View Products One To Many'} />} />
-            <Route path="/productsmany/edit/:id" element={<ProductOneToManyCreate {...props} title={'Edit Products One To Many'} />} />
+            <Route path="/productsmany/edit/:id" element={<ProductOneToManyEdit {...props} title={'Edit Products One To Many'} />} />
             <Route path="/" element={<Products {...props} title={'Products Table'} nolistbar={true} />} />
         </Routes>
     )
