@@ -33,10 +33,9 @@ const Component = (props) => {
             const index = updatedItems.findIndex(x => x.id === id);
             updatedItems[index] = { action, ...data };
             items = updatedItems;
-        }
-        else if (action === 'delete') {
+        } else if (action === 'delete') {
             let updatedItems = [...items];
-            updatedItems = updatedItems.filter(x => x.id !== id);
+            updatedItems.find(x => x.id === id).action = 'delete';
             items = updatedItems;
         }
         if (onTableRowUpdated) onTableRowUpdated({ location, items });
@@ -61,7 +60,7 @@ const Component = (props) => {
                             return (
                                 <Box key={index} sx={{ float: "left", minWidth: "95%", margin: 2, boxShadow, borderRadius }}>
                                     <CustomTable location={x} title={UIComponentTitle} mode={props.mode}
-                                        controls={props.controls[x]} rows={values} options={props.options} onTableRowUpdated={OnTableRowUpdated} />
+                                        controls={props.controls[x]} rows={values.filter(m => m.action !== 'delete')} options={props.options} onTableRowUpdated={OnTableRowUpdated} />
                                 </Box>
                             )
                         }

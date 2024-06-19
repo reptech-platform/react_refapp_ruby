@@ -315,7 +315,6 @@ const GetProduct = async (id, params, expands) => {
             url = `${serverApi}Products(${id})?${params}`;
         }
         if (expands) url = params ? `${url}&$expand=${expands}` : `${url}?&$expand=${expands}`;
-        console.log(url);
 
         try {
             const res = await fetch(url, {
@@ -717,6 +716,119 @@ const GetProductOnBoardings = async () => {
     });
 }
 
+const GetProductPComponents = async (productId) => {
+    return new Promise(async (resolve) => {
+        let url = `${serverApi}ProductPComponentss?$filter=Product_id eq ${productId}`;
+
+        try {
+            const res = await fetch(url, {
+                method: "GET",
+                headers: {
+                    "Content-type": "application/json"
+                }
+            });
+
+            const json = await res.json();
+            if (res.status === 200) {
+                return resolve({ status: res.ok, values: json.value || [] });
+            }
+
+            return resolve({ status: false, statusText: json.error.message });
+
+        } catch (error) {
+            console.log(error);
+            return resolve({ status: false, statusText: error.message });
+        }
+    });
+}
+
+const SetProductPComponents = async (input) => {
+    return new Promise(async (resolve) => {
+
+        const { Id, CompId, ProductId, Deleted } = input;
+
+        let method = "POST";
+        let url = `${serverApi}ProductPComponentss`;
+        let data = { CompId, Product_id: ProductId };
+
+        if (Id && !Deleted) {
+            method = "PATCH";
+            url = `${serverApi}ProductPComponentss(${Id})`;
+        } else if (Id && Deleted) {
+            method = "DELETE";
+            data = {};
+            url = `${serverApi}ProductPComponentss(${Id})`;
+        }
+
+        try {
+            const res = await fetch(url, {
+                method, body: JSON.stringify(data),
+                headers: {
+                    "Content-type": "application/json"
+                }
+            });
+
+            if (res.status === 201) {
+                const json = await res.json();
+                return resolve({ status: res.ok, id: json.Id });
+            } else if (res.status === 200 || res.status === 204) {
+                return resolve({ status: res.ok, Id });
+            } else {
+                const json = await res.json();
+                return resolve({ status: false, statusText: json.error.message });
+            }
+
+        } catch (error) {
+            console.log(error);
+            return resolve({ status: false, statusText: error.message });
+        }
+    });
+}
+
+const SetPComponent = async (input) => {
+    return new Promise(async (resolve) => {
+
+        const { CompId, Deleted } = input;
+
+        let method = "POST";
+        let url = `${serverApi}PComponents`;
+        let data = input;
+
+        if (CompId && !Deleted) {
+            method = "PATCH";
+            url = `${serverApi}PComponents(${CompId})`;
+            delete data['CompId'];
+        } else if (CompId && Deleted) {
+            method = "DELETE";
+            data = {};
+            url = `${serverApi}PComponents(${CompId})`;
+        }
+
+        try {
+            const res = await fetch(url, {
+                method, body: JSON.stringify(data),
+                headers: {
+                    "Content-type": "application/json"
+                }
+            });
+
+            if (res.status === 201) {
+                const json = await res.json();
+                return resolve({ status: res.ok, id: json.CompId });
+            } else if (res.status === 200 || res.status === 204) {
+                return resolve({ status: res.ok, id: CompId });
+            } else {
+                const json = await res.json();
+                return resolve({ status: false, statusText: json.error.message });
+            }
+
+        } catch (error) {
+            console.log(error);
+            return resolve({ status: false, statusText: error.message });
+        }
+    });
+}
+
 export {
     GetMetaData, GetEntityInfo, GetEntityInfoCount,
     GetProductTypesCount, GetProductTypes, SetProductTypes, GetProductStatus,
@@ -724,5 +836,6 @@ export {
     GetProductsCount, GetProducts, GetProduct, SetProduct, SetProductVendor,
     GetOtherDetails, SetOtherDetails,
     GetProductOtherImages, SetProductOtherImages,
-    GetProductPrice, SetProductPrice, GetProductOnBoardings
+    GetProductPrice, SetProductPrice, GetProductOnBoardings,
+    GetProductPComponents, SetPComponent, SetProductPComponents
 };

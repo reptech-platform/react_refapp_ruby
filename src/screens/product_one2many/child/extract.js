@@ -35,7 +35,7 @@ const FetchProductInfo = async () => {
 const FetchProductDetails = async (productId, enums) => {
 
     return new Promise(async (resolve) => {
-        let item = {}, backItem = {}, tmp;
+        let item = {}, backItem = {}, tmp, productPComponents = [];
 
         const keyItems = Object.keys(ProductJsonConfig);
 
@@ -49,9 +49,13 @@ const FetchProductDetails = async (productId, enums) => {
 
         if (productId) {
             global.Busy(true);
+
+            let rslt = await Api.GetProductPComponents(productId);
+            if (rslt.status) productPComponents = rslt.values;
+
             // Get Product Details
             const $expand = MapItems.filter(z => z.expand).map(x => x.expand).join(",");
-            let rslt = await Api.GetProduct(productId, `$expand=${$expand}`);
+            rslt = await Api.GetProduct(productId, `$expand=${$expand}`);
             if (rslt.status) {
 
                 const product = rslt.values;
@@ -65,8 +69,21 @@ const FetchProductDetails = async (productId, enums) => {
 
                     const sourceObj = Helper.IsNullValue(source) ? product : product[source];
                     if (parent && child) {
-                        sourceObj.forEach(x => x.id = Helper.GetGUID());
-                        item[target].find((x) => x.type === "keyid").values = sourceObj;
+                        let _tmpItems = [];
+                        let _fItem = item[target];//.filter(z => z.type !== 'keyid');
+                        sourceObj.forEach(x => {
+                            let _tmpItem = {};
+                            _tmpItem['id'] = Helper.GetGUID();
+                            _fItem.forEach(m => {
+                                if (m.type === 'keyid' && !Helper.IsNullValue(x[m.key])) {
+                                    _tmpItem['id'] = x[m.key];
+                                }
+                                _tmpItem[m.key] = x[m.key]
+                            })
+                            _tmpItems.push(_tmpItem);
+                        });
+
+                        item[target].find((x) => x.type === "keyid").values = _tmpItems;
                     } else {
                         for (let prop in sourceObj) {
                             const tItem = item[target].find((x) => x.key === prop);
@@ -149,7 +166,7 @@ const FetchProductDetails = async (productId, enums) => {
             global.Busy(false);
         }
 
-        return resolve({ row: item, backRow: backItem });
+        return resolve({ row: item, backRow: backItem, mapitems: productPComponents });
     });
 }
 
@@ -208,8 +225,9 @@ const Extract = async (productId) => {
             await FetchDropdownItems(items).then(async (enums) => {
                 rtnObj.options = Helper.CloneObject(enums);
                 if (!Helper.IsNullValue(productId)) {
-                    await FetchProductDetails(productId, enums).then(({ row, backRow }) => {
+                    await FetchProductDetails(productId, enums).then(({ row, backRow, mapitems }) => {
                         rtnObj.row = Helper.CloneObject(row);
+                        rtnObj.mapitems = Helper.CloneObject(mapitems);
                         rtnObj.backRow = Helper.CloneObject(backRow);
                     })
                 }
