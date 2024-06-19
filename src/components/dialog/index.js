@@ -2,7 +2,6 @@ import * as React from 'react';
 import { Button, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import { Done as DoneIcon, Close as CloseIcon } from '@mui/icons-material';
 import { styled } from '@mui/material/styles';
-import { ValidatorForm } from 'react-material-ui-form-validator';
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
     '& .MuiDialogContent-root': {
@@ -15,7 +14,7 @@ const BootstrapDialog = styled(Dialog)(({ theme }) => ({
 
 const Component = (props) => {
 
-    const { open, width, height, title, onCloseClicked, children } = props;
+    const { open, width, height, title, onCloseClicked, children, sxContent, action } = props;
 
     const handleStateChange = (e, bState) => {
         if (onCloseClicked) onCloseClicked(bState);
@@ -34,15 +33,17 @@ const Component = (props) => {
             <DialogTitle sx={{ m: 0, p: 2 }} id="customized-dialog-title">
                 {title}
             </DialogTitle>
-            <DialogContent dividers sx={{ display: "flex", alignItems: "center" }}>
+            <DialogContent dividers sx={{
+                ...sxContent, display: "flex", alignItems: "center"
+            }}>
                 {children}
             </DialogContent>
             <DialogActions>
-                <Button variant="contained" startIcon={<DoneIcon />} onClick={(e) => handleStateChange(e, true)}>
-                    Yes
-                </Button>
+                {action === 'add' && <Button variant="contained" startIcon={<DoneIcon />} onClick={(e) => handleStateChange(e, true)}>Add</Button>}
+                {action === 'edit' && <Button variant="contained" startIcon={<DoneIcon />} onClick={(e) => handleStateChange(e, true)}>Update</Button>}
+                {action === 'delete' && <Button variant="contained" startIcon={<DoneIcon />} onClick={(e) => handleStateChange(e, true)}>Ok</Button>}
                 <Button variant="outlined" startIcon={<CloseIcon />} onClick={(e) => handleStateChange(e, false)}>
-                    No
+                    Cancel
                 </Button>
             </DialogActions>
         </BootstrapDialog>
