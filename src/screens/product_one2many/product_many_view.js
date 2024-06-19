@@ -42,11 +42,15 @@ const Component = (props) => {
                                 {title}
                             </Typography>
                         </Box>
-                        <Grid container sx={{ justifyContent: 'flex-end' }}>
+                        <Grid container sx={{ alignItems: "center", justifyContent: 'flex-end', gap: 1, pt: 1, pb: 1 }}>
+                            <Button variant="contained" startIcon={<EditIcon />}
+                                onClick={() => NavigateTo(`/productsmany/edit/${id}`)}
+                            >Edit</Button>
                             <Button variant="contained" startIcon={<ArrowLeftIcon />}
-                                onClick={() => NavigateTo("/products")}
+                                onClick={() => NavigateTo("/productsmany")}
                             >Back</Button>
                         </Grid>
+
                     </Stack>
                 </Box>
                 <Divider />

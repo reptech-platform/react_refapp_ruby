@@ -207,7 +207,7 @@ const Component = (props) => {
                         </Box>
                         <Grid container sx={{ justifyContent: 'flex-end' }}>
                             <Button variant="contained" startIcon={<ArrowLeftIcon />}
-                                onClick={() => NavigateTo("/products")}
+                                onClick={() => NavigateTo("/productsmany")}
                             >Back</Button>
                         </Grid>
                     </Stack>

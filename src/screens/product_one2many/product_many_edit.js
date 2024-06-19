@@ -106,8 +106,6 @@ const Component = (props) => {
             return;
         }
 
-        return;
-
         for (let i = 0; i < mapItems.length; i++) {
             // Add or Update the product and navigation entity if it is deos not exist
             let navItem = product.find(x => x.uicomponent === mapItems[i].uicomponent);
@@ -157,7 +155,7 @@ const Component = (props) => {
 
         global.AlertPopup("success", "Product is created successfully!");
         setShowUpdate(false);
-        NavigateTo("/products");
+        NavigateTo("/productsmany");
     }
 
     const OnInputChange = (e) => {
@@ -254,7 +252,7 @@ const Component = (props) => {
                         </Box>
                         <Grid container sx={{ justifyContent: 'flex-end' }}>
                             <Button variant="contained" startIcon={<ArrowLeftIcon />}
-                                onClick={() => NavigateTo("/products")}
+                                onClick={() => NavigateTo("/productsmany")}
                             >Back</Button>
                         </Grid>
                     </Stack>
