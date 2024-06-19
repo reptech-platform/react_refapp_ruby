@@ -22,6 +22,8 @@ const Component = (props) => {
     const [showButton, setShowButton] = useState(true);
     const [dropDownOptions, setDropDownOptions] = useState([]);
     const [childCollections, setChildCollections] = useState([]);
+    const [productPComponents, setProductPComponents] = useState([]);
+
     const NavigateTo = useNavigate();
     const [showUpdate, setShowUpdate] = useState(false);
     const { title } = props;
@@ -49,23 +51,62 @@ const Component = (props) => {
             product.push({ key: x.property, value: vObj, type: "inline" });
         });
 
-        inlineObjs = childCollections.filter(x => x.child);
+        // Add or Update Collection Items
+        let updateChild = [];
+        inlineObjs = childCollections.filter(x => x.child) || [];
         inlineObjs.forEach(x => {
-            let _values = row[x.name].find(z => z.type === 'keyid')?.values;
-            _values.forEach(m => {
-                ['action', 'CompId', 'id'].forEach(z => delete m[z]);
+            let _obj = row[x.name].find(z => z.type === 'keyid');
+            let _values = _obj?.values;
+            let _keyId = _obj?.key;
+            let filterRowItems = Helper.CloneObject(_values).filter(x => ['add', 'edit', 'delete'].indexOf(x.action) > -1);
+            filterRowItems.forEach(m => {
+                delete m['id'];
+                switch (m['action']) {
+                    case 'add': break;
+                    case 'edit': m.Deleted = true; break;
+                    case 'delete': m.Deleted = true; break;
+                }
+                if (m['action'] === 'delete') {
+                    m.Deleted = true;
+                } else if (m['action'] === 'add') {
+                    delete m[_keyId];
+                }
+                delete m['id'];
+                delete m['action'];
             });
-            product.push({ key: x.property, value: _values, type: "collections" });
+
+            filterRowItems.forEach(m => updateChild.push(m));
+
         });
 
-        console.log(product);
-        return;
+        if (updateChild.length === 0) {
+            global.AlertPopup("error", "Atleaset one child item should exist!");
+            return;
+        }
 
         // Add Or Update Product
         rslt = await Support.AddOrUpdateProduct(product, dropDownOptions, ['MainImage', 'OtherImages']);
         if (rslt.status) {
             productId = rslt.id;
         } else { return; }
+
+        let bAllStatus = false;
+        for (let i = 0; i < updateChild.length; i++) {
+            let _data = updateChild[i];
+            let compProductMapId = null;
+            if (!Helper.IsNullValue(_data.CompId)) {
+                compProductMapId = productPComponents.find(x => x.CompId === _data.CompId && x.Product_id === productId).Id;
+            }
+            rslt = await Support.AddOrUpdateProductComponent(compProductMapId, productId, _data);
+            bAllStatus = !bAllStatus ? rslt.status : bAllStatus;
+        }
+
+        if (!bAllStatus) {
+            global.AlertPopup("error", "Somthing went wrong to update!");
+            return;
+        }
+
+        return;
 
         for (let i = 0; i < mapItems.length; i++) {
             // Add or Update the product and navigation entity if it is deos not exist
@@ -178,10 +219,12 @@ const Component = (props) => {
 
     const fetchData = async () => {
         await Extract(id).then(rslt => {
-            const { row, options, collections } = rslt;
+            const { row, options, collections, mapitems } = rslt;
+            console.log(mapitems);
             setRow(row);
             setChildCollections(collections);
             setDropDownOptions(options);
+            setProductPComponents(mapitems)
             setState(!state);
         })
     };
