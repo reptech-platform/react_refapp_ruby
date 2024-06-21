@@ -4,10 +4,13 @@ import {
     ProductCreate,
     Products, ProductTiles, ProductList,
     ProductEdit, StepperForm, TabbedLayout,
-    ProductView, ProductTypes, InformatForm
+    ProductView, ProductTypes, InformatForm,
+    Order,
+    Shipping,
 } from "screens";
 
 const Component = (props) => {
+    
 
     return (
         <Routes>
@@ -22,6 +25,8 @@ const Component = (props) => {
             <Route path="/producttiles" element={<ProductTiles {...props} title={'Products Table'} />} />
             <Route path="/productlist" element={<ProductList {...props} title={'Products List'} />} />
             <Route path="/" element={<Products {...props} title={'Products Table'} nolistbar={true} />} />
+            <Route path="/order" element={<Order {...props} title={'Order Items'}  />} />
+            <Route path="/shipping" element={<Shipping />} />
         </Routes>
     )
 

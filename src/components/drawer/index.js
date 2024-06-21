@@ -1,10 +1,11 @@
 import React from 'react';
-import { Toolbar, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Tooltip } from '@mui/material';
+import { Toolbar, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Tooltip, } from '@mui/material';
 import MuiDrawer from '@mui/material/Drawer';
 import { styled, useTheme } from '@mui/material/styles';
-import { ShoppingBasket, Toc, EditNote, Checklist, Tab, GridView as GridViewIcon } from '@mui/icons-material';
+import { ShoppingBasket, Toc, EditNote, Checklist, Tab, GridView as GridViewIcon,LocalShipping,} from '@mui/icons-material';
 import { DRAWER_WIDTH } from "config";
 import { useNavigate } from 'react-router-dom';
+
 
 const openedMixin = (theme) => ({
     width: DRAWER_WIDTH,
@@ -119,6 +120,22 @@ const Component = (props) => {
                                 </Tooltip>
                             </ListItemIcon>
                             {open && <ListItemText primary="List Layout" sx={{ pl: 1 }} />}
+                        </ListItemButton>
+                        <ListItemButton onClick={() => NavigateTo("/order")} sx={{ height: 50 }}>
+                            <ListItemIcon sx={{ minWidth: 30 }}>
+                                <Tooltip title="Order">
+                                    <Checklist />
+                                </Tooltip>
+                            </ListItemIcon>
+                            {open && <ListItemText primary="Order" sx={{ pl: 1 }} />}
+                        </ListItemButton>
+                        <ListItemButton onClick={() => NavigateTo("/shipping")} sx={{ height: 50 }}>
+                            <ListItemIcon sx={{ minWidth: 30 }}>
+                                <Tooltip title="Shipping">
+                                    <LocalShipping/>
+                                </Tooltip>
+                            </ListItemIcon>
+                            {open && <ListItemText primary="Shipping" sx={{ pl: 1 }} />}
                         </ListItemButton>
                     </List>
                 </ListItem>

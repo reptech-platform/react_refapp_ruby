@@ -716,6 +716,59 @@ const GetProductOnBoardings = async () => {
     });
 }
 
+const GetOrderItems = async () => {
+    return new Promise(async (resolve) => {
+        const url = 'http://122.166.66.145:8382/ecomrubyV3/OrderItems?$expand=OIProduct($expand=MainImage)';
+        
+        try {
+            const res = await fetch(url, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            });
+            const json = await res.json();
+            if (res.status === 200) {
+                const itemsWithImages = await Promise.all(json.value.map(async (item) => {
+                    if (item.OIProduct && item.OIProduct.MainImage) {
+                        const imageRes = await fetch(`http://122.166.66.145:8382/ecomrubyV3/Documents(${item.OIProduct.MainImage.DocId})/$value`, {
+                            method: "GET"
+                        });
+                        if (imageRes.ok) {
+                            let imageData = await imageRes.text();
+                            if (imageData.startsWith("data:")) {
+                                imageData = imageData.substring(imageData.indexOf('data:'));
+                            } else {
+                                const tmp = imageData.split('\r\n');
+                                for (let img of tmp) {
+                                    if (img.startsWith("data:")) imageData = img;
+                                }
+                            }
+                            item.OIProduct.MainImage.DocPath = imageData;
+                        } else {
+                            
+                            console.error('Image fetch failed for DocId:', item.OIProduct.MainImage.DocId);
+                        }
+                    }
+                   
+
+                    return item;
+                }))
+                return resolve({ status: res.ok, values: itemsWithImages });
+            }
+            return resolve({ status: false, statusText: json.error.message });
+
+        } catch (error) {
+            console.log(error);
+            return resolve({ status: false, statusText: error.message });
+        }
+    });
+};
+
+
+
+
+
 export {
     GetMetaData, GetEntityInfo, GetEntityInfoCount,
     GetProductTypesCount, GetProductTypes, SetProductTypes, GetProductStatus,
@@ -723,5 +776,5 @@ export {
     GetProductsCount, GetProducts, GetProduct, SetProduct, SetProductVendor,
     GetOtherDetails, SetOtherDetails,
     GetProductOtherImages, SetProductOtherImages,
-    GetProductPrice, SetProductPrice, GetProductOnBoardings
+    GetProductPrice, SetProductPrice, GetProductOnBoardings,GetOrderItems
 };
