@@ -1050,6 +1050,8 @@ const SetMapOrderItem = async (input) => {
     });
 }
 
+
+
 export {
     GetMetaData, GetEntityInfo, GetEntityInfoCount, SetEntityInfo,
     GetProductTypesCount, GetProductTypes, SetProductTypes, GetProductStatus,
@@ -1057,8 +1059,7 @@ export {
     GetProductsCount, GetProducts, GetProduct, SetProduct, SetProductVendor,
     GetOtherDetails, SetOtherDetails,
     GetProductOtherImages, SetProductOtherImages,
-    GetProductPrice, SetProductPrice, GetProductOnBoardings,GetOrderItems
-    GetProductPrice, SetProductPrice, GetProductOnBoardings,
+    GetProductPrice, SetProductPrice, GetProductOnBoardings,GetOrderItems,
     GetOrdersCount, GetOrders, GetOrder, SetOrders, GetMapOrderItems,
     SetOrderItem, SetMapOrderItem
 };

@@ -20,6 +20,5 @@ export {
     Products, ProductTiles, ProductList,
     ProductEdit, ProductView, ProductTypes,
     InformatForm, StepperForm, TabbedLayout,Order, Shipping,
-    InformatForm, StepperForm, TabbedLayout,
     OrderList, OrderNew, OrderView, OrderEdit
 };
