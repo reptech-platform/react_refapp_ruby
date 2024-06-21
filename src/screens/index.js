@@ -8,7 +8,6 @@ import ProductTypes from "./productType_table/productType_index.js";
 import InformatForm from "./product_information_form/product_information_form.js";
 import StepperForm from "./product_stepper/product_stepper_index.js";
 import TabbedLayout from "./product_tabbed/product_tabbed.js";
-import Order from "./order/order.js";
 import Shipping from "./shipping/index.js";
 import OrderList from "./order/order_list.js";
 import OrderNew from "./order/order_new.js";
@@ -19,6 +18,6 @@ export {
     ProductCreate,
     Products, ProductTiles, ProductList,
     ProductEdit, ProductView, ProductTypes,
-    InformatForm, StepperForm, TabbedLayout,Order, Shipping,
+    InformatForm, StepperForm, TabbedLayout,Shipping,
     OrderList, OrderNew, OrderView, OrderEdit
 };

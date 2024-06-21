@@ -5,7 +5,6 @@ import {
     Products, ProductTiles, ProductList,
     ProductEdit, StepperForm, TabbedLayout,
     ProductView, ProductTypes, InformatForm,
-    Order,
     Shipping,
     OrderList, OrderNew, OrderView, OrderEdit
 } from "screens";
@@ -31,7 +30,6 @@ const Component = (props) => {
             <Route path="/order/edit/:id" element={<OrderEdit {...props} title={'Edit Order'} />} />
 
             <Route path="/" element={<Products {...props} title={'Products Table'} nolistbar={true} />} />
-            <Route path="/order" element={<Order {...props} title={'Order Items'}  />} />
             <Route path="/shipping" element={<Shipping />} />
         </Routes>
     )
