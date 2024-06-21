@@ -1,12 +1,15 @@
 import {
     SetProduct, SetProductPrice, SetProductOtherImages, SetProductVendor,
-    SetOtherDetails, SetDocument, GetDocument, SetProductTypes
+    SetOtherDetails, SetDocument, SetProductTypes,
+    SetOrderItem, SetMapOrderItem, GetMapOrderItems, SetOrders
 } from "./services";
+
+import Helper from "shared/helper";
 
 var fn = {};
 
 const numberItems = ['Price', 'Size', 'ProductOtherDetails', 'ProductProductType', 'Weight',
-    'ProductProductPrice', 'Product_id', 'ProductMainImage', 'DocId', 'Id'];
+    'ProductProductPrice', 'Product_id', 'ProductMainImage', 'DocId', 'Id', 'Order_item_quantity', 'Order_item_price', 'RMA_number'];
 const defaultError = "Something went wrong while processing request!";
 
 fn.AddOrUpdateProductType = async (input, excludesItems) => {
@@ -211,6 +214,86 @@ fn.AddOrUpdateProductOtherImages = async (input, excludesItems) => {
         }
 
         return resolve({ status, id });
+    });
+}
+
+fn.AddOrUpdateOrderItem = async (orderItemMapId, OrderId, input) => {
+    return new Promise(async (resolve) => {
+        let data = {}, status = false, rslt, id = null;
+        global.Busy(true);
+
+        if (input.Deleted) {
+            data = { Id: orderItemMapId, Deleted: input.Deleted };
+            rslt = await SetMapOrderItem(data);
+            if (!rslt.status) {
+                global.Busy(false);
+                const msg = rslt.statusText || defaultError;
+                global.AlertPopup("error", msg);
+                return resolve({ status, id });
+            }
+        }
+
+        const tmp = Object.keys(input);
+        tmp.map((x) => {
+            if (numberItems.indexOf(x) > -1) {
+                if (input[x]) data[x] = parseFloat(input[x]);
+            } else {
+                data[x] = input[x];
+            }
+        });
+
+        rslt = await SetOrderItem(data);
+        if (rslt.status) {
+            id = rslt.id;
+            status = true;
+            if (Helper.IsNullValue(data.Order_item_id)) {
+                data = { Id: orderItemMapId, Order_item_id: id, OrderId };
+                rslt = await SetMapOrderItem(data);
+                if (!rslt.status) {
+                    global.Busy(false);
+                    const msg = rslt.statusText || defaultError;
+                    global.AlertPopup("error", msg);
+                    return resolve({ status, id });
+                }
+            }
+        } else {
+            global.Busy(false);
+            const msg = rslt.statusText || defaultError;
+            global.AlertPopup("error", msg);
+        }
+        global.Busy(false);
+
+        return resolve({ status, id });
+    });
+}
+
+fn.DeleteOrder = async (OrderId) => {
+    return new Promise(async (resolve) => {
+        let status = false, rslt, id = null;
+        global.Busy(true);
+
+        rslt = await GetMapOrderItems(OrderId);
+        if (rslt.status) {
+            let data = rslt.values;
+
+            for (let i = 0; i < data.length; i++) {
+                let tmp = { Id: data[i].Id, Deleted: true };
+                rslt = await SetMapOrderItem(tmp);
+            }
+
+        }
+
+        rslt = await SetOrders({ OrderId: OrderId, Deleted: true });
+        if (!rslt.status) {
+            global.Busy(false);
+            const msg = rslt.statusText || defaultError;
+            global.AlertPopup("error", msg);
+        } else {
+            status = true;
+        }
+        global.Busy(false);
+
+        return resolve({ status });
     });
 }
 

@@ -48,7 +48,7 @@ const FetchProductDetails = async (productId, enums) => {
             global.Busy(true);
             // Get Product Details
             const $expand = MapItems.map(x => x.expand).join(",");
-            let rslt = await Api.GetProduct(productId, `$expand=${$expand}`);
+            let rslt = await Api.GetProduct(productId, null, $expand);
             if (rslt.status) {
 
                 const product = rslt.values;

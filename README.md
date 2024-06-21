@@ -1,70 +1,26 @@
-# Getting Started with Create React App
+Basic documentation for this change - One-To-Many page (advanced form page)
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Form Page (Detail page):
+This page is improved to support OneToMany association. This page shows Order and OrderItems.
+Order is the parent. OrderItem is the child object.
+Order has collection of OrderItem objects. We refer this as OneToMany association OR collection type. Refer ecomrubyV3 model, posted above.
 
-## Available Scripts
+Assumption: the number of item objects are limited.
 
-In the project directory, you can run:
+A table is used for OrderItem objects in this page. This table comes with defined functionality like Add, Edit, View & Delete. These operations can be performed independently of the Order object.
 
-### `npm start`
+While creating Order (before submission):
+	When the OrderItem objects are added/modified, they are stored locally in the browser session.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+When Order form is submitted:	
+	All these item objects are saved into database nested into Order object. 
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
-
-### `npm test`
-
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `npm run build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)..
+When Order form is cancelled, without saving/submitting:
+	All the item objects added to table are lost. They are not saved into database.
+	
+Edit Order - when submitted:
+	Newly added item objects are added to the order.
+	Modified item objects are updated independently to OrderItems.
+	
+Delete Order:
+	Associated item objects are also deleted from database.

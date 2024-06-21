@@ -42,7 +42,7 @@ const Component = React.forwardRef((props, ref) => {
 
         global.Busy(true);
         // Get Product Details
-        let rslt = await Api.GetProduct(productId, "$expand=MainImage,PType,SellingPrice,ODetails,OtherImages");
+        let rslt = await Api.GetProduct(productId, null, "MainImage,PType,SellingPrice,ODetails,OtherImages");
         if (rslt.status) {
 
             const product = rslt.values;

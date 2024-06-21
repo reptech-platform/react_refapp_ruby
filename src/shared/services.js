@@ -57,6 +57,48 @@ const GetEntityInfoCount = async (name) => {
     });
 }
 
+const SetEntityInfo = async (name, keyId, input) => {
+    return new Promise(async (resolve) => {
+        let id = input[keyId];
+        let method = "POST";
+        let url = `${serverApi}${name}s`;
+        if (input[keyId] && !input.Deleted) {
+            method = "PATCH";
+            url = `${serverApi}${name}s(${input[keyId]})`;
+        } else if (input[keyId] && input.Deleted) {
+            method = "DELETE";
+            url = `${serverApi}${name}s(${input[keyId]})`;
+        }
+
+        delete input['id'];
+        delete input[keyId];
+        delete input['Deleted'];
+
+        try {
+            const res = await fetch(url, {
+                method, body: JSON.stringify(input),
+                headers: {
+                    "Content-type": "application/json"
+                }
+            });
+
+            if (res.status === 201) {
+                const json = await res.json();
+                return resolve({ status: res.ok, id: json[keyId] });
+            } else if (res.status === 200 || res.status === 204) {
+                return resolve({ status: res.ok, id });
+            } else {
+                const json = await res.json();
+                return resolve({ status: false, statusText: json.error.message });
+            }
+
+        } catch (error) {
+            console.log(error);
+            return resolve({ status: false, statusText: error.message });
+        }
+    });
+}
+
 /* Product Types */
 const GetProductTypesCount = async (query) => {
     return new Promise(async (resolve) => {
@@ -769,12 +811,254 @@ const GetOrderItems = async () => {
 
 
 
+/* Orders */
+
+const GetOrdersCount = async (query) => {
+    return new Promise(async (resolve) => {
+        let url = `${serverApi}Orders/$count`;
+        if (query) url = `${serverApi}Orders/$count?${query}`;
+
+        try {
+            const res = await fetch(url, {
+                method: "GET",
+                headers: {
+                    "Content-type": "application/json"
+                }
+            });
+
+            const json = await res.json();
+            if (res.status === 200) {
+                return resolve({ status: res.ok, values: json || 0 });
+            }
+
+            return resolve({ status: false, statusText: json.error.message });
+
+        } catch (error) {
+            console.log(error);
+            return resolve({ status: false, statusText: error.message });
+        }
+    })
+}
+
+const GetOrders = async (query, expands) => {
+    return new Promise(async (resolve) => {
+        let url = `${serverApi}Orders`;
+        if (query) url = `${serverApi}Orders?${query}`;
+        if (expands) url = `${url}&$expand=${expands}`;
+
+        try {
+            const res = await fetch(url, {
+                method: "GET",
+                headers: {
+                    "Content-type": "application/json"
+                }
+            });
+
+            const json = await res.json();
+            if (res.status === 200) {
+                return resolve({ status: res.ok, values: json.value || [] });
+            }
+
+            return resolve({ status: false, statusText: json.error.message });
+
+        } catch (error) {
+            console.log(error);
+            return resolve({ status: false, statusText: error.message });
+        }
+    });
+}
+
+const GetOrder = async (id, params, expands) => {
+    return new Promise(async (resolve) => {
+        let url = `${serverApi}Orders(${id})`;
+        if (params) {
+            url = `${serverApi}Orders(${id})?${params}`;
+        }
+        if (expands) url = params ? `${url}&$expand=${expands}` : `${url}?&$expand=${expands}`;
+
+        try {
+            const res = await fetch(url, {
+                method: "GET",
+                headers: {
+                    "Content-type": "application/json"
+                }
+            });
+            const json = await res.json();
+            if (res.status === 200) {
+                return resolve({ status: res.ok, values: json || {} });
+            }
+
+            return resolve({ status: false, statusText: json.error.message });
+
+        } catch (error) {
+            console.log(error);
+            return resolve({ status: false, statusText: error.message });
+        }
+    });
+}
+
+const SetOrders = async (input) => {
+    return new Promise(async (resolve) => {
+        let id = input.OrderId;
+        let method = "POST";
+        let url = `${serverApi}Orders`;
+        if (input.OrderId && !input.Deleted) {
+            method = "PATCH";
+            url = `${serverApi}Orders(${input.OrderId})`;
+        } else if (input.OrderId && input.Deleted) {
+            method = "DELETE";
+            url = `${serverApi}Orders(${input.OrderId})`;
+        }
+
+        delete input['OrderId'];
+        delete input['Deleted'];
+
+        try {
+            const res = await fetch(url, {
+                method, body: JSON.stringify(input),
+                headers: {
+                    "Content-type": "application/json"
+                }
+            });
+
+            if (res.status === 201) {
+                const json = await res.json();
+                return resolve({ status: res.ok, id: json.OrderId });
+            } else if (res.status === 200 || res.status === 204) {
+                return resolve({ status: res.ok, id });
+            } else {
+                const json = await res.json();
+                return resolve({ status: false, statusText: json.error.message });
+            }
+
+        } catch (error) {
+            console.log(error);
+            return resolve({ status: false, statusText: error.message });
+        }
+    });
+}
+
+const GetMapOrderItems = async (orderId) => {
+    return new Promise(async (resolve) => {
+        let url = `${serverApi}OrderItemss?$filter=OrderId eq ${orderId}`;
+
+        try {
+            const res = await fetch(url, {
+                method: "GET",
+                headers: {
+                    "Content-type": "application/json"
+                }
+            });
+
+            const json = await res.json();
+            if (res.status === 200) {
+                return resolve({ status: res.ok, values: json.value || [] });
+            }
+
+            return resolve({ status: false, statusText: json.error.message });
+
+        } catch (error) {
+            console.log(error);
+            return resolve({ status: false, statusText: error.message });
+        }
+    });
+}
+
+const SetOrderItem = async (input) => {
+    return new Promise(async (resolve) => {
+
+        let method = "POST";
+        let Id = input.Order_item_id;
+        let url = `${serverApi}OrderItems`;
+
+        if (Id && !input.Deleted) {
+            method = "PATCH";
+            url = `${serverApi}OrderItems(${Id})`;
+        } else if (Id && input.Deleted) {
+            method = "DELETE";
+            url = `${serverApi}OrderItems(${Id})`;
+        }
+
+        delete input['Order_item_id'];
+        delete input['Deleted'];
+
+        try {
+            const res = await fetch(url, {
+                method, body: JSON.stringify(input),
+                headers: {
+                    "Content-type": "application/json"
+                }
+            });
+
+            if (res.status === 201) {
+                const json = await res.json();
+                return resolve({ status: res.ok, id: json.Order_item_id });
+            } else if (res.status === 200 || res.status === 204) {
+                return resolve({ status: res.ok, Id });
+            } else {
+                const json = await res.json();
+                return resolve({ status: false, statusText: json.error.message });
+            }
+
+        } catch (error) {
+            console.log(error);
+            return resolve({ status: false, statusText: error.message });
+        }
+    });
+}
+
+const SetMapOrderItem = async (input) => {
+    return new Promise(async (resolve) => {
+
+        const { Id, Order_item_id, OrderId, Deleted } = input;
+
+        let method = "POST";
+        let url = `${serverApi}OrderItemss`;
+        let data = { Order_item_id, OrderId };
+
+        if (Id && !Deleted) {
+            method = "PATCH";
+            url = `${serverApi}OrderItemss(${Id})`;
+        } else if (Id && Deleted) {
+            method = "DELETE";
+            data = {};
+            url = `${serverApi}OrderItemss(${Id})`;
+        }
+
+        try {
+            const res = await fetch(url, {
+                method, body: JSON.stringify(data),
+                headers: {
+                    "Content-type": "application/json"
+                }
+            });
+
+            if (res.status === 201) {
+                const json = await res.json();
+                return resolve({ status: res.ok, id: json.Id });
+            } else if (res.status === 200 || res.status === 204) {
+                return resolve({ status: res.ok, Id });
+            } else {
+                const json = await res.json();
+                return resolve({ status: false, statusText: json.error.message });
+            }
+
+        } catch (error) {
+            console.log(error);
+            return resolve({ status: false, statusText: error.message });
+        }
+    });
+}
+
 export {
-    GetMetaData, GetEntityInfo, GetEntityInfoCount,
+    GetMetaData, GetEntityInfo, GetEntityInfoCount, SetEntityInfo,
     GetProductTypesCount, GetProductTypes, SetProductTypes, GetProductStatus,
     GetDocument, SetDocument, GetProductType,
     GetProductsCount, GetProducts, GetProduct, SetProduct, SetProductVendor,
     GetOtherDetails, SetOtherDetails,
     GetProductOtherImages, SetProductOtherImages,
     GetProductPrice, SetProductPrice, GetProductOnBoardings,GetOrderItems
+    GetProductPrice, SetProductPrice, GetProductOnBoardings,
+    GetOrdersCount, GetOrders, GetOrder, SetOrders, GetMapOrderItems,
+    SetOrderItem, SetMapOrderItem
 };

@@ -6,9 +6,12 @@ import { ROWSPERPAGE } from "config";
 
 const Component = (props) => {
 
-
     const { columns, rowsCount, rows, pageInfo, onActionClicked, sortBy, keyId, noActions,
+        localPaginationMode, localSorting,
         onSortClicked, onPageClicked } = props;
+
+    const serverSortingMode = localSorting ? 'client' : 'server';
+    const serverPaginationMode = localPaginationMode ? 'client' : 'server';
 
     const OnActionClicked = (id, type) => {
         if (onActionClicked) onActionClicked(id, type);
@@ -96,8 +99,8 @@ const Component = (props) => {
                 }}
                 pageSizeOptions={ROWSPERPAGE}
                 sortModel={sortBy && [sortBy] || [{ field: "", sort: "asc" }]}
-                paginationMode="server"
-                sortingMode="server"
+                paginationMode={serverPaginationMode}
+                sortingMode={serverSortingMode}
                 onSortModelChange={handleSortModelChange}
                 onPaginationModelChange={handlePaginationModel}
                 sx={{

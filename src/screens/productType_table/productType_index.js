@@ -1,19 +1,21 @@
 import React, { useState, useEffect } from "react";
-import { Typography, Grid, Stack, Box, Divider, IconButton, useTheme } from '@mui/material';
+import { Typography, Grid, Stack, Box, IconButton, useTheme, Divider } from '@mui/material';
 import { Add as AddBoxIcon } from '@mui/icons-material';
-import Container from "screens/container";
 import { SearchInput, CustomDialog, TextInput } from "components";
-import { GetProductTypes, GetProductTypesCount, SetProductTypes } from "shared/services";
 import Helper from "shared/helper";
 import { DataTable } from '../childs';
 import { ValidatorForm } from 'react-material-ui-form-validator';
+import Container from "screens/container";
+import { GetProductTypes, GetProductTypesCount, SetProductTypes } from "shared/services";
 
 const columns = [
+    { headerName: "PtId", field: "PtId", flex: 1, editable: false, key: true },
     { headerName: "Name", field: "ProductTypeName", flex: 1, editable: false },
     { headerName: "Description", field: "ProductTypeDesc", flex: 1, editable: true }
 ];
 
 const httpMethods = { add: 'POST', edit: 'PATCH', delete: 'DELETE' };
+
 const httpMethodResponse = {
     POST: { success: 'created', failed: 'creating' },
     PATCH: { success: 'updated', failed: 'updating' },
@@ -21,6 +23,7 @@ const httpMethodResponse = {
 };
 
 const Component = (props) => {
+
     const { title } = props;
     const theme = useTheme();
     const [initialize, setInitialize] = useState(false);
@@ -186,13 +189,13 @@ const Component = (props) => {
                         onSortClicked={OnSortClicked} onPageClicked={OnPageClicked} />
                 </Box>
 
-                <CustomDialog open={actions.action == 'delete'} title={"Confirmation"} onCloseClicked={OnCloseClicked}>
+                <CustomDialog open={actions.action == 'delete'} title={"Confirmation"} action={actions.action} onCloseClicked={OnCloseClicked}>
                     <Typography gutterBottom>
                         Are you sure? You want to delete?
                     </Typography>
                 </CustomDialog>
 
-                <CustomDialog width="auto" open={actions.action == 'add'} title={"Add Product Type"} onCloseClicked={OnCloseClicked}>
+                <CustomDialog width="auto" open={actions.action == 'add'} action={actions.action} title={"Add Product Type"} onCloseClicked={OnCloseClicked}>
                     <ValidatorForm ref={form} onSubmit={handleSubmit}>
                         <Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
                             <Grid item xs={6}>
@@ -213,7 +216,7 @@ const Component = (props) => {
                     </ValidatorForm>
                 </CustomDialog>
 
-                <CustomDialog width="auto" open={actions.action == 'edit'} title={"Edit Product Type"} onCloseClicked={OnCloseClicked}>
+                <CustomDialog width="auto" open={actions.action == 'edit'} action={actions.action} title={"Edit Product Type"} onCloseClicked={OnCloseClicked}>
                     <ValidatorForm ref={form} onSubmit={handleSubmit}>
                         <Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
                             <Grid item xs={6}>
@@ -233,7 +236,6 @@ const Component = (props) => {
                         </Grid>
                     </ValidatorForm>
                 </CustomDialog>
-
             </Container>
         </>
     )

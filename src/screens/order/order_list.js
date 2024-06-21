@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Stack, Box, Grid, Typography, IconButton, useTheme } from '@mui/material';
 import { useNavigate } from "react-router-dom";
@@ -8,16 +9,23 @@ import * as Api from "shared/services";
 import { SearchInput, CustomDialog } from "components";
 import Helper from "shared/helper";
 import { Add as AddBoxIcon } from '@mui/icons-material';
+import Support from "shared/support";
+
+const dateFields = ["Date", "StartDateOfValidity", "EndDateOfValidity"];
 
 const columns = [
-    { headerName: "Name", field: "Name", sortField: "Name", flex: 1 },
-    { headerName: "Type", field: "ProductTypeDesc", sortField: "ProductPType", flex: 1 },
-    { headerName: "Description", field: "Product_description", sortField: "Product_description", flex: 1 },
-    { headerName: "Manufacturer", field: "Manufacturer", sortField: "Manufacturer", flex: 1 },
-    { headerName: "UOM", field: "UnitOfMeasurement", sortField: "UnitOfMeasurement", flex: 1 },
-    { headerName: "Weight", field: "Weight", sortField: "Weight", flex: 1 },
-    { headerName: "Size", field: "Size", sortField: "Size", flex: 1 },
-    { headerName: "Color", field: "Color", sortField: "Color", flex: 1 }
+    { headerName: "OrderId", field: "OrderId", sortField: "OrderId", flex: 0.5 },
+    { headerName: "Date", field: "Date", sortField: "Date", flex: 0.6 },
+    { headerName: "Company Code", field: "CompanyCode", sortField: "CompanyCode", flex: 0.6 },
+    { headerName: "Vendor Account Number", field: "VendorAccountNumber", sortField: "VendorAccountNumber", flex: 1 },
+    { headerName: "PoCategory", field: "PoCategory", sortField: "PoCategory", flex: 0.5 },
+    { headerName: "Start Date Of Validity", field: "StartDateOfValidity", sortField: "StartDateOfValidity", flex: 0.6 },
+    { headerName: "End Date Of Validity", field: "EndDateOfValidity", sortField: "EndDateOfValidity", flex: 0.6 },
+    { headerName: "Destination City Code", field: "DestinationCityCode", sortField: "DestinationCityCode", flex: 0.6 },
+    { headerName: "Shipping Type", field: "ShippingType", sortField: "ShippingType", flex: 0.6 },
+    { headerName: "Shipping Address", field: "ShippingAddress", sortField: "ShippingAddress", flex: 1 },
+    { headerName: "IsApproved", field: "IsApproved", sortField: "IsApproved", flex: 0.5 }
+
 ];
 
 const defaultError = "Something went wroing while creating record!";
@@ -36,6 +44,17 @@ const Component = (props) => {
 
     const NavigateTo = useNavigate();
 
+    const ExtractShippingAddress = (x) => {
+
+        let tmp = [];
+
+        for (let p in x) {
+            tmp.push(x[p]);
+        }
+
+        return tmp.join(" ");
+    }
+
     const FetchResults = async () => {
 
         let query = null, filters = [];
@@ -47,14 +66,14 @@ const Component = (props) => {
         global.Busy(true);
 
         if (!Helper.IsNullValue(searchStr)) {
-            filters.push(`$filter=contains(Product_description, '${searchStr}') or contains(Name, '${searchStr}')`);
+            filters.push(`$filter=contains(VendorAccountNumber, '${searchStr}') or contains(Name, '${searchStr}')`);
         }
 
         if (!Helper.IsJSONEmpty(filters)) {
             query = filters.join("&");
         }
 
-        await Api.GetProductsCount(query)
+        await Api.GetOrdersCount(query)
             .then(async (res) => {
                 if (res.status) {
                     setRowsCount(parseInt(res.values));
@@ -78,15 +97,20 @@ const Component = (props) => {
         }
 
         let _rows = [];
-        await Api.GetProducts(query, "PType")
+        await Api.GetOrders(query)
             .then(async (res) => {
                 if (res.status) {
                     _rows = res.values || [];
                     if (_rows.length > 0) {
                         _rows.forEach(x => {
                             x.id = Helper.GetGUID();
-                            x.ProductTypeDesc = x.PType?.ProductTypeDesc || 'NA';
+                            x.ShippingAddress = ExtractShippingAddress(x.ShippingAddress);
                         });
+                        dateFields.forEach(m => {
+                            _rows.forEach(x => {
+                                x[m] = Helper.ToDate(x[m], "YYYY-MM-DD");
+                            });
+                        })
                     }
                 } else {
                     console.log(res.statusText);
@@ -98,27 +122,17 @@ const Component = (props) => {
         return _rows;
     }
 
-    const OnViewChanged = (e) => {
-        let _route;
-        if (e === 'DETAILS') _route = `/products`;
-        if (e === 'TILES') _route = `/producttiles`;
-        if (e === 'CONTENT') _route = `/productcontent`;
-        if (e === 'LIST') _route = `/productlist`;
-        if (_route) NavigateTo(_route);
-    }
-
     const OnSearchChanged = (e) => { setSearchStr(e); }
 
     const OnSortClicked = (e) => { setSortBy(e); }
 
     const OnPageClicked = (e) => { setPageInfo({ page: 0, pageSize: 5 }); if (e) setPageInfo(e); }
 
-    const OnDeleteClicked = (e) => { setDeletedId(e); }
-
     const OnCloseClicked = async (e) => {
         if (e) {
-            const rslt = await Api.SetProduct({ Product_id: deletedId, Deleted: true });
+            const rslt = await Support.DeleteOrder(deletedId);
             if (rslt.status) {
+                setDeletedId(0);
                 setInitialize(true);
                 global.AlertPopup("success", "Record is deleted successful.!");
             } else {
@@ -133,9 +147,9 @@ const Component = (props) => {
 
     const OnActionClicked = (id, type) => {
         let _route;
-        if (type === 'edit') _route = `/products/edit/${id}`;
-        if (type === 'view') _route = `/products/view/${id}`;
-        if (type === 'delete') setDeletedId(id);;
+        if (type === 'edit') _route = `/order/edit/${id}`;
+        if (type === 'view') _route = `/order/view/${id}`;
+        if (type === 'delete') setDeletedId(id);
         if (_route) NavigateTo(_route);
     }
 
@@ -168,7 +182,7 @@ const Component = (props) => {
                                     borderRadius: "4px",
                                     border: theme.borderBottom
                                 }}
-                                onClick={() => NavigateTo("/products/create")}
+                                onClick={() => NavigateTo("/order/new")}
                             >
                                 <AddBoxIcon />
                             </IconButton>
@@ -176,10 +190,10 @@ const Component = (props) => {
                     </Stack>
                 </Box>
                 <Box style={{ width: '100%' }}>
-                    <DataTable keyId={'Product_id'} columns={columns} rowsCount={rowsCount} rows={rows} sortBy={sortBy} pageInfo={pageInfo} onActionClicked={OnActionClicked}
+                    <DataTable keyId={'OrderId'} columns={columns} rowsCount={rowsCount} rows={rows} sortBy={sortBy} pageInfo={pageInfo} onActionClicked={OnActionClicked}
                         onSortClicked={OnSortClicked} onPageClicked={OnPageClicked} />
                 </Box>
-                <CustomDialog open={showConfirm} title={"Confirmation"} action={'delete'} onCloseClicked={OnCloseClicked}>
+                <CustomDialog open={showConfirm} title={"Confirmation"} action="delete" onCloseClicked={OnCloseClicked}>
                     <Typography gutterBottom>
                         Are you sure? You want to delete?
                     </Typography>
