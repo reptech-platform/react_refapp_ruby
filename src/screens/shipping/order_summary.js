@@ -8,6 +8,7 @@ const OrderSummary = (props) => {
     const theme = useTheme();
     const [initialize, setInitialize] = useState(false);
     const [items, setItems] = useState([]);
+    console.log("items",items[0]?.img)
 
     const FetchResults = async () => {
         global.Busy(true);
@@ -37,15 +38,15 @@ const OrderSummary = (props) => {
         }
     }, [initialize]);
 
-    const totalPrice = items.reduce((total, item) => total + item.Order_item_price * item.Order_item_quantity, 0);
+    const totalPrice = items.reduce((total, item) => total + item.Order_item_price, 0);
 
     return (
         <div style={{ padding: 20, borderRadius: 10, backgroundColor: theme.palette.background.paper, boxShadow: '0 0 10px rgba(0,0,0,0.1)', margin: 'auto' }}>
             <h2 style={{ marginBottom: 20 }}>Order Summary</h2>
             {items.map((item, index) => (
                 <div key={index} style={{ display: 'flex', alignItems: 'center', marginBottom: 20 }}>
-                    {item.OIProduct?.MainImage?.DocPath ?(
-                        <img src={item.OIProduct.MainImage.DocPath} alt={item.OIProduct ? item.OIProduct.Name : ""}  style={{ width: 50, height: 50, marginRight: 15 }} />
+                    {item.OIProduct?.MainImage?(
+                        <img src={item.img} alt={item.OIProduct ? item.OIProduct.Name : ""}  style={{ width: 50, height: 50, marginRight: 15 }} />
                     ): (<img src='https://via.placeholder.com/150' alt="no product Image"  style={{ width: 50, height: 50, marginRight: 15 }} />)}
                     <div style={{ flexGrow: 1 }}>
                         <div style={{ fontWeight: 'bold' }}>{item.OIProduct?.Name}</div>
@@ -77,7 +78,7 @@ const OrderSummary = (props) => {
                             />
                         </div>
                     </div>
-                    <div style={{ marginLeft: 10 }}>Rs {item.Order_item_price * item.Order_item_quantity}</div>
+                    <div style={{ marginLeft: 10 }}>Rs {item.Order_item_price}</div>
                 </div>
             ))}
             <div style={{ borderTop: '1px solid #ddd', paddingTop: 10 }}>

@@ -472,23 +472,26 @@ const GetDocument = async (id, value) => {
         }
 
         try {
-            const res = await fetch(url, { method: "GET" });
+            const res = await fetch(url, { method: "GET"});
 
             if (res.status === 200) {
                 let data = null;
-                if (value) {
+                if (value) { 
                     data = await res.text();
                     if (!Helper.IsNullValue(data)) {
                         if (data.startsWith("data:")) {
                             data = data.substring(data.indexOf('data:'));
                         } else {
                             let tmp = data.split('\r\n');
+                            // tmp= tmp.slice(4, tmp.length-2);
+                            // console.log("tmp array",tmp)
+                            // data = tmp.join('');
                             for (let img of tmp) {
                                 if (img.startsWith("data:")) data = img;
                             }
                         }
                     }
-                    return resolve({ status: res.ok, values: data });
+                    return resolve({ status: res.ok, values: data});
                 }
                 data = await res.json();
                 return resolve({ status: res.ok, values: data });
@@ -760,7 +763,7 @@ const GetProductOnBoardings = async () => {
 
 const GetOrderItems = async () => {
     return new Promise(async (resolve) => {
-        const url = 'http://122.166.66.145:8382/ecomrubyV3/OrderItems?$expand=OIProduct($expand=MainImage)';
+        const url = `${serverApi}OrderItems?$expand=OIProduct($expand=MainImage)`;
         
         try {
             const res = await fetch(url, {
@@ -773,27 +776,10 @@ const GetOrderItems = async () => {
             if (res.status === 200) {
                 const itemsWithImages = await Promise.all(json.value.map(async (item) => {
                     if (item.OIProduct && item.OIProduct.MainImage) {
-                        const imageRes = await fetch(`http://122.166.66.145:8382/ecomrubyV3/Documents(${item.OIProduct.MainImage.DocId})/$value`, {
-                            method: "GET"
-                        });
-                        if (imageRes.ok) {
-                            let imageData = await imageRes.text();
-                            if (imageData.startsWith("data:")) {
-                                imageData = imageData.substring(imageData.indexOf('data:'));
-                            } else {
-                                const tmp = imageData.split('\r\n');
-                                for (let img of tmp) {
-                                    if (img.startsWith("data:")) imageData = img;
-                                }
-                            }
-                            item.OIProduct.MainImage.DocPath = imageData;
-                        } else {
-                            
-                            console.error('Image fetch failed for DocId:', item.OIProduct.MainImage.DocId);
-                        }
+                        let id=item.OIProduct.MainImage.DocId;
+                        let { values }=await GetDocument(id,true);
+                        item.img=values
                     }
-                   
-
                     return item;
                 }))
                 return resolve({ status: res.ok, values: itemsWithImages });

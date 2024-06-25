@@ -8,7 +8,8 @@ import { ValidatorForm } from 'react-material-ui-form-validator';
 import { useTheme } from '@mui/material';
 
 
-const Shipping = (props) => {
+
+const Component = (props) => {
     const theme=useTheme()
     const [shippingInfo, setShippingInfo] = React.useState({
         fullName: '',
@@ -68,7 +69,7 @@ const Shipping = (props) => {
         <Container {...props}>
         <ValidatorForm onSubmit={handleSubmit}>
             <div style={{ display: 'flex', justifyContent: 'center', padding: 20,boxSizing:"border-box"}}>
-                <div style={{ flexGrow: 1,flexShrink:2, marginRight: 15,}}>
+                <div style={{ flexGrow: 1,flexShrink:2, marginRight: 20,}}>
                     <ShippingInformationCard
                         shippingInfo={shippingInfo}
                         onInputChange={handleShippingInfoChange}
@@ -105,4 +106,4 @@ const Shipping = (props) => {
     );
 };
 
-export default Shipping;
+export default Component;

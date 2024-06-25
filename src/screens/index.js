@@ -13,11 +13,12 @@ import OrderList from "./order/order_list.js";
 import OrderNew from "./order/order_new.js";
 import OrderView from "./order/order_view.js";
 import OrderEdit from "./order/order_edit.js";
+import Messaging from "./messaging and chat/index.js";
 
 export {
     ProductCreate,
     Products, ProductTiles, ProductList,
     ProductEdit, ProductView, ProductTypes,
-    InformatForm, StepperForm, TabbedLayout,Shipping,
+    InformatForm, StepperForm, TabbedLayout,Shipping,Messaging,
     OrderList, OrderNew, OrderView, OrderEdit
 };
