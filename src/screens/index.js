@@ -13,10 +13,11 @@ import ProductOneToMany from "./product_one2many/product_many_list.js";
 import ProductOneToManyCreate from "./product_one2many/product_many_create.js";
 import ProductOneToManyEdit from "./product_one2many/product_many_edit.js";
 import ProductOneToManyView from "./product_one2many/product_many_view.js";
+import Shipping from './shipping'
 
 export {
     Products, ProductCreate, ProductTiles, ProductList,
     ProductEdit, ProductView, ProductTypes,
     InformatForm, StepperForm, TabbedLayout,
-    ProductOneToMany, ProductOneToManyCreate, ProductOneToManyEdit, ProductOneToManyView
+    ProductOneToMany, ProductOneToManyCreate, ProductOneToManyEdit, ProductOneToManyView,Shipping
 };

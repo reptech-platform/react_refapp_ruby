@@ -829,6 +829,39 @@ const SetPComponent = async (input) => {
     });
 }
 
+const GetOrderItems = async () => {
+    return new Promise(async (resolve) => {
+        const url = `${serverApi}OrderItems?$expand=OIProduct($expand=MainImage)`;
+        
+        try {
+            const res = await fetch(url, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            });
+            const json = await res.json();
+            if (res.status === 200) {
+                const itemsWithImages = await Promise.all(json.value.map(async (item) => {
+                    if (item.OIProduct && item.OIProduct.MainImage) {
+                        let id=item.OIProduct.MainImage.DocId;
+                        let { values }=await GetDocument(id,true);
+                        item.img=values
+                    }
+                    return item;
+                }))
+                return resolve({ status: res.ok, values: itemsWithImages });
+            }
+            return resolve({ status: false, statusText: json.error.message });
+
+        } catch (error) {
+            console.log(error);
+            return resolve({ status: false, statusText: error.message });
+        }
+    });
+};
+
+
 export {
     GetMetaData, GetEntityInfo, GetEntityInfoCount,
     GetProductTypesCount, GetProductTypes, SetProductTypes, GetProductStatus,
@@ -837,5 +870,5 @@ export {
     GetOtherDetails, SetOtherDetails,
     GetProductOtherImages, SetProductOtherImages,
     GetProductPrice, SetProductPrice, GetProductOnBoardings,
-    GetProductPComponents, SetPComponent, SetProductPComponents
+    GetProductPComponents, SetPComponent, SetProductPComponents,GetOrderItems,
 };

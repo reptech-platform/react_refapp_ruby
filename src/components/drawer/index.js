@@ -2,7 +2,7 @@ import React from 'react';
 import { Toolbar, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Tooltip } from '@mui/material';
 import MuiDrawer from '@mui/material/Drawer';
 import { styled, useTheme } from '@mui/material/styles';
-import { ShoppingBasket, Toc, EditNote, Checklist, Tab, GridView as GridViewIcon, Share as ShareIcon } from '@mui/icons-material';
+import { ShoppingBasket, Toc, EditNote, Checklist, Tab, GridView as GridViewIcon, Share as ShareIcon,LocalShipping } from '@mui/icons-material';
 import { DRAWER_WIDTH } from "config";
 import { useNavigate } from 'react-router-dom';
 
@@ -127,6 +127,14 @@ const Component = (props) => {
                                 </Tooltip>
                             </ListItemIcon>
                             {open && <ListItemText primary="List Layout" sx={{ pl: 1 }} />}
+                        </ListItemButton>
+                        <ListItemButton onClick={() => NavigateTo("/shipping")} sx={{ height: 50 }}>
+                            <ListItemIcon sx={{ minWidth: 30 }}>
+                                <Tooltip title="List Layout">
+                                   <LocalShipping />
+                                </Tooltip>
+                            </ListItemIcon>
+                            {open && <ListItemText primary="shipping" sx={{ pl: 1 }} />}
                         </ListItemButton>
                     </List>
                 </ListItem>
