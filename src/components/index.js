@@ -10,6 +10,7 @@ import FileInput from "./fileinput";
 import CheckInput from "./checkinput";
 import AlertMessage from "./msgalert";
 import DateTimePicker from "./datetimepicker";
+import TimePicker from "./timepicker";
 import GridContainer from "./gridcontainer";
 import CardItem from "./cardview";
 import CardView from "./cardtitle";
@@ -22,5 +23,5 @@ import Select from "./select";
 
 export {
     Header, Drawer, Container, Image, FileInput, CheckInput, GridContainer, CardItem, CustomDialog, RatingGroup, Select,
-    DropDown, SearchInput, TextInput, ColorPicker, AlertMessage, DateTimePicker, ToggleButtons, RadioGroup, Stepper, CardView
+    DropDown, SearchInput, TextInput, ColorPicker, AlertMessage, DateTimePicker, TimePicker, ToggleButtons, RadioGroup, Stepper, CardView
 };
