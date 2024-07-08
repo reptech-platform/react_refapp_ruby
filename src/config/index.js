@@ -18,5 +18,6 @@ export const ROWSPERPAGE = [5, 10, 15, 20, 25];
 // export const apiUrl = "http://52.15.220.173:8081/ecom/";
 // export const apiUrl = "https://ruby-refapp-bknd.code-wizard.in/ExclusiveAccess/";
 // export const apiUrl = "http://122.166.66.145:8382/ecomrubyV3/";
+// export const apiUrl = "http://3.91.131.18:8084/ecom_ruby_v5/";
 
-export const apiUrl = "http://3.91.131.18:8084/ecom_ruby_v5/";
+export const apiUrl ="http://apprunner.code-wizard.in:8752/shipping/"

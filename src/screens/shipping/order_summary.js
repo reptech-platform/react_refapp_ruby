@@ -8,8 +8,7 @@ const OrderSummary = (props) => {
     const theme = useTheme();
     const [initialize, setInitialize] = useState(false);
     const [items, setItems] = useState([]);
-    console.log("items",items[0]?.img)
-
+    
     const FetchResults = async () => {
         global.Busy(true);
         const { values } = await Api.GetOrderItems();
@@ -38,49 +37,53 @@ const OrderSummary = (props) => {
         }
     }, [initialize]);
 
-    const totalPrice = items.reduce((total, item) => total + item.Order_item_price, 0);
+    const totalPrice = items && items.length > 0 ? items.reduce((total, item) => total + item.Order_item_price, 0) : 0;
 
     return (
         <div style={{ padding: 20, borderRadius: 10, backgroundColor: theme.palette.background.paper, boxShadow: '0 0 10px rgba(0,0,0,0.1)', margin: 'auto' }}>
             <h2 style={{ marginBottom: 20 }}>Order Summary</h2>
-            {items.map((item, index) => (
-                <div key={index} style={{ display: 'flex', alignItems: 'center', marginBottom: 20 }}>
-                    {item.OIProduct?.MainImage?(
-                        <img src={item.img} alt={item.OIProduct ? item.OIProduct.Name : ""}  style={{ width: 50, height: 50, marginRight: 15 }} />
-                    ): (<img src='https://via.placeholder.com/150' alt="no product Image"  style={{ width: 50, height: 50, marginRight: 15 }} />)}
-                    <div style={{ flexGrow: 1 }}>
-                        <div style={{ fontWeight: 'bold' }}>{item.OIProduct?.Name}</div>
-                        <div>Status: {item.Order_item_status}</div>
-                        <div style={{ display: 'flex', alignItems: 'center' }}>
-                            Quantity:
-                            <img 
-                                src={minusicon} 
-                                alt="Decrease" 
-                                onClick={() => handleDecrease(index)} 
-                                style={{ 
-                                    width: 18, 
-                                    height: 18, 
-                                    margin: '0 5px', 
-                                    cursor: 'pointer' 
-                                }} 
+            {Array.isArray(items) && items.length > 0 ? (
+                items.map((item, index) => (
+                    <div key={index} style={{ display: 'flex', alignItems: 'center', marginBottom: 20 }}>
+                        {item.OIProduct?.MainImage ? (
+                            <img
+                                src={item.img || 'https://via.placeholder.com/150'}
+                                alt={item.OIProduct?.Name || "No product name"}
+                                style={{ width: 50, height: 50, marginRight: 15 }}
                             />
-                            {item.Order_item_quantity}
-                            <img 
-                                src={plusicon} 
-                                alt="Increase" 
-                                onClick={() => handleIncrease(index)} 
-                                style={{ 
-                                    width: 18, 
-                                    height: 18, 
-                                    margin: '0 5px', 
-                                    cursor: 'pointer' 
-                                }} 
+                        ) : (
+                            <img
+                                src='https://via.placeholder.com/150'
+                                alt="No product image"
+                                style={{ width: 50, height: 50, marginRight: 15 }}
                             />
+                        )}
+                        <div style={{ flexGrow: 1 }}>
+                            <div style={{ fontWeight: 'bold' }}>{item.OIProduct?.Name || "Unknown Product"}</div>
+                            <div>Status: {item.Order_item_status || "Unknown Status"}</div>
+                            <div style={{ display: 'flex', alignItems: 'center' }}>
+                                Quantity:
+                                <img
+                                    src={minusicon}
+                                    alt="Decrease"
+                                    onClick={() => handleDecrease(index)}
+                                    style={{ width: 18, height: 18, margin: '0 5px', cursor: 'pointer' }}
+                                />
+                                {item.Order_item_quantity || 0}
+                                <img
+                                    src={plusicon}
+                                    alt="Increase"
+                                    onClick={() => handleIncrease(index)}
+                                    style={{ width: 18, height: 18, margin: '0 5px', cursor: 'pointer' }}
+                                />
+                            </div>
                         </div>
+                        <div style={{ marginLeft: 10 }}>Rs {item.Order_item_price || 0}</div>
                     </div>
-                    <div style={{ marginLeft: 10 }}>Rs {item.Order_item_price}</div>
-                </div>
-            ))}
+                ))
+            ) : (
+                <p>No items available</p>
+            )}
             <div style={{ borderTop: '1px solid #ddd', paddingTop: 10 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                     <div>Price:</div>
