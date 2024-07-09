@@ -6,7 +6,7 @@ import { GetMetaDataInfo } from "shared/common";
 import Support from "shared/support";
 
 const MapItems = [
-    { navpropname: "", uicomponent: "product", expand: "OtherImages,MainImage", exclude: ['MainImage', 'OtherImages'], func: Support.AddOrUpdateProduct },
+    { navpropname: "", uicomponent: "product", expand: "OtherImages,MainImage,PComponents", exclude: ['MainImage', 'OtherImages'], func: Support.AddOrUpdateProduct },
     { navpropname: "PType", uicomponent: "producttype", expand: "PType", exclude: [], func: Support.AddOrUpdateProductType },
     { navpropname: "ODetails", uicomponent: "otherdetails", expand: "ODetails", exclude: [], func: Support.AddOrUpdateOtherDetails },
     { navpropname: "SellingPrice", uicomponent: "productsellingprice", expand: "SellingPrice", exclude: [], func: Support.AddOrUpdatePrice },
@@ -50,12 +50,12 @@ const FetchProductDetails = async (productId, enums) => {
         if (productId) {
             global.Busy(true);
 
-            let rslt = await Api.GetProductPComponents(productId);
-            if (rslt.status) productPComponents = rslt.values;
+            // let rslt = await Api.GetProductPComponents(productId);
+            // if (rslt.status) productPComponents = rslt.values;
 
             // Get Product Details
             const $expand = MapItems.filter(z => z.expand).map(x => x.expand).join(",");
-            rslt = await Api.GetProduct(productId, `$expand=${$expand}`);
+            let rslt = await Api.GetProduct(productId, `$expand=${$expand}`);
             if (rslt.status) {
 
                 const product = rslt.values;
@@ -125,7 +125,7 @@ const FetchProductDetails = async (productId, enums) => {
                         rslt = await Api.GetDocument(tmp.DocId, true);
                         if (rslt.status) tmp['DocData'] = rslt.values;
                     }
-                    item['product'].find((x) => x.key === "MainImage").value = tmp;
+                    if(item['product'].find((x) => x.key === "MainImage")) item['product'].find((x) => x.key === "MainImage").value = tmp;
                 }
 
                 // Get Product Other Images
