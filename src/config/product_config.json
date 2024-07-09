@@ -258,6 +258,18 @@
             ]
         },
         {
+            "key": "ManufacturingTime",
+            "label": "ManufacturingTime",
+            "type": "time",
+            "editable": true,
+            "validators": [
+                "required"
+            ],
+            "validationMessages": [
+                "Product manufacturing time is required"
+            ]
+        },
+        {
             "key": "AvailabilityStatus",
             "label": "Availability Status",
             "type": "dropdown",
