@@ -6,6 +6,7 @@ import PaymentInformationCard from './payment_information';
 import PayWithUPIQR from './payment_QR';
 import { ValidatorForm } from 'react-material-ui-form-validator';
 import { useTheme } from '@mui/material';
+import { SetOrders } from "shared/services";
 
 
 
@@ -23,11 +24,11 @@ const Component = (props) => {
     });
 
     const [cardDetails, setCardDetails] = React.useState({
-        cardNumber: '',
-        nameOnCard: '',
-        expirationMonth: '',
-        expirationYear: '',
-        securityCode: ''
+        CardNumber: '',
+        Name: '',
+        Month: '',
+        Year: '',
+        Cvv: ''
     });
 
     React.useEffect(() => {
@@ -59,10 +60,33 @@ const Component = (props) => {
         }));
     };
 
-    const handleSubmit = (e) => {
-        e.preventDefault();  
-        console.log('Shipping Info:', shippingInfo);
-        console.log('Card Details:', cardDetails);
+    const handleSubmit = async (e) => {
+        e.preventDefault(); 
+        let data = {
+            ShippingAddress: {
+                HouseNumber: shippingInfo.aptSuite,
+                Street: shippingInfo.streetAddress,
+                Pincode: parseInt(shippingInfo.zipCode),
+                State: shippingInfo.state,
+            },
+            Payment: {
+                CardNumber: cardDetails.CardNumber,
+                Name: cardDetails.Name,
+                Month: parseInt(cardDetails.Month), 
+                Year: parseInt(cardDetails.Year), 
+                Cvv: parseInt(cardDetails.Cvv) 
+            }
+        };
+    
+        global.Busy(true);
+        let rslt = await SetOrders(data);
+        global.Busy(false);
+        if (rslt.status) {
+            global.AlertPopup("success", "Order is created successfully!");
+        } else {
+            const msg = rslt.statusText || defaultError;
+            global.AlertPopup("error", msg);
+        } 
     };
 
     return (

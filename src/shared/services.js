@@ -861,6 +861,46 @@ const GetOrderItems = async () => {
     });
 };
 
+const SetOrders = async (input) => {
+    return new Promise(async (resolve) => {
+        let id = input.OrderId;
+        let method = "POST";
+        let url = `${serverApi}Orders`;
+        if (input.OrderId && !input.Deleted) {
+            method = "PATCH";
+            url = `${serverApi}Orders(${input.OrderId})`;
+        } else if (input.OrderId && input.Deleted) {
+            method = "DELETE";
+            url = `${serverApi}Orders(${input.OrderId})`;
+        }
+
+        delete input['OrderId'];
+        delete input['Deleted'];
+
+        try {
+            const res = await fetch(url, {
+                method, body: JSON.stringify(input),
+                headers: {
+                    "Content-type": "application/json"
+                }
+            });
+
+            if (res.status === 201) {
+                const json = await res.json();
+                return resolve({ status: res.ok, id: json.OrderId });
+            } else if (res.status === 200 || res.status === 204) {
+                return resolve({ status: res.ok, id });
+            } else {
+                const json = await res.json();
+                return resolve({ status: false, statusText: json.error.message });
+            }
+
+        } catch (error) {
+            console.log(error);
+            return resolve({ status: false, statusText: error.message });
+        }
+    });
+}
 
 export {
     GetMetaData, GetEntityInfo, GetEntityInfoCount,
@@ -870,5 +910,5 @@ export {
     GetOtherDetails, SetOtherDetails,
     GetProductOtherImages, SetProductOtherImages,
     GetProductPrice, SetProductPrice, GetProductOnBoardings,
-    GetProductPComponents, SetPComponent, SetProductPComponents,GetOrderItems,
+    GetProductPComponents, SetPComponent, SetProductPComponents,GetOrderItems,SetOrders,
 };
