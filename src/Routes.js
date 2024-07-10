@@ -4,7 +4,7 @@ import {
     Products, ProductCreate, ProductTiles, ProductList,
     ProductEdit, StepperForm, TabbedLayout,
     ProductView, ProductTypes, InformatForm,
-    ProductOneToMany, ProductOneToManyCreate, ProductOneToManyEdit, ProductOneToManyView
+    ProductOneToMany, ProductOneToManyCreate, ProductOneToManyEdit, ProductOneToManyView,Shipping,
 } from "screens";
 
 const Component = (props) => {
@@ -26,6 +26,7 @@ const Component = (props) => {
             <Route path="/productsmany/view/:id" element={<ProductOneToManyView {...props} title={'View Products One To Many'} />} />
             <Route path="/productsmany/edit/:id" element={<ProductOneToManyEdit {...props} title={'Edit Products One To Many'} />} />
             <Route path="/" element={<Products {...props} title={'Products Table'} nolistbar={true} />} />
+            <Route path="/shipping" element={<Shipping {...props}/>} />
         </Routes>
     )
 

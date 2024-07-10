@@ -829,6 +829,79 @@ const SetPComponent = async (input) => {
     });
 }
 
+const GetOrderItems = async () => {
+    return new Promise(async (resolve) => {
+        const url = `${serverApi}OrderItems?$expand=OIProduct($expand=MainImage)`;
+        
+        try {
+            const res = await fetch(url, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            });
+            const json = await res.json();
+            if (res.status === 200) {
+                const itemsWithImages = await Promise.all(json.value.map(async (item) => {
+                    if (item.OIProduct && item.OIProduct.MainImage) {
+                        let id=item.OIProduct.MainImage.DocId;
+                        let { values }=await GetDocument(id,true);
+                        item.img=values
+                    }
+                    return item;
+                }))
+                return resolve({ status: res.ok, values: itemsWithImages });
+            }
+            return resolve({ status: false, statusText: json.error.message });
+
+        } catch (error) {
+            console.log(error);
+            return resolve({ status: false, statusText: error.message });
+        }
+    });
+};
+
+const SetOrders = async (input) => {
+    return new Promise(async (resolve) => {
+        let id = input.OrderId;
+        let method = "POST";
+        let url = `${serverApi}Orders`;
+        if (input.OrderId && !input.Deleted) {
+            method = "PATCH";
+            url = `${serverApi}Orders(${input.OrderId})`;
+        } else if (input.OrderId && input.Deleted) {
+            method = "DELETE";
+            url = `${serverApi}Orders(${input.OrderId})`;
+        }
+
+        delete input['OrderId'];
+        delete input['Deleted'];
+
+        try {
+            const res = await fetch(url, {
+                method, body: JSON.stringify(input),
+                headers: {
+                    "Content-type": "application/json"
+                }
+            });
+
+            if (res.status === 201) {
+                const json = await res.json();
+                return resolve({ status: res.ok, id: json.OrderId });
+            } else if (res.status === 200 || res.status === 204) {
+                return resolve({ status: res.ok, id });
+            } else {
+                const json = await res.json();
+                return resolve({ status: false, statusText: json.error.message });
+            }
+
+        } catch (error) {
+            console.log(error);
+            return resolve({ status: false, statusText: error.message });
+        }
+    });
+}
+
 export {
     GetMetaData, GetEntityInfo, GetEntityInfoCount,
     GetProductTypesCount, GetProductTypes, SetProductTypes, GetProductStatus,
@@ -837,5 +910,5 @@ export {
     GetOtherDetails, SetOtherDetails,
     GetProductOtherImages, SetProductOtherImages,
     GetProductPrice, SetProductPrice, GetProductOnBoardings,
-    GetProductPComponents, SetPComponent, SetProductPComponents
+    GetProductPComponents, SetPComponent, SetProductPComponents,GetOrderItems,SetOrders,
 };
