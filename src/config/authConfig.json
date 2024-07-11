@@ -1,0 +1,120 @@
+{
+    "signup": [
+        {
+            "key": "Email",
+            "label": "Email",
+            "type": "text",
+            "editable": true,
+            "validators": [
+                "required"
+            ],
+            "validationMessages": [
+                "Email is required"
+            ],
+            "nocreate": false
+        },
+        {
+            "key": "Password",
+            "label": "Password",
+            "type": "password",
+            "editable": true,
+            "validators": [
+                "required",
+                "isStrongPassword"
+            ],
+            "validationMessages": [
+                "Password is required",
+                "At least one lowercase, uppercase letter, digit, special character and Minimum length of 8 characters"
+            ]
+        },
+        {
+            "key": "ConfirmPassword",
+            "label": "Confirm Password",
+            "type": "password",
+            "editable": true,
+            "validators": [
+                "required",
+                "isPasswordMatch"
+            ],
+            "validationMessages": [
+                "Password is required",
+                "Password does'nt match"
+            ]
+        }
+    ],
+    "login": [
+        {
+            "key": "Email",
+            "label": "Email",
+            "type": "text",
+            "editable": true,
+            "validators": [
+                "required"
+            ],
+            "validationMessages": [
+                "Email is required"
+            ],
+            "value": ""
+        },
+        {
+            "key": "Password",
+            "label": "Password",
+            "type": "password",
+            "editable": true,
+            "validators": [
+                "required",
+                "isNumber"
+            ],
+            "validationMessages": [
+                "Password is required",
+                "Password must contains a number",
+                "Product Price must be a pasitive number"
+            ]
+        }
+    ],
+    "forgotPassword" : [
+        {
+            "key": "Email",
+            "label": "Email",
+            "type": "text",
+            "editable": true,
+            "validators": [
+                "required"
+            ],
+            "validationMessages": [
+                "Email is required"
+            ],
+            "nocreate": false
+        }
+    ],
+    "resetPassword": [
+        {
+            "key": "Password",
+            "label": "Password",
+            "type": "password",
+            "editable": true,
+            "validators": [
+                "required",
+                "isStrongPassword"
+            ],
+            "validationMessages": [
+                "Password is required",
+                 "At least one lowercase, uppercase letter, digit, special character and Minimum length of 8 characters"
+            ]
+        },
+        {
+            "key": "ConfirmPassword",
+            "label": "Confirm Password",
+            "type": "password",
+            "editable": true,
+            "validators": [
+                "required",
+                "isPasswordMatch"
+            ],
+            "validationMessages": [
+                "Password is required",
+                "Password does'nt match"
+            ]
+        }
+    ]
+}

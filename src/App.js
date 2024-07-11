@@ -6,6 +6,7 @@ import RouteItems from "./Routes";
 import { DefaultTheme, DarkTheme, LightTheme } from "./theme";
 import TimerSession from "shared/useTimerSession";
 import "./App.css";
+import { useLocation } from 'react-router-dom';
 
 global.Busy = (bBool) => {
   var x = document.getElementById("busyloader");
@@ -15,11 +16,15 @@ global.Busy = (bBool) => {
 global.AlertPopup = (type, msg) => {
   sessionStorage.setItem('alert', JSON.stringify({ msg, type }));
 };
+const FScreenList = ["/signup","/login"];
 
 const Component = () => {
   const [open, setOpen] = React.useState(false);
   const [customTheme, setCustomTheme] = React.useState(DefaultTheme);
   const [theme] = TimerSession('theme');
+
+  const location = useLocation();
+  const currentPath = location.pathname;
 
   const OnDrawerClicked = () => { setOpen(!open); }
 
@@ -30,17 +35,23 @@ const Component = () => {
       setCustomTheme(DarkTheme);
     }
   }, [theme]);
-
+ 
   return (
     <>
       <ThemeProvider theme={customTheme}>
         <CssBaseline />
         <Box sx={{ flexGrow: 1 }}>
-          <Header open={open} onDrawerClicked={OnDrawerClicked} />
-          <Drawer open={open} />
-          <Container open={open}>
-            <RouteItems />
-          </Container>
+        {FScreenList.includes(currentPath) ? (
+                <RouteItems />
+          ) : (
+              <>
+              <Header open={open} onDrawerClicked={OnDrawerClicked} />
+                <Drawer open={open} />
+                <Container open={open}>
+                  <RouteItems />
+                </Container>
+              </>
+          )}
           <AlertMessage />
         </Box>
       </ThemeProvider>

@@ -1,16 +1,20 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
+import ProtectedRoute from "utils/protectedRoute";
 import {
     Products, ProductCreate, ProductTiles, ProductList,
     ProductEdit, StepperForm, TabbedLayout,
     ProductView, ProductTypes, InformatForm,
-    ProductOneToMany, ProductOneToManyCreate, ProductOneToManyEdit, ProductOneToManyView
+    ProductOneToMany, ProductOneToManyCreate, ProductOneToManyEdit, ProductOneToManyView,
+    Login, Signup
+
 } from "screens";
 
 const Component = (props) => {
 
     return (
         <Routes>
+            <Route element={<ProtectedRoute />}> 
             <Route path="/infoform" element={<InformatForm {...props} title={'Information Form'} />} />
             <Route path="/stepper" element={<StepperForm {...props} title={'Stepper Form'} />} />
             <Route path="/tabbed" element={<TabbedLayout {...props} title={'Tabbed Layout'} />} />
@@ -26,6 +30,9 @@ const Component = (props) => {
             <Route path="/productsmany/view/:id" element={<ProductOneToManyView {...props} title={'View Products One To Many'} />} />
             <Route path="/productsmany/edit/:id" element={<ProductOneToManyEdit {...props} title={'Edit Products One To Many'} />} />
             <Route path="/" element={<Products {...props} title={'Products Table'} nolistbar={true} />} />
+            </Route>
+            <Route path="/signup" element={<Signup />} />
+            <Route path="/login" element={<Login />}/>
         </Routes>
     )
 

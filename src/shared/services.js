@@ -1,10 +1,9 @@
 import Helper from "shared/helper";
-import { apiUrl as serverApi } from "config";
+import { apiUrl as serverApi, springSecurityApi, notificationApi } from "config";
 
 // const serverApi = apiUrl;
 // const serverApi = "http:/34.238.241.129:8081/ecom/";
 // const serverApi = "http://52.15.220.173:8081/ecom/";
-
 const GetEntityInfo = async (name) => {
     return new Promise(async (resolve) => {
         let url = `${serverApi}${name}`;
@@ -829,6 +828,165 @@ const SetPComponent = async (input) => {
     });
 }
 
+const GenerateOTP = async (email) => {
+    return new Promise(async (resolve) => {
+        let url = `${notificationApi}/otp/generate`;
+
+        try {
+            const res = await fetch(url, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "text/plain"
+                },
+                body: email
+            });
+
+            if (res.status === 200 || res.status === 201) {
+                return resolve({ status: res.ok});
+            }
+            const json = await res.json();
+
+            return resolve({ status: false, statusText: json.error.message });
+
+        } catch (error) {
+            console.log(error);
+            return resolve({ status: false, statusText: error.message });
+        }
+    });
+}
+
+const VerifyOTP = async (payload) => {
+    return new Promise(async (resolve) => {
+        let url = `${notificationApi}/otp/verify`;
+
+        try {
+            const res = await fetch(url, {
+                method: "POST",
+                headers: {
+                    "Content-type": "application/json"
+                },
+                body: JSON.stringify(payload)
+            });
+            
+            const json = await res.json();
+            if (res.status === 200 || res.status === 201) {
+                return resolve({ status: res.ok, values: json || [] });
+            }
+
+            return resolve({ status: false, statusText: json.error.message });
+
+        } catch (error) {
+            console.log(error);
+            return resolve({ status: false, statusText: error.message });
+        }
+    });
+}
+
+const SignupUser = async (data) => {
+    return new Promise(async (resolve) => {
+        let url = `${springSecurityApi}/signup`;
+        try {
+            const res = await fetch(url, {
+                method: "POST",
+                headers: {
+                    "Content-type": "application/json"
+                },
+                body: JSON.stringify(data),
+            });
+
+            const json = await res.json();
+            if (res.status === 200 || res.status === 201) {
+                    return resolve({ status: res.ok, values: json || [] });
+            }
+
+            return resolve({ status: false, statusText: json.errors[0] });
+
+        } catch (error) {
+            console.log(error);
+            return resolve({ status: false, statusText: error.message });
+        }
+    });
+}
+
+const LoginUser = async (data) => {
+    return new Promise(async (resolve) => {
+        let url = `${springSecurityApi}/login`;
+
+        try {
+            const res = await fetch(url, {
+                method: "POST",
+                headers: {
+                    "Content-type": "application/json"
+                },
+                body: JSON.stringify(data),
+            });
+
+            const json = await res.json();
+            if (res.status === 200 || res.status === 201) {
+                return resolve({ status: res.ok, values: json || [] });
+            }
+
+            return resolve({ status: false, statusText: json.errors[0] });
+
+        } catch (error) {
+            console.log(error);
+            return resolve({ status: false, statusText: error.message });
+        }
+    });
+}
+
+const VerifyUser = async (userId) => {
+    return new Promise(async (resolve) => {
+        let url = `${springSecurityApi}/users/verify?userId=${userId}`;
+
+        try {
+            const res = await fetch(url, {
+                method: "PUT",
+                headers: {
+                    "Content-type": "application/json"
+                },
+            });
+
+            if (res.status === 200 || res.status === 202) {  
+                return resolve({ status: res.ok});
+            }
+
+         return resolve({ status: false, statusText: json.errors[0] });
+
+        } catch (error) {
+            console.log(error);
+            return resolve({ status: false, statusText: error.message });
+        }
+    });
+}
+
+const ResetPassword = async (data) => {
+    return new Promise(async (resolve) => {
+        let url = `${springSecurityApi}/users/updatePassword`;
+
+        try {
+            const res = await fetch(url, {
+                method: "PUT",
+                headers: {
+                    "Content-type": "application/json"
+                },
+                body: JSON.stringify(data),
+            });
+
+            const json = await res.json();
+            if (res.status === 200 || res.status === 201) {
+                return resolve({ status: res.ok, values: json || [] });
+            }
+
+            return resolve({ status: false, statusText: json.errors[0] });
+
+        } catch (error) {
+            console.log(error);
+            return resolve({ status: false, statusText: error.message });
+        }
+    });
+}
+
 export {
     GetMetaData, GetEntityInfo, GetEntityInfoCount,
     GetProductTypesCount, GetProductTypes, SetProductTypes, GetProductStatus,
@@ -837,5 +995,6 @@ export {
     GetOtherDetails, SetOtherDetails,
     GetProductOtherImages, SetProductOtherImages,
     GetProductPrice, SetProductPrice, GetProductOnBoardings,
-    GetProductPComponents, SetPComponent, SetProductPComponents
+    GetProductPComponents, SetPComponent, SetProductPComponents,
+    GenerateOTP, VerifyOTP, SignupUser, LoginUser, ResetPassword, VerifyUser
 };
