@@ -15,7 +15,7 @@ const Component = (props) => {
     const { title } = props;
     const [initialize, setInitialize] = React.useState(false);
     const [isSubmitted, setIsSubmitted] = React.useState(false);
-    const [jumpStep, setJumpStep] = React.useState(2);
+    const [jumpStep, setJumpStep] = React.useState(0);
     const [row, setRow] = React.useState({});
     const [stepperComponents, setStepperComponents] = React.useState([]);
     const inputRefs = React.useRef({ productForm: null });
