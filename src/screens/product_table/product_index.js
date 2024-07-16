@@ -179,7 +179,7 @@ const Component = (props) => {
                     <DataTable keyId={'Product_id'} columns={columns} rowsCount={rowsCount} rows={rows} sortBy={sortBy} pageInfo={pageInfo} onActionClicked={OnActionClicked}
                         onSortClicked={OnSortClicked} onPageClicked={OnPageClicked} />
                 </Box>
-                <CustomDialog open={showConfirm} title={"Confirmation"} onCloseClicked={OnCloseClicked}>
+                <CustomDialog open={showConfirm} action={'delete'} title={"Confirmation"} onCloseClicked={OnCloseClicked}>
                     <Typography gutterBottom>
                         Are you sure? You want to delete?
                     </Typography>
