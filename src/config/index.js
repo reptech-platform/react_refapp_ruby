@@ -16,7 +16,7 @@ export const DRAWER_WIDTH = 200;
 export const ROWSPERPAGE = [5, 10, 15, 20, 25];
 
 //export const apiUrl = "http://52.15.220.173:8081/ecom/";
-//export const apiUrl = "https://ruby-refapp-bknd.code-wizard.in/ExclusiveAccess/";
-// export const apiUrl = "http://122.166.66.145:8383/Ecom_V4.21/";
-export const apiUrl = "http://122.166.66.145:9003/ExclusiveAccess/";
+export const apiUrl = "https://ruby-refapp-bknd.code-wizard.in/ExclusiveAccess/";
+//export const apiUrl = "http://122.166.66.145:8383/Ecom_V4.21/";
+//export const apiUrl = "http://122.166.66.145:9003/ExclusiveAccess/";
 
