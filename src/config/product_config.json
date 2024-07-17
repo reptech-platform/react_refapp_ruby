@@ -2,7 +2,8 @@
     "producttype": [
         {
             "key": "PtId",
-            "type": "keyid"
+            "type": "keyid",
+            "UIComponentTitle": "Product Type"
         },
         {
             "key": "ProductTypeName",
@@ -35,7 +36,8 @@
     "product": [
         {
             "key": "Product_id",
-            "type": "keyid"
+            "type": "keyid",
+            "UIComponentTitle": "Product"
         },
         {
             "key": "ProductPType",
@@ -243,7 +245,8 @@
     "otherdetails": [
         {
             "key": "OtherDetailsId",
-            "type": "keyid"
+            "type": "keyid",
+            "UIComponentTitle": "Other Details"
         },
         {
             "key": "ManufacturingDate",
@@ -255,18 +258,6 @@
             ],
             "validationMessages": [
                 "Product manufacturing date is required"
-            ]
-        },
-        {
-            "key": "ManufacturingTime",
-            "label": "ManufacturingTime",
-            "type": "time",
-            "editable": true,
-            "validators": [
-                "required"
-            ],
-            "validationMessages": [
-                "Product manufacturing time is required"
             ]
         },
         {
@@ -328,7 +319,8 @@
     "productvendor": [
         {
             "key": "SId",
-            "type": "keyid"
+            "type": "keyid",
+            "UIComponentTitle": "Product Vendor"
         },
         {
             "key": "SupplierName",
@@ -361,7 +353,8 @@
     "productbuyingprice": [
         {
             "key": "PpId",
-            "type": "keyid"
+            "type": "keyid",
+            "UIComponentTitle": "Product Buying Price"
         },
         {
             "key": "Price",
@@ -411,7 +404,8 @@
     "productsellingprice": [
         {
             "key": "PpId",
-            "type": "keyid"
+            "type": "keyid",
+            "UIComponentTitle": "Product Selling Price"
         },
         {
             "key": "Price",
