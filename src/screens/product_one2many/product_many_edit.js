@@ -63,7 +63,7 @@ const Component = (props) => {
                 delete m['id'];
                 switch (m['action']) {
                     case 'add': break;
-                    case 'edit': m.Deleted = true; break;
+                    case 'edit': m.Edited = true; break;
                     case 'delete': m.Deleted = true; break;
                 }
                 if (m['action'] === 'delete') {
@@ -79,7 +79,7 @@ const Component = (props) => {
 
         });
 
-        if (updateChild.length === 0) {
+        if (inlineObjs.length === 0) {
             global.AlertPopup("error", "Atleaset one child item should exist!");
             return;
         }
@@ -94,14 +94,14 @@ const Component = (props) => {
         for (let i = 0; i < updateChild.length; i++) {
             let _data = updateChild[i];
             let compProductMapId = null;
-            if (!Helper.IsNullValue(_data.CompId)) {
+            if (_data.Deleted && !Helper.IsNullValue(_data.CompId)) {
                 compProductMapId = productPComponents.find(x => x.CompId === _data.CompId && x.Product_id === productId).Id;
             }
             rslt = await Support.AddOrUpdateProductComponent(compProductMapId, productId, _data);
             bAllStatus = !bAllStatus ? rslt.status : bAllStatus;
         }
 
-        if (!bAllStatus) {
+        if (!bAllStatus && updateChild.length > 0) {
             global.AlertPopup("error", "Somthing went wrong to update!");
             return;
         }
@@ -218,7 +218,6 @@ const Component = (props) => {
     const fetchData = async () => {
         await Extract(id).then(rslt => {
             const { row, options, collections, mapitems } = rslt;
-            console.log(mapitems);
             setRow(row);
             setChildCollections(collections);
             setDropDownOptions(options);

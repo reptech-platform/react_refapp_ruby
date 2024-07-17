@@ -47,7 +47,17 @@ const FetchProductDetails = async (productId, enums) => {
         if (productId) {
             global.Busy(true);
             // Get Product Details
-            const $expand = MapItems.map(x => x.expand).join(",");
+            let $expand = [];
+            let $expandItems = MapItems.filter(z => z.expand).map(x => x.expand);
+            $expandItems.forEach(x => {
+                if (x.indexOf(",") > -1) {
+                    $expand.push(...x.split(","));
+                } else {
+                    $expand.push(x);
+                }
+            })
+
+            $expand = Helper.RemoveDuplicatesFromArray($expand);
             let rslt = await Api.GetProduct(productId, `$expand=${$expand}`);
             if (rslt.status) {
 

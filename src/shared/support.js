@@ -240,14 +240,18 @@ fn.AddOrUpdateProductComponent = async (compProductMapId, ProductId, input) => {
                 return resolve({ status, CompId: input.CompId });
             }
 
-            return;
+            return resolve({ status: true });
         }
+
+        const edited = input.Edited || false;
+
+        delete input['Edited'];
 
         rslt = await SetPComponent(input);
         if (rslt.status) {
             id = rslt.id;
             status = true;
-            if (!Helper.IsNullValue(id)) {
+            if (!Helper.IsNullValue(id) && !edited) {
                 data = { Id: compProductMapId, CompId: id, ProductId };
                 rslt = await SetProductPComponents(data);
                 if (!rslt.status) {

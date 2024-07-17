@@ -35,7 +35,8 @@ const FetchProductInfo = async () => {
 const FetchProductDetails = async (productId, enums) => {
 
     return new Promise(async (resolve) => {
-        let item = {}, backItem = {}, tmp, productPComponents = [];
+
+        let item = {}, rslt, backItem = {}, tmp, productPComponents = [];
 
         const keyItems = Object.keys(ProductJsonConfig);
 
@@ -50,12 +51,23 @@ const FetchProductDetails = async (productId, enums) => {
         if (productId) {
             global.Busy(true);
 
-            // let rslt = await Api.GetProductPComponents(productId);
-            // if (rslt.status) productPComponents = rslt.values;
+            rslt = await Api.GetProductPComponents(productId);
+            if (rslt.status) productPComponents = rslt.values;
 
             // Get Product Details
-            const $expand = MapItems.filter(z => z.expand).map(x => x.expand).join(",");
-            let rslt = await Api.GetProduct(productId, `$expand=${$expand}`);
+            let $expand = [];
+            let $expandItems = MapItems.filter(z => z.expand).map(x => x.expand);
+            $expandItems.forEach(x => {
+                if (x.indexOf(",") > -1) {
+                    $expand.push(...x.split(","));
+                } else {
+                    $expand.push(x);
+                }
+            })
+
+            $expand = Helper.RemoveDuplicatesFromArray($expand);
+
+            rslt = await Api.GetProduct(productId, `$expand=${$expand}`);
             if (rslt.status) {
 
                 const product = rslt.values;
@@ -125,7 +137,7 @@ const FetchProductDetails = async (productId, enums) => {
                         rslt = await Api.GetDocument(tmp.DocId, true);
                         if (rslt.status) tmp['DocData'] = rslt.values;
                     }
-                    if(item['product'].find((x) => x.key === "MainImage")) item['product'].find((x) => x.key === "MainImage").value = tmp;
+                    if (item['product'].find((x) => x.key === "MainImage")) item['product'].find((x) => x.key === "MainImage").value = tmp;
                 }
 
                 // Get Product Other Images
