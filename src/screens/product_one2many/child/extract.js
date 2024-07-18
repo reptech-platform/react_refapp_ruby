@@ -159,7 +159,10 @@ const FetchProductDetails = async (productId, enums) => {
                         _document.push(tmp);
                     }
 
-                    item['product'].find((x) => x.key === "OtherImages").value = _document;
+                    if (item['product'].find((x) => x.key === "OtherImages")) {
+                        item['product'].find((x) => x.key === "OtherImages").value = _document;
+                    }
+
                 }
 
             }

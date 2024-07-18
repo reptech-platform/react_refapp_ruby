@@ -125,6 +125,16 @@
                 "Product color is required"
             ],
             "value": "#7e2020"
+        },
+        {
+            "key": "MainImage",
+            "label": "MainImage",
+            "width": "30%",
+            "type": "doc",
+            "accept": ".JPG,.JPEG,.PNG",
+            "editable": true,
+            "validators": [],
+            "validationMessages": []
         }
     ],
     "producttype": [
