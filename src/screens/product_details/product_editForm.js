@@ -85,6 +85,15 @@ const Component = (props) => {
                     if (rslt.status) {
                         newObject.find((x) => x.type === 'keyid').value = rslt.id;
                         if (Helper.IsNullValue(mapItem.navpropname)) productId = rslt.id;
+
+                        const mapPropKey = product.find(x => x.uicomponent === mapItem.uicomponent).key;
+                        data = [
+                            { key: "Product_id", value: parseInt(productId) },
+                            { key: mapPropKey, value: parseInt(rslt.id) }
+                        ];
+                        rslt = await Support.AddOrUpdateProduct(data, dropDownOptions);
+                        if (!rslt.status) return;
+
                         // Update Back for next tracking purpose
                         UpdateBackUp(mapItem.target);
                     } else { return; }
