@@ -110,7 +110,11 @@ const FetchProductDetails = async (productId, enums) => {
                         rslt = await Api.GetDocument(tmp.DocId, true);
                         if (rslt.status) tmp['DocData'] = rslt.values;
                     }
-                    item['product'].find((x) => x.key === "MainImage").value = tmp;
+
+                    if (item['product'].find((x) => x.key === "MainImage")) {
+                        item['product'].find((x) => x.key === "MainImage").value = tmp;
+                    }
+
                 }
 
                 // Get Product Other Images
@@ -132,7 +136,9 @@ const FetchProductDetails = async (productId, enums) => {
                         _document.push(tmp);
                     }
 
-                    item['product'].find((x) => x.key === "OtherImages").value = _document;
+                    if (item['product'].find((x) => x.key === "OtherImages")) {
+                        item['product'].find((x) => x.key === "OtherImages").value = _document;
+                    }
                 }
 
             }

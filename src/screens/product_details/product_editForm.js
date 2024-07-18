@@ -22,6 +22,7 @@ const Component = (props) => {
     const [dropDownOptions, setDropDownOptions] = useState([]);
 
     const TrackChanges = (name) => {
+        if (Helper.IsNullValue(backRow[name])) return [];
         const source = JSON.parse(JSON.stringify(backRow[name]));
         const target = JSON.parse(JSON.stringify(row[name]));
 
