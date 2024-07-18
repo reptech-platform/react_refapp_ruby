@@ -17,6 +17,7 @@ const Component = (props) => {
     const { id } = useParams();
     const [form, setForm] = useState(null);
     const [row, setRow] = useState({});
+    const [backRow, setBackupRow] = useState({});
     const [initialized, setInitialized] = useState(false);
     const [state, setState] = useState(false);
     const [showButton, setShowButton] = useState(true);
@@ -28,12 +29,47 @@ const Component = (props) => {
     const [showUpdate, setShowUpdate] = useState(false);
     const { title } = props;
 
+    const TrackChanges = (name) => {
+        if (Helper.IsNullValue(backRow[name])) return [];
+        const source = JSON.parse(JSON.stringify(backRow[name]));
+        const target = JSON.parse(JSON.stringify(row[name]));
+
+        let changes = [];
+        for (let prop of source) {
+            let value1 = source.find((x) => x.key === prop.key).value ?? "";
+            let value2 = target.find((x) => x.key === prop.key).value ?? "";
+
+            if (prop.key === 'MainImage') {
+                value1 = value1.DocName ?? "";
+                value2 = value2.DocName ?? "";
+            } else if (prop.key === 'OtherImages') {
+                if (value1.length !== value2.length) {
+                    value1 = ""; value2 = "CHANGED";
+                } else {
+                    for (let k = 0; k < value1.length; k++) {
+                        if (value1[k].DocName !== value2[k].DocName) {
+                            value1 = ""; value2 = "CHANGED";
+                            break;
+                        }
+                    }
+                }
+            }
+            if (value1.toString() !== value2.toString()) {
+                changes.push(prop.key);
+            }
+        }
+
+        return changes;
+    }
+
     const OnSubmit = async () => {
-        let rslt, data, prodImages, productId;
+        let rslt, data, prodImages, productId, changes;
         const mapItems = MapItems;
 
         // Attach inline objects
         let product = row['product'];
+        productId = row['product'].find((x) => x.type === 'keyid').value;
+
         let inlineObjs = childCollections.filter(x => !x.child);
         inlineObjs.forEach(x => {
             let vObj = {};
@@ -85,10 +121,13 @@ const Component = (props) => {
         }
 
         // Add Or Update Product
-        rslt = await Support.AddOrUpdateProduct(product, dropDownOptions, ['MainImage', 'OtherImages']);
-        if (rslt.status) {
-            productId = rslt.id;
-        } else { return; }
+        changes = TrackChanges('product');
+        if (changes.length > 0) {
+            rslt = await Support.AddOrUpdateProduct(product, dropDownOptions, ['MainImage', 'OtherImages']);
+            if (rslt.status) {
+                productId = rslt.id;
+            } else { return; }
+        }
 
         let bAllStatus = false;
         for (let i = 0; i < updateChild.length; i++) {
@@ -107,48 +146,63 @@ const Component = (props) => {
         }
 
         for (let i = 0; i < mapItems.length; i++) {
-            // Add or Update the product and navigation entity if it is deos not exist
-            let navItem = product.find(x => x.uicomponent === mapItems[i].uicomponent);
-            if (!Helper.IsJSONEmpty(navItem) && Helper.IsNullValue(navItem.value)) {
-                rslt = await mapItems[i].func(row[navItem.uicomponent], dropDownOptions);
-                if (rslt.status) {
-                    data = [
-                        { key: "Product_id", value: parseInt(productId) },
-                        { key: navItem.key, value: parseInt(rslt.id) }
-                    ];
-                    rslt = await Support.AddOrUpdateProduct(data, dropDownOptions);
-                    if (!rslt.status) return;
 
-                } else { return; }
+            // Check is there any changes
+            const mapItem = MapItems[i];
+            changes = TrackChanges(mapItem.uicomponent);
+            if (changes.length > 0) {
+                // Add or Update the product and navigation entity if it is deos not exist
+                let navItem = product.find(x => x.uicomponent === mapItems[i].uicomponent);
+                if (!Helper.IsJSONEmpty(navItem)) {
+                    rslt = await mapItems[i].func(row[navItem.uicomponent], dropDownOptions);
+                    if (rslt.status) {
+                        data = [
+                            { key: "Product_id", value: parseInt(productId) },
+                            { key: navItem.key, value: parseInt(rslt.id) }
+                        ];
+                        rslt = await Support.AddOrUpdateProduct(data, dropDownOptions);
+                        if (!rslt.status) return;
+
+                        // Update Back for next tracking purpose
+                        UpdateBackUp(mapItem.target);
+
+                    } else { return; }
+                }
             }
         }
 
         // Add Product Main Image
-        prodImages = product.find((x) => x.key === 'MainImage');
-        if (prodImages && !Helper.IsNullValue(prodImages.value)) {
-            rslt = await Support.AddOrUpdateDocument(prodImages);
-            if (rslt.status) {
-                data = [
-                    { key: "Product_id", value: parseInt(productId) },
-                    { key: "ProductMainImage", value: parseInt(rslt.id) }
-                ];
-                rslt = await Support.AddOrUpdateProduct(data, dropDownOptions);
-                if (!rslt.status) return;
-            } else { return; }
-        }
-
-        // Add Product Other Images
-        prodImages = product.find((x) => x.key === 'OtherImages');
-        if (prodImages && !Helper.IsNullValue(prodImages.value)) {
-            for (let i = 0; i < prodImages.length; i++) {
-                rslt = await Support.AddOrUpdateDocument({ value: prodImages[i] });
+        changes = TrackChanges('product');
+        if (changes.length > 0 && changes.indexOf('MainImage') > -1) {
+            prodImages = product.find((x) => x.key === 'MainImage');
+            if (prodImages && !Helper.IsNullValue(prodImages.value)) {
+                rslt = await Support.AddOrUpdateDocument(prodImages);
                 if (rslt.status) {
                     data = [
                         { key: "Product_id", value: parseInt(productId) },
-                        { key: "DocId", value: parseInt(rslt.id) }
+                        { key: "ProductMainImage", value: parseInt(rslt.id) }
                     ];
-                    rslt = await Support.AddOrUpdateProductOtherImages(data);
+                    rslt = await Support.AddOrUpdateProduct(data, dropDownOptions);
                     if (!rslt.status) return;
+                } else { return; }
+            }
+        }
+
+        // Add Product Other Images
+        changes = TrackChanges('product');
+        if (changes.length > 0 && changes.indexOf('OtherImages') > -1) {
+            prodImages = product.find((x) => x.key === 'OtherImages');
+            if (prodImages && !Helper.IsNullValue(prodImages.value)) {
+                for (let i = 0; i < prodImages.length; i++) {
+                    rslt = await Support.AddOrUpdateDocument({ value: prodImages[i] });
+                    if (rslt.status) {
+                        data = [
+                            { key: "Product_id", value: parseInt(productId) },
+                            { key: "DocId", value: parseInt(rslt.id) }
+                        ];
+                        rslt = await Support.AddOrUpdateProductOtherImages(data);
+                        if (!rslt.status) return;
+                    }
                 }
             }
         }
@@ -156,6 +210,18 @@ const Component = (props) => {
         global.AlertPopup("success", "Product is created successfully!");
         setShowUpdate(false);
         NavigateTo("/productsmany");
+    }
+
+    const UpdateBackUp = (name) => {
+        if (name) {
+            let obj = Helper.CloneObject(row[name]);
+            let bItems = [];
+            for (let prop of obj) {
+                bItems.push({ key: prop.key, value: prop.value });
+            }
+            setBackupRow((prev) => ({ ...prev, [name]: bItems }));
+            setState(!state);
+        }
     }
 
     const OnInputChange = (e) => {
@@ -217,11 +283,12 @@ const Component = (props) => {
 
     const fetchData = async () => {
         await Extract(id).then(rslt => {
-            const { row, options, collections, mapitems } = rslt;
+            const { row, options, collections, mapitems, backRow } = rslt;
             setRow(row);
             setChildCollections(collections);
             setDropDownOptions(options);
-            setProductPComponents(mapitems)
+            setProductPComponents(mapitems);
+            setBackupRow(backRow);
             setState(!state);
         })
     };
