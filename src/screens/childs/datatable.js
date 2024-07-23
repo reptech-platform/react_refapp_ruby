@@ -6,9 +6,8 @@ import { ROWSPERPAGE } from "config";
 
 const Component = (props) => {
 
-
-    const { columns, rowsCount, rows, pageInfo, onActionClicked, sortBy, keyId, noActions,
-        onSortClicked, onPageClicked } = props;
+    const { columns, rowsCount, rows, pageInfo, onActionClicked, sortBy, keyId,
+        onSortClicked, onPageClicked, sx, noActions, hideFooter } = props;
 
     const OnActionClicked = (id, type) => {
         if (onActionClicked) onActionClicked(id, type);
@@ -88,6 +87,7 @@ const Component = (props) => {
                 rowCount={rowsCount}
                 rows={rows}
                 rowSelection={false}
+                hideFooter={hideFooter || false}
                 paginationModel={pageInfo}
                 initialState={{
                     pagination: {
@@ -103,7 +103,8 @@ const Component = (props) => {
                 sx={{
                     "& .MuiDataGrid-cell:focus-within, & .MuiDataGrid-cell:focus": {
                         outline: "none !important",
-                    }
+                    },
+                    ...sx
                 }}
             />
         </>

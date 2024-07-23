@@ -1,7 +1,7 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
 import {
-    Products, ProductCreate, ProductTiles, ProductList,
+    Dashboard, Products, ProductCreate, ProductTiles, ProductList,
     ProductEdit, StepperForm, TabbedLayout,
     ProductView, ProductTypes, InformatForm,
     ProductOneToMany, ProductOneToManyCreate, ProductOneToManyEdit, ProductOneToManyView
@@ -25,7 +25,8 @@ const Component = (props) => {
             <Route path="/productsmany/create" element={<ProductOneToManyCreate {...props} title={'Create Products One To Many'} />} />
             <Route path="/productsmany/view/:id" element={<ProductOneToManyView {...props} title={'View Products One To Many'} />} />
             <Route path="/productsmany/edit/:id" element={<ProductOneToManyEdit {...props} title={'Edit Products One To Many'} />} />
-            <Route path="/" element={<Products {...props} title={'Products Table'} nolistbar={true} />} />
+            {/* <Route path="/" element={<Products {...props} title={'Products Table'} nolistbar={true} />} /> */}
+            <Route exact path="/" element={<Dashboard {...props} title={'Dashboard'} />} />
         </Routes>
     )
 

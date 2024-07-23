@@ -218,3 +218,29 @@ input[type="color"] {
   border-width: 1px;
   border-color: rgba(0, 0, 0, 0.87);
 }
+
+.delivered {
+  background-color: #00B69B;
+  color: #ffffff;
+  border-radius: 5px;
+  padding: 3;
+  width: 93px;
+  font-family: "Poppins";
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 21px;
+  text-align: center;
+}
+
+.pending {
+  background-color: #FF9B52;
+  color: #ffffff;
+  border-radius: 5px;
+  padding: 3;
+  width: 93px;
+  font-family: "Poppins";
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 21px;
+  text-align: center;
+}
