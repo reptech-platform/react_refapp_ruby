@@ -14,9 +14,12 @@ import ProductOneToManyCreate from "./product_one2many/product_many_create.js";
 import ProductOneToManyEdit from "./product_one2many/product_many_edit.js";
 import ProductOneToManyView from "./product_one2many/product_many_view.js";
 
+import Dashboard from "./dashboard";
+
 export {
     Products, ProductCreate, ProductTiles, ProductList,
     ProductEdit, ProductView, ProductTypes,
     InformatForm, StepperForm, TabbedLayout,
-    ProductOneToMany, ProductOneToManyCreate, ProductOneToManyEdit, ProductOneToManyView
+    ProductOneToMany, ProductOneToManyCreate, ProductOneToManyEdit, ProductOneToManyView,
+    Dashboard
 };

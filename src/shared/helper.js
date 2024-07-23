@@ -48,4 +48,20 @@ fn.ToFirstCharCapital = (e) => {
     return e.charAt(0).toUpperCase() + e.slice(1);
 }
 
+fn.INRCurrencyFormat = (e, nodecimals, nocurrency) => {
+    if (fn.IsNullValue(e)) return "";
+    let formatter = new Intl.NumberFormat("en-IN", {
+        style: "currency",
+        currency: "INR",
+    });
+    if (nocurrency) {
+        formatter = new Intl.NumberFormat("en-IN", {
+            currency: "INR"
+        });
+    }
+    let tmp = formatter.format(e);
+    if (nodecimals) tmp = tmp.substring(0, tmp.indexOf("."));
+    return tmp;
+};
+
 export default fn;
