@@ -1,5 +1,6 @@
 import Helper from "shared/helper";
 import { apiUrl as serverApi } from "config";
+import Session from "shared/session";
 
 // const serverApi = apiUrl;
 // const serverApi = "http:/34.238.241.129:8081/ecom/";
@@ -829,6 +830,66 @@ const SetPComponent = async (input) => {
     });
 }
 
+const GetUsers = async () => {
+
+    return new Promise(async (resolve) => {
+
+        let url = `${serverApi}Users`;
+        const headersItems = await Session.GetHeader();
+
+        try {
+            const res = await fetch(url, {
+                method: "GET",
+                mode: 'cors',
+                headers: { ...headersItems }
+            });
+
+            const json = await res.json();
+            if (res.status === 200) {
+                return resolve({ status: res.ok, values: json.value || [] });
+            }
+
+            return resolve({ status: false, statusText: json.error.message });
+
+        } catch (error) {
+            console.log(error);
+            return resolve({ status: false, statusText: error.message });
+        }
+
+    });
+
+}
+
+const GetChilds = async () => {
+
+    return new Promise(async (resolve) => {
+
+        let url = `${serverApi}Childs`;
+        const headersItems = await Session.GetHeader();
+
+        try {
+            const res = await fetch(url, {
+                method: "GET",
+                mode: 'cors',
+                headers: { ...headersItems }
+            });
+
+            const json = await res.json();
+            if (res.status === 200) {
+                return resolve({ status: res.ok, values: json.value || [] });
+            }
+
+            return resolve({ status: false, statusText: json.error.message });
+
+        } catch (error) {
+            console.log(error);
+            return resolve({ status: false, statusText: error.message });
+        }
+
+    });
+
+}
+
 export {
     GetMetaData, GetEntityInfo, GetEntityInfoCount,
     GetProductTypesCount, GetProductTypes, SetProductTypes, GetProductStatus,
@@ -837,5 +898,6 @@ export {
     GetOtherDetails, SetOtherDetails,
     GetProductOtherImages, SetProductOtherImages,
     GetProductPrice, SetProductPrice, GetProductOnBoardings,
-    GetProductPComponents, SetPComponent, SetProductPComponents
+    GetProductPComponents, SetPComponent, SetProductPComponents,
+    GetUsers, GetChilds
 };

@@ -1,13 +1,15 @@
 import React from "react";
-import { Tooltip, useTheme } from '@mui/material';
+import { Tooltip } from '@mui/material';
 import { DataGrid, GridActionsCellItem } from '@mui/x-data-grid';
 import { Edit as EditIcon, DeleteOutlined as DeleteIcon, Visibility as VisibilityIcon } from '@mui/icons-material';
 import { ROWSPERPAGE } from "config";
 
 const Component = (props) => {
 
-    const { columns, rowsCount, rows, pageInfo, onActionClicked, sortBy, keyId,
+    const { columns, rowsCount, rows, pageInfo, onActionClicked, sortBy, keyId, pageMode,
         onSortClicked, onPageClicked, sx, noActions, hideFooter } = props;
+
+    const paginationMode = pageMode || "server";
 
     const OnActionClicked = (id, type) => {
         if (onActionClicked) onActionClicked(id, type);
@@ -96,8 +98,8 @@ const Component = (props) => {
                 }}
                 pageSizeOptions={ROWSPERPAGE}
                 sortModel={sortBy && [sortBy] || [{ field: "", sort: "asc" }]}
-                paginationMode="server"
-                sortingMode="server"
+                paginationMode={paginationMode}
+                sortingMode={paginationMode}
                 onSortModelChange={handleSortModelChange}
                 onPaginationModelChange={handlePaginationModel}
                 sx={{

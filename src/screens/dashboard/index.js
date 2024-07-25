@@ -1,34 +1,104 @@
 
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Container from "screens/container";
-import { Box, Grid, Stack } from '@mui/material';
-import { CounterContainer, LineChart } from "components";
+import { Grid, Stack } from '@mui/material';
+import { CounterContainer } from "components";
 import Helper from "shared/helper";
-import { DataTable } from '../childs';
-
-const columns = [
-    { headerName: "Product Name", field: "productname", flex: 1, sortable: false },
-    { headerName: "Location", field: "location", flex: 1, sortable: false },
-    { headerName: "Date-Time", field: "DateOfTime", flex: 1, sortable: false },
-    { headerName: "Piece", field: "piece", flex: 1, sortable: false },
-    { headerName: "Amount", field: "amount", flex: 1, sortable: false, renderCell: (index) => Helper.INRCurrencyFormat(index.row.amount, true) },
-    {
-        headerName: "Status", field: "status", flex: 1, sortable: false,
-        renderCell: (index) => <div className={index.row.status?.toLowerCase()}>{index.row.status}</div>
-    }
-];
+import * as Api from "shared/services";
+import UserView from "./childs/users";
+import LocationView from "./childs/locations";
+import ChildView from "./childs/childview";
 
 const Component = (props) => {
 
-    const [rows, setRows] = useState([
+    const [initialize, setInitialize] = useState(false);
+    const [selectedItem, setSelectedItem] = useState(0);
+    const [rows, setRows] = useState([]);
+    const [counts, setCounts] = useState({
+        usersCount: 0, usersGrowth: 0,
+        locationsCount: 0, locationsGrowth: 0,
+        hobbiesCount: 0, hobbiesGrowth: 0
+    });
+    const [state, setState] = useState(false);
 
-        { id: 1, productname: "Apple Watch", location: "6096 Marjolaine Land", DateOfTime: "12.09.2019 - 12.53 P", piece: 423, amount: 34295, status: "Delivered" },
-        { id: 2, productname: "Apple Watch", location: "6096 Marjolaine Land", DateOfTime: "12.09.2019 - 12.53 P", piece: 423, amount: 34295, status: "Pending" }
+    const UpdateCounts = (name, value) => {
+        setCounts((prev) => ({ ...prev, [name]: value }));
+    }
 
+    const GetDayPercentage = (list, field, type) => {
+        const prevDate = Helper.AlterDate(null, type, -1);
+        const curDate = Helper.AlterDate(null, 't');
+        const getCreatedDateList = list.filter((x) => !Helper.IsNullValue(x[field]));
+        const prevDayCount = getCreatedDateList.filter((x) => Helper.IsDateEqual(x[field], prevDate)).length;
+        const curDayCount = getCreatedDateList.filter((x) => Helper.IsDateEqual(x[field], curDate)).length;
+        if (parseInt(curDayCount) === 0 || parseInt(prevDayCount) === 0) return 0;
+        const diffCount = parseInt(curDayCount) - parseInt(prevDayCount);
+        return (parseInt(diffCount) / parseInt(prevDayCount)) * 100;
+    }
 
-    ]);
-    const [pageInfo, setPageInfo] = useState({ page: 0, pageSize: 5 });
+    const FetchUserResults = async () => {
+        //setRows([]);
+        global.Busy(true);
+        let rslt = await Api.GetUsers();
+        global.Busy(false);
+        if (rslt.status) {
+            let usersList = rslt.values || [];
+            usersList.forEach(x => x.id = x.UserId);
+
+            const usersGrowth = GetDayPercentage(usersList, 'CreatedDate', 'd');
+
+            UpdateCounts('usersCount', usersList.length);
+            UpdateCounts('usersGrowth', usersGrowth);
+
+            const locationGrowth = GetDayPercentage(usersList, 'Pincode', 'w');
+            UpdateCounts('locationsCount', usersList.length);
+            UpdateCounts('locationsGrowth', locationGrowth);
+
+            if (selectedItem === 1 || selectedItem === 2) setRows(usersList);
+
+        } else {
+            console.log(rslt.statusText);
+        }
+
+        setState(!state);
+    }
+
+    const FetchChildResults = async () => {
+        //setRows([]);
+        global.Busy(true);
+        let rslt = await Api.GetChilds();
+        global.Busy(false);
+
+        if (rslt.status) {
+            let childsList = rslt.values || [];
+            childsList.forEach(x => x.id = x.ChildId);
+
+            // Alter data until have actual data. 
+            childsList.forEach((x, index) => x.CreatedDate = (index % 3) === 0 ? Helper.AlterDate(null, 'd', -1) : Helper.AlterDate(null, 'd', -index));
+            let hobbiesList = childsList.filter(x => !Helper.IsArrayNull(x.Interests));
+
+            const hobbiesGrowth = GetDayPercentage(childsList, 'CreatedDate', 'd');
+            UpdateCounts('hobbiesGrowth', hobbiesGrowth);
+            UpdateCounts('hobbiesCount', hobbiesList.length);
+
+            if (selectedItem === 3) setRows(childsList);
+
+        } else {
+            console.log(rslt.statusText);
+        }
+        setState(!state);
+    }
+
+    const FetchResults = async () => {
+        setRows([]);
+        await FetchUserResults();
+        await FetchChildResults();
+    }
+
+    if (initialize) { setInitialize(false); setSelectedItem(1); }
+    useEffect(() => { setInitialize(true); }, []);
+    useEffect(() => { FetchResults(); }, [selectedItem]);
 
     return (
 
@@ -36,65 +106,16 @@ const Component = (props) => {
             <Container {...props} styles={{ backgroundColor: "#F7F9FD" }}>
                 <Grid container rowGap={6} sx={{ p: 2 }} >
                     <Stack direction={"row"} columnGap={5}>
-                        <CounterContainer title="Total Users" count="40,689" trendingUp={true} trendingValue={"8.5%"} trendingLabel={"Up from yesterday"} />
-                        <CounterContainer title="Total Orders" count="10293" trendingUp={true} trendingValue={"1.3%"} trendingLabel={"Up from past week"} />
-                        <CounterContainer title="Total Sales" count={Helper.INRCurrencyFormat(89000, true)} trendingUp={false} trendingValue={"4.3%"} trendingLabel={"Down from yesterday"} />
+                        <CounterContainer id={1} selected={selectedItem} title="Users" count={counts.usersCount} onItemSeleted={(e) => setSelectedItem(e)}
+                            trendingUp={counts.usersGrowth} trendingValue={counts.usersGrowth} trendingLabel={"Up from yesterday"} />
+                        <CounterContainer id={2} selected={selectedItem} title="Locations" count={counts.locationsCount} onItemSeleted={(e) => setSelectedItem(e)}
+                            trendingValue={counts.locationsGrowth} trendingLabel={"Up from past week"} />
+                        <CounterContainer id={3} selected={selectedItem} title="Hobbies" count={counts.hobbiesCount} onItemSeleted={(e) => setSelectedItem(e)}
+                            trendingValue={counts.hobbiesGrowth} trendingLabel={"Down from yesterday"} />
                     </Stack>
-                    <Box sx={{
-                        width: "100%",
-                        height: "100%",
-                        border: "1px solid #E7E7E7",
-                        backgroundColor: "#FFFFFF",
-                        boxShadow: "6px 6px 54px 0px #0000000D",
-                        borderRadius: 1,
-                        p: 2
-                    }}>
-                        <LineChart />
-                    </Box>
-                    <Box sx={{
-                        width: "100%",
-                        border: "1px solid #E7E7E7",
-                        backgroundColor: "#FFFFFF",
-                        boxShadow: "6px 6px 54px 0px #0000000D",
-                        borderRadius: 1,
-                        p: 2
-                    }}>
-                        <DataTable
-
-                            sx={{
-                                "& .MuiTablePagination-input, & .MuiTablePagination-selectLabel": {
-                                    display: "none !important"
-                                },
-                                "& .MuiDataGrid-columnHeader:focus-within, & .MuiDataGrid-columnHeader:focus": {
-                                    outline: "none !important",
-                                },
-                                "& .MuiDataGrid-cell:focus-within, & .MuiDataGrid-cell:focus": {
-                                    outline: "none !important",
-                                },
-                                '& .MuiDataGrid-columnSeparator': {
-                                    display: 'none',
-                                },
-                                "& .MuiDataGrid-cell": {
-                                    fontFamily: "arial",
-                                    fontSize: "0.86em",
-                                    color: "#353535"
-                                },
-                                "& .MuiDataGrid-columnHeaders": {
-                                    minHeight: "48px !important",
-                                    maxHeight: "48px !important",
-                                    lineHeight: "48px !important",
-                                    backgroundColor: "#F1F4F9 !important"
-                                },
-                                "& .MuiDataGrid-columnHeaderTitle": {
-                                    fontFamily: "Poppins",
-                                    fontSize: "14px",
-                                    fontWeight: "700",
-                                    lineHeight: "21px"
-                                },
-                                border: "0px !important"
-                            }}
-                            columns={columns} rowsCount={0} rows={rows} pageInfo={pageInfo} noActions={true} hideFooter={true} />
-                    </Box>
+                    {selectedItem === 1 ? <UserView state={state} rows={rows} /> : null}
+                    {selectedItem === 2 ? <LocationView state={state} rows={rows} /> : null}
+                    {selectedItem === 3 ? <ChildView state={state} rows={rows} /> : null}
                 </Grid>
             </Container>
         </>
