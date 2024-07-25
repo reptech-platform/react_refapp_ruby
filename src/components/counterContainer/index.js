@@ -6,11 +6,19 @@ import TrendingDownIcon from '@mui/icons-material/TrendingDown';
 
 const Component = (props) => {
 
-    const { count, trendingValue, trendingLabel, trendingUp, title } = props;
+    const { id, selected, count, trendingValue, trendingLabel, title, onItemSeleted } = props;
+
+    let trendingUp = !trendingValue.toString().startsWith("-");
 
     const trendingColor = trendingUp ? "#00B69B" : "#F93C65";
+    const borderColor = selected === id ? 'green' : '#E7E7E7';
 
     const trendingIcon = trendingUp ? <TrendingUpIcon sx={{ color: trendingColor }} /> : <TrendingDownIcon sx={{ color: trendingColor }} />;
+
+    const OnItemSelected = (e) => {
+        e.preventDefault();
+        if (onItemSeleted) onItemSeleted(id);
+    }
 
     return (
 
@@ -18,12 +26,14 @@ const Component = (props) => {
             <Box sx={{
                 width: 280,
                 height: 160,
-                border: "1px solid #E7E7E7",
-
+                backgroundColor: "#ffffff",
+                border: "1px solid",
+                borderColor,
                 boxShadow: "6px 6px 54px 0px #0000000D",
-                borderRadius: 5
-            }}>
-                <List sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
+                borderRadius: 5,
+                cursor: "pointer"
+            }} onClick={OnItemSelected}>
+                <List sx={{ width: '100%', maxWidth: 360 }}>
                     <ListItem alignItems="flex-start">
                         <ListItemText
                             primary={
@@ -87,7 +97,7 @@ const Component = (props) => {
                                         color: trendingColor
                                     }}
                                 >
-                                    {trendingValue}
+                                    {trendingValue}%
                                 </Typography>
                                 <Typography
                                     sx={{
