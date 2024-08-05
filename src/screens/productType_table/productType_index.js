@@ -4,6 +4,7 @@ import { Add as AddBoxIcon } from '@mui/icons-material';
 import Container from "screens/container";
 import { SearchInput, CustomDialog, TextInput } from "components";
 import { GetProductTypes, GetProductTypesCount, SetProductTypes } from "shared/services";
+import Support from "shared/support";
 import Helper from "shared/helper";
 import { DataTable } from '../childs';
 import { ValidatorForm } from 'react-material-ui-form-validator';
@@ -137,7 +138,7 @@ const Component = (props) => {
             global.Busy(true);
             let data = { ...params, Deleted: params.httpMethod === 'DELETE' };
             delete data["httpMethod"];
-            const { status } = await SetProductTypes(data);
+            const { status } = await Support.AddOrUpdateProductType(data);
             if (status) {
                 global.AlertPopup("success", `Record is ${success} successful!`);
             } else {
