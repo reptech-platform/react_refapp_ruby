@@ -22,6 +22,8 @@ fn.AddOrUpdateProductType = async (input, excludesItems) => {
             }
         });
 
+        UpdateNumberFields(data);
+
         global.Busy(true);
         let rslt = await SetProductTypes(data);
         global.Busy(false);
@@ -48,6 +50,8 @@ fn.AddOrUpdateProductVendor = async (input, excludesItems) => {
                 data[x.key] = x.value;
             }
         });
+
+        UpdateNumberFields(data);
 
         global.Busy(true);
         let rslt = await SetProductVendor(data);
@@ -82,6 +86,8 @@ fn.AddOrUpdateProduct = async (input, enums, excludesItems) => {
             }
         });
 
+        UpdateNumberFields(data);
+
         global.Busy(true);
         let rslt = await SetProduct(data);
         global.Busy(false);
@@ -112,6 +118,8 @@ fn.AddOrUpdatePrice = async (input, excludesItems) => {
                 }
             }
         });
+
+        UpdateNumberFields(data);
 
         global.Busy(true);
         let rslt = await SetProductPrice(data);
@@ -147,6 +155,8 @@ fn.AddOrUpdateOtherDetails = async (input, enums, excludesItems) => {
                     }
                 }
             });
+
+        UpdateNumberFields(data);
 
         global.Busy(true);
         let rslt = await SetOtherDetails(data);
@@ -201,6 +211,7 @@ fn.AddOrUpdateProductOtherImages = async (input, excludesItems) => {
             }
         });
 
+        UpdateNumberFields(data);
         let rslt = await SetProductOtherImages(data);
         global.Busy(false);
         if (rslt.status) {
@@ -232,6 +243,7 @@ fn.AddOrUpdateProductComponent = async (compProductMapId, ProductId, input) => {
 
             data = { CompId: input.CompId, Deleted: input.Deleted };
 
+            UpdateNumberFields(data);
             rslt = await SetPComponent(data);
             if (!rslt.status) {
                 global.Busy(false);
@@ -302,4 +314,23 @@ fn.DeleteOrder = async (OrderId) => {
     });
 }
 
+const UpdateNumberFields = (items) => {
+    for (var key in items) {
+        if (Object.prototype.hasOwnProperty.call(items, key)) {
+            if (!Helper.IsNullValue(items[key])) {
+                if (Helper.IsArray(items[key])) {
+                    for (let j = 0; j < items[key].length; j++) {
+                        UpdateNumberFields(items[key][j]);
+                    }
+                } else if (Helper.IsJSON(items[key])) {
+                    UpdateNumberFields(items[key]);
+                } else {
+                    if (numberItems.indexOf(key) > -1) {
+                        items[key] = parseInt(items[key]);
+                    }
+                }
+            }
+        }
+    }
+};
 export default fn;
