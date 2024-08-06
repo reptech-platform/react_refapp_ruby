@@ -90,7 +90,18 @@ const FetchProductDetails = async (productId, enums) => {
                                 if (m.type === 'keyid' && !Helper.IsNullValue(x[m.key])) {
                                     _tmpItem['id'] = x[m.key];
                                 }
-                                _tmpItem[m.key] = x[m.key]
+                                let _nValue = x[m.key];
+                                if (m.type === 'dropdown') {
+                                    const { Values } = enums.find((z) => z.Name === m.source);
+                                    const _value = Values.find((z) => z[m.valueId] === _nValue || z[m.contentId] === _nValue) || {};
+                                    _nValue = _value[m.contentId];
+
+                                } else if (m.type === 'date') {
+                                    let tmpDate = _nValue.split('T');
+                                    _nValue = tmpDate[0];
+                                }
+
+                                _tmpItem[m.key] = _nValue;
                             })
                             _tmpItems.push(_tmpItem);
                         });

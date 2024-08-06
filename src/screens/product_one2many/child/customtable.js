@@ -46,12 +46,23 @@ const Component = (props) => {
     const OnInputChange = (e) => { setNewItem((prev) => ({ ...prev, [e.name]: e.value })); }
 
     const OnActionClicked = (id, type) => {
-
         ClearSettings();
         if (type === 'edit' || type === 'view' || type === 'delete') {
             const selectedRow = rows.find((x) => x[keyIdName] === id);
-            let tmpInfo = configInfo;
+            let tmpInfo = Helper.CloneObject(configInfo);
             tmpInfo.forEach(x => x.value = selectedRow[x.key]);
+
+            tmpInfo.forEach(m => {
+                let _nValue = m.value;
+                if (m.type === 'dropdown') {
+                    const { Values } = options.find((z) => z.Name === m.source);
+                    const _value = Values.find((z) => z[m.valueId] === _nValue || z[m.contentId] === _nValue) || {};
+                    _nValue = _value[m.valueId];
+                }
+
+                m.value = _nValue;
+            })
+
             setConfigInfo(tmpInfo);
             setNewItem(selectedRow);
             setState(!state);
