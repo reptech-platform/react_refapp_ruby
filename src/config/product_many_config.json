@@ -354,6 +354,39 @@
                 "Product color is required"
             ],
             "value": "#7e2020"
+        },
+        {
+            "key": "PComponentPCompVendor",
+            "label": "Vendor",
+            "type": "dropdown",
+            "valueId": "VId",
+            "nameId": "VendorName",
+            "contentId": "VendorName",
+            "source": "Vendor",
+            "editable": true,
+            "create": true,
+            "validators": [],
+            "validationMessages": [],
+            "value": null
+        },
+        {
+            "key": "Status",
+            "label": "Status",
+            "type": "dropdown",
+            "valueId": "Value",
+            "nameId": "Name",
+            "contentId": "Name",
+            "source": "OnBoardingStatus",
+            "editable": true,
+            "validators": [
+                "required",
+                "isNumber"
+            ],
+            "validationMessages": [
+                "Status status is required",
+                "Status status is required"
+            ],
+            "value": 2
         }
     ]
 }

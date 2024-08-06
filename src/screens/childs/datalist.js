@@ -64,7 +64,7 @@ const Component = (props) => {
                                         </Typography>
                                         <br />
                                         <Typography paragraph component="span">&nbsp;</Typography>
-                                        <Typography variant={x.property5 && x.property5.toLowerCase()} component="span">
+                                        <Typography variant={x.property5 && x.property5?.toLowerCase() || 'body2'} component="span">
                                             {x.property5}
                                         </Typography>
                                     </React.Fragment>
