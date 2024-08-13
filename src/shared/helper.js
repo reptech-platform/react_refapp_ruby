@@ -31,6 +31,15 @@ fn.IsArrayNull = (e) => {
     return true;
 };
 
+fn.IsArray = (e) => {
+    if (fn.IsNull(e)) return false;
+    return e.constructor === [].constructor;
+};
+
+fn.IsJSON = (e) => {
+    if (fn.IsNull(e)) return false;
+    return e.constructor === ({}).constructor;
+};
 
 fn.ToDate = (e, format, utc) => {
     let dt = e;
