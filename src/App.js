@@ -5,7 +5,10 @@ import { Header, Container, Drawer, AlertMessage } from 'components';
 import RouteItems from "./Routes";
 import { DefaultTheme, DarkTheme, LightTheme } from "./theme";
 import TimerSession from "shared/useTimerSession";
+
 import "./App.css";
+
+const defaultToken = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJzYWluaWtoaWxhMTk5OUBnbWFpbC5jb20iLCJleHAiOjE3MjMwNzY1OTQsImlhdCI6MTcyMTI3NjU5NCwiZW1haWwiOiJzYWluaWtoaWxhMTk5OUBnbWFpbC5jb20ifQ.uUPOMMSrMOTNHnIPcEThLLsOkl6oPKhF8Rl4z9IKNgW_iuaWuh9SUjPWgoTh02LffOPy9mrir-46fITZY2RuZw";
 
 global.Busy = (bBool) => {
   var x = document.getElementById("busyloader");
@@ -29,6 +32,7 @@ const Component = () => {
     } else if (theme === 'Dark') {
       setCustomTheme(DarkTheme);
     }
+    sessionStorage.setItem('jwtToken', defaultToken);
   }, [theme]);
 
   return (
