@@ -97,7 +97,7 @@ const FetchProductDetails = async (productId, enums) => {
                                     _nValue = _value[m.contentId];
 
                                 } else if (m.type === 'date') {
-                                    let tmpDate = _nValue.split('T');
+                                    let tmpDate = _nValue.indexOf("T") > 0 ? _nValue.split('T') : [_nValue];
                                     _nValue = tmpDate[0];
                                 }
 
@@ -123,7 +123,7 @@ const FetchProductDetails = async (productId, enums) => {
                                     }
 
                                 } else if (tItem.type === 'date') {
-                                    let tmpDate = sourceObj[prop].split('T');
+                                    let tmpDate = sourceObj[prop].indexOf("T") > 0 ? sourceObj[prop].split('T') : [sourceObj[prop]];
                                     _nValue = tmpDate[0];
                                 } else {
                                     _nValue = sourceObj[prop];
