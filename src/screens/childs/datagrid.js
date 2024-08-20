@@ -13,7 +13,8 @@ const Component = (props) => {
     };
 
     const handleChangeRowsPerPage = (event) => {
-        /* setPageInfo({ page: 0, pageSize: parseInt(event.target.value, 5) }); */
+        const _page = { page: 0, pageSize: parseInt(event.target.value, 5) };
+        if (onPageClicked) onPageClicked(_page);
     };
 
     const OnActionClicked = (id, type) => {

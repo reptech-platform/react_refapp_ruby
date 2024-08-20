@@ -189,7 +189,7 @@ const Component = (props) => {
         const { mapitem, source, valueId } = item;
         const { Values } = dropDownOptions.find(x => x.Name === source);
         const obj = value ? Values.find(x => x[valueId] === value) : null;
-        let _rowMap = _row[mapitem];
+        let _rowMap = _row[mapitem] || [];
 
         for (let i = 0; i < _rowMap.length; i++) {
 
@@ -214,7 +214,7 @@ const Component = (props) => {
             _rowMap[i] = tmpField;
 
         }
-        _row[mapitem] = _rowMap;
+        if ( _row[mapitem] ) _row[mapitem] = _rowMap;
         setRow(_row);
         setState(!state);
     };
