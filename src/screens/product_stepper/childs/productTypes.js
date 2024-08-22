@@ -23,7 +23,11 @@ const Component = React.forwardRef((props, ref) => {
         if (e) e.preventDefault();
         let rslt, productTypeId;
 
-        rslt = await Support.AddOrUpdateProductType(props.row['producttype'], ["ProductOptionType"]);
+        let childItem = props.row['producttype'];
+        let numfields = Helper.GetAllNumberFields(childItem);
+        if (numfields.length > 0) Helper.UpdateNumberFields(childItem, numfields);
+
+        rslt = await Support.AddOrUpdateProductType(childItem, ["ProductOptionType"]);
         if (rslt.status) {
             productTypeId = parseInt(rslt.id);
             props.row['producttype'].find((x) => x.key === 'PtId').value = rslt.id;

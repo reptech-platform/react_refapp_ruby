@@ -1,6 +1,7 @@
 import React from 'react';
 import RenderFormContols from "./formcontrols";
 import Support from "shared/support";
+import Helper from "shared/helper";
 
 const Component = React.forwardRef((props, ref) => {
     const { enums, setIsSubmitted, tag } = props;
@@ -16,8 +17,12 @@ const Component = React.forwardRef((props, ref) => {
 
             productId = props.row['product'].find((x) => x.key === 'Product_id').value || 0;
 
+            let childItem = props.row['otherdetails'];
+            let numfields = Helper.GetAllNumberFields(childItem);
+            if (numfields.length > 0) Helper.UpdateNumberFields(childItem, numfields);
+
             // Add Product Other Details
-            rslt = await Support.AddOrUpdateOtherDetails(props.row['otherdetails'], enums);
+            rslt = await Support.AddOrUpdateOtherDetails(childItem, enums);
             if (rslt.status) {
                 // Add Or Update Product
                 data = [

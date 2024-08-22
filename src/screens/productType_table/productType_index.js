@@ -138,6 +138,10 @@ const Component = (props) => {
             global.Busy(true);
             let data = { ...params, Deleted: params.httpMethod === 'DELETE' };
             delete data["httpMethod"];
+
+            let numfields = Helper.GetAllNumberFields(data);
+            if (numfields.length > 0) Helper.UpdateNumberFields(data, numfields);
+
             const { status } = await Support.AddOrUpdateProductType(data);
             if (status) {
                 global.AlertPopup("success", `Record is ${success} successful!`);

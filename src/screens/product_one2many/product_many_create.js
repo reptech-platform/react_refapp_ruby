@@ -26,15 +26,23 @@ const Component = (props) => {
     const { title } = props;
 
     const OnSubmit = async () => {
-        let rslt, data, prodImages, productId;
+        let rslt, data, prodImages, productId, numfields;
         const mapItems = MapItems;
 
         // Attach inline objects
         let product = row['product'];
+
+        numfields = Helper.GetAllNumberFields(product);
+        if (numfields.length > 0) Helper.UpdateNumberFields(product, numfields);
+
         let inlineObjs = childCollections.filter(x => !x.child);
         inlineObjs.forEach(x => {
             let vObj = {};
             let obj = row[x.name];
+
+            numfields = Helper.GetAllNumberFields(obj);
+            if (numfields.length > 0) Helper.UpdateNumberFields(obj, numfields);
+
             const tmp = Object.values(obj);
             tmp.filter((x) => x.value).map((x) => {
                 if (x.type === 'dropdown') {
@@ -67,7 +75,12 @@ const Component = (props) => {
             // Add or Update the product and navigation entity if it is deos not exist
             let navItem = product.find(x => x.uicomponent === mapItems[i].uicomponent);
             if (!Helper.IsJSONEmpty(navItem) && Helper.IsNullValue(navItem.value)) {
-                rslt = await mapItems[i].func(row[navItem.uicomponent], dropDownOptions);
+
+                let childItem = row[navItem.uicomponent];
+                numfields = Helper.GetAllNumberFields(childItem);
+                if (numfields.length > 0) Helper.UpdateNumberFields(childItem, numfields);
+
+                rslt = await mapItems[i].func(childItem, dropDownOptions);
                 if (rslt.status) {
                     data = [
                         { key: "Product_id", value: parseInt(productId) },
@@ -162,7 +175,7 @@ const Component = (props) => {
             _rowMap[i] = tmpField;
 
         }
-        if ( _row[uicomponent] ) _row[uicomponent] = _rowMap;
+        if (_row[uicomponent]) _row[uicomponent] = _rowMap;
         setRow(_row);
         setState(!state);
     };

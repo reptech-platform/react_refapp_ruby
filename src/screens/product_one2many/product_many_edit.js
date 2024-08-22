@@ -63,7 +63,7 @@ const Component = (props) => {
     }
 
     const OnSubmit = async () => {
-        let rslt, data, prodImages, productId, changes;
+        let rslt, data, prodImages, productId, changes, numfields;
         const mapItems = MapItems;
 
         // Attach inline objects
@@ -74,6 +74,10 @@ const Component = (props) => {
         inlineObjs.forEach(x => {
             let vObj = {};
             let obj = row[x.name];
+
+            numfields = Helper.GetAllNumberFields(obj);
+            if (numfields.length > 0) Helper.UpdateNumberFields(obj, numfields);
+
             const tmp = Object.values(obj);
             tmp.filter((x) => x.value).map((x) => {
                 if (x.type === 'dropdown') {
@@ -123,6 +127,10 @@ const Component = (props) => {
         // Add Or Update Product
         changes = TrackChanges('product');
         if (changes.length > 0) {
+
+            numfields = Helper.GetAllNumberFields(product);
+            if (numfields.length > 0) Helper.UpdateNumberFields(product, numfields);
+
             rslt = await Support.AddOrUpdateProduct(product, dropDownOptions, ['MainImage', 'OtherImages']);
             if (rslt.status) {
                 productId = rslt.id;
@@ -154,7 +162,12 @@ const Component = (props) => {
                 // Add or Update the product and navigation entity if it is deos not exist
                 let navItem = product.find(x => x.uicomponent === mapItems[i].uicomponent);
                 if (!Helper.IsJSONEmpty(navItem)) {
-                    rslt = await mapItems[i].func(row[navItem.uicomponent], dropDownOptions);
+
+                    let childItem = row[navItem.uicomponent];
+                    numfields = Helper.GetAllNumberFields(childItem);
+                    if (numfields.length > 0) Helper.UpdateNumberFields(childItem, numfields);
+
+                    rslt = await mapItems[i].func(childItem, dropDownOptions);
                     if (rslt.status) {
                         data = [
                             { key: "Product_id", value: parseInt(productId) },
@@ -272,7 +285,7 @@ const Component = (props) => {
 
         }
 
-        if ( _row[uicomponent] ) _row[uicomponent] = _rowMap;
+        if (_row[uicomponent]) _row[uicomponent] = _rowMap;
 
         setRow(_row);
         setState(!state);

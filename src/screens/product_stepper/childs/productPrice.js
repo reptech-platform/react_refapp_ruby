@@ -1,6 +1,7 @@
 import React from 'react';
 import RenderFormContols from "./formcontrols";
 import Support from "shared/support";
+import Helper from "shared/helper";
 
 const Component = React.forwardRef((props, ref) => {
 
@@ -19,8 +20,12 @@ const Component = React.forwardRef((props, ref) => {
 
             productId = props.row['product'].find((x) => x.key === 'Product_id').value || 0;
 
+            let childItem = props.row['productprice'];
+            let numfields = Helper.GetAllNumberFields(childItem);
+            if (numfields.length > 0) Helper.UpdateNumberFields(childItem, numfields);
+
             // Add Or Update Product Price
-            rslt = await Support.AddOrUpdatePrice(props.row['productprice']);
+            rslt = await Support.AddOrUpdatePrice(childItem);
             if (rslt.status) {
                 data = [
                     { key: "Product_id", value: parseInt(productId) },
