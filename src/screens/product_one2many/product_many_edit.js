@@ -95,10 +95,12 @@ const Component = (props) => {
         let updateChild = [];
         inlineObjs = childCollections.filter(x => x.child) || [];
         inlineObjs.forEach(x => {
+            let _org = row[x.name];
             let _obj = row[x.name].find(z => z.type === 'keyid');
             let _values = _obj?.values;
             let _keyId = _obj?.key;
             let filterRowItems = Helper.CloneObject(_values).filter(x => ['add', 'edit', 'delete'].indexOf(x.action) > -1);
+            let valueList = [];
             filterRowItems.forEach(m => {
                 delete m['id'];
                 switch (m['action']) {
@@ -113,9 +115,35 @@ const Component = (props) => {
                 }
                 delete m['id'];
                 delete m['action'];
-            });
 
-            filterRowItems.forEach(m => updateChild.push(m));
+                let oValues = Object.keys(m);
+                let newFldList = [];
+                oValues.forEach(z => {
+                    let fld = _org.find(k => k.key === z);
+                    if (fld) {
+                        fld.value = m[z];
+                        if (fld.type === 'dropdown') {
+                            fld.value = dropDownOptions.find((z) => z.Name === fld.source).Values.find((k) => k[fld.nameId] === fld.value)[fld.valueId];
+                            if (fld.enum) {
+                                fld.value = fld.value?.toString();
+                            }
+                        }
+                        newFldList.push(fld);
+                    }
+                });
+
+                numfields = Helper.GetAllNumberFields(newFldList);
+                if (numfields.length > 0) Helper.UpdateNumberFields(newFldList, numfields);
+
+                let tmp2 = {};
+
+                newFldList.forEach(j => {
+                    tmp2 = { ...tmp2, [j.key]: j.value };
+                });
+
+                updateChild.push(tmp2);
+
+            });
 
         });
 

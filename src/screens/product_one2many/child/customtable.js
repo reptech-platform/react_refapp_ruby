@@ -33,6 +33,11 @@ const Component = (props) => {
             return { headerName: z.label, field: z.key, flex: 1, flexGrow: 1, flexShrink: 1 };
         });
 
+        let tmp = {};
+        controls.forEach(x => {
+            if (x.type !== 'keyid') tmp = { ...tmp, [x.key]: x.value };
+        })
+        setNewItem(tmp);
         const _keyItem = controls.find(x => x.type === 'keyid');
         setKeyIdName(_keyItem.key);
         setColumns(_columns);
@@ -43,11 +48,23 @@ const Component = (props) => {
     const OnPageClicked = (e) => { setPageInfo({ page: 0, pageSize: 5 }); if (e) setPageInfo(e); }
     const OnSortClicked = (e) => { setSortBy(e); }
     const OnSearchChanged = (e) => { setSearchStr(e); }
-    const OnInputChange = (e) => { setNewItem((prev) => ({ ...prev, [e.name]: e.value })); }
+    const OnInputChange = (e) => {
+
+        if (e.value !== "CNONE") {
+
+            let tmp = controls.find(x => x.key === e.name);
+
+            if (tmp.type === 'dropdown') {
+                e.value = options.find((z) => z.Name === tmp.source).Values.find((m) => parseInt(m[tmp.valueId]) === parseInt(e.value))[tmp.nameId];
+            }
+
+            setNewItem((prev) => ({ ...prev, [e.name]: e.value }));
+        }
+    }
 
     const OnActionClicked = (id, type) => {
-        ClearSettings();
         if (type === 'edit' || type === 'view' || type === 'delete') {
+            ClearSettings();
             const selectedRow = rows.find((x) => x[keyIdName] === id);
             let tmpInfo = Helper.CloneObject(configInfo);
             tmpInfo.forEach(x => x.value = selectedRow[x.key]);
@@ -73,7 +90,7 @@ const Component = (props) => {
     const ClearSettings = () => {
         setConfigInfo(Helper.CloneObject(configBackInfo));
         setActions({ id: 0, action: null });
-        setNewItem(null);
+        //setNewItem(null);
     }
 
     const OnCloseClicked = (e) => {

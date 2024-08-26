@@ -47,8 +47,6 @@ const Component = (props) => {
             tmp.filter((x) => x.value).map((x) => {
                 if (x.type === 'dropdown') {
                     vObj[x.key] = dropDownOptions.find((z) => z.Name === x.source).Values.find((m) => parseInt(m[x.valueId]) === parseInt(x.value))[x.valueId];
-                } else if (numberItems.indexOf(x.key) > -1) {
-                    if (x.value) vObj[x.key] = parseFloat(x.value);
                 } else {
                     vObj[x.key] = x.value;
                 }
@@ -58,11 +56,40 @@ const Component = (props) => {
 
         inlineObjs = childCollections.filter(x => x.child);
         inlineObjs.forEach(x => {
-            let _values = row[x.name].find(z => z.type === 'keyid')?.values;
+            let obj = row[x.name];
+            let _values = obj.find(z => z.type === 'keyid')?.values;
+            let valueList = [];
             _values.forEach(m => {
                 ['action', 'CompId', 'id'].forEach(z => delete m[z]);
+                let oValues = Object.keys(m);
+                let newFldList = [];
+                oValues.forEach(z => {
+                    let fld = obj.find(k => k.key === z);
+                    fld.value = m[z];
+                    if (fld.type === 'dropdown') {
+                        fld.value = dropDownOptions.find((zz) => zz.Name === fld.source).Values.find((kk) => kk[fld.nameId] === fld.value)[fld.valueId];
+                        if (fld.enum) {
+                            fld.value = fld.value?.toString();
+                        }
+                    }
+
+                    newFldList.push(fld);
+                });
+
+                numfields = Helper.GetAllNumberFields(newFldList);
+                if (numfields.length > 0) Helper.UpdateNumberFields(newFldList, numfields);
+
+                let tmp2 = {};
+
+                newFldList.forEach(j => {
+                    tmp2 = { ...tmp2, [j.key]: j.value };
+                });
+
+                valueList.push(tmp2);
+
             });
-            product.push({ key: x.property, value: _values, type: "collections" });
+
+            product.push({ key: x.property, value: valueList, type: "collections" });
         });
 
         // Add Or Update Product
