@@ -114,4 +114,40 @@ fn.IsDateEqual = (date1, date2) => {
     return dDate1 === dDate2;
 }
 
+fn.UpdateNumberFields = (items, numFields) => {
+    for (var key in items) {
+        if (Object.prototype.hasOwnProperty.call(items, key)) {
+            let field = items[key];
+            if (numFields.indexOf(field.key) > -1 && !fn.IsNullValue(field.value)) {
+                let count = 0;
+                count = field.validators.filter(x => ['isFloat'].indexOf(x) > -1).length;
+                if (count > 0) {
+                    items[key].value = parseFloat(items[key].value);
+                }
+                count = field.validators.filter(x => ['isNumber'].indexOf(x) > -1).length;
+                if (count > 0) {
+                    items[key].value = parseInt(items[key].value);
+                }
+            }
+        }
+    }
+};
+
+fn.GetAllNumberFields = (obj) => {
+
+    let numFields = [];
+
+    obj.forEach(e => {
+        if (e.validators && e.type !== 'dropdown') {
+            let count = e.validators.filter(x => ['isFloat', 'isNumber'].indexOf(x) > -1);
+            if (count.length > 0) {
+                numFields.push(e.key);
+            }
+        }
+    });
+
+    return numFields;
+
+}
+
 export default fn;

@@ -67,7 +67,7 @@ const Component = (props) => {
     }
 
     const OnSubmit = async () => {
-        let rslt, data, changes = [], productId, product;
+        let rslt, data, changes = [], productId, product, numfields;
 
         product = row['product'];
         productId = row['product'].find((x) => x.type === 'keyid').value;
@@ -82,6 +82,8 @@ const Component = (props) => {
                 let tmp = changes.filter((x) => mapItem.exclude.indexOf(x) === -1);
                 if (tmp.length > 0) {
                     let newObject = row[mapItem.uicomponent];
+                    numfields = Helper.GetAllNumberFields(newObject);
+                    if (numfields.length > 0) Helper.UpdateNumberFields(newObject, numfields);
                     rslt = await mapItem.func(newObject, dropDownOptions, mapItem.exclude);
                     if (rslt.status) {
                         newObject.find((x) => x.type === 'keyid').value = rslt.id;
@@ -214,7 +216,7 @@ const Component = (props) => {
             _rowMap[i] = tmpField;
 
         }
-        if ( _row[mapitem] ) _row[mapitem] = _rowMap;
+        if (_row[mapitem]) _row[mapitem] = _rowMap;
         setRow(_row);
         setState(!state);
     };

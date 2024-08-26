@@ -378,6 +378,7 @@
             "contentId": "Name",
             "source": "OnBoardingStatus",
             "editable": true,
+            "enum": true,
             "validators": [
                 "required",
                 "isNumber"

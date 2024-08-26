@@ -63,7 +63,7 @@ const Component = (props) => {
     }
 
     const OnSubmit = async () => {
-        let rslt, data, prodImages, productId, changes;
+        let rslt, data, prodImages, productId, changes, numfields;
         const mapItems = MapItems;
 
         // Attach inline objects
@@ -74,6 +74,10 @@ const Component = (props) => {
         inlineObjs.forEach(x => {
             let vObj = {};
             let obj = row[x.name];
+
+            numfields = Helper.GetAllNumberFields(obj);
+            if (numfields.length > 0) Helper.UpdateNumberFields(obj, numfields);
+
             const tmp = Object.values(obj);
             tmp.filter((x) => x.value).map((x) => {
                 if (x.type === 'dropdown') {
@@ -91,10 +95,12 @@ const Component = (props) => {
         let updateChild = [];
         inlineObjs = childCollections.filter(x => x.child) || [];
         inlineObjs.forEach(x => {
+            let _org = row[x.name];
             let _obj = row[x.name].find(z => z.type === 'keyid');
             let _values = _obj?.values;
             let _keyId = _obj?.key;
             let filterRowItems = Helper.CloneObject(_values).filter(x => ['add', 'edit', 'delete'].indexOf(x.action) > -1);
+            let valueList = [];
             filterRowItems.forEach(m => {
                 delete m['id'];
                 switch (m['action']) {
@@ -109,9 +115,35 @@ const Component = (props) => {
                 }
                 delete m['id'];
                 delete m['action'];
-            });
 
-            filterRowItems.forEach(m => updateChild.push(m));
+                let oValues = Object.keys(m);
+                let newFldList = [];
+                oValues.forEach(z => {
+                    let fld = _org.find(k => k.key === z);
+                    if (fld) {
+                        fld.value = m[z];
+                        if (fld.type === 'dropdown') {
+                            fld.value = dropDownOptions.find((z) => z.Name === fld.source).Values.find((k) => k[fld.nameId] === fld.value)[fld.valueId];
+                            if (fld.enum) {
+                                fld.value = fld.value?.toString();
+                            }
+                        }
+                        newFldList.push(fld);
+                    }
+                });
+
+                numfields = Helper.GetAllNumberFields(newFldList);
+                if (numfields.length > 0) Helper.UpdateNumberFields(newFldList, numfields);
+
+                let tmp2 = {};
+
+                newFldList.forEach(j => {
+                    tmp2 = { ...tmp2, [j.key]: j.value };
+                });
+
+                updateChild.push(tmp2);
+
+            });
 
         });
 
@@ -123,6 +155,10 @@ const Component = (props) => {
         // Add Or Update Product
         changes = TrackChanges('product');
         if (changes.length > 0) {
+
+            numfields = Helper.GetAllNumberFields(product);
+            if (numfields.length > 0) Helper.UpdateNumberFields(product, numfields);
+
             rslt = await Support.AddOrUpdateProduct(product, dropDownOptions, ['MainImage', 'OtherImages']);
             if (rslt.status) {
                 productId = rslt.id;
@@ -154,7 +190,12 @@ const Component = (props) => {
                 // Add or Update the product and navigation entity if it is deos not exist
                 let navItem = product.find(x => x.uicomponent === mapItems[i].uicomponent);
                 if (!Helper.IsJSONEmpty(navItem)) {
-                    rslt = await mapItems[i].func(row[navItem.uicomponent], dropDownOptions);
+
+                    let childItem = row[navItem.uicomponent];
+                    numfields = Helper.GetAllNumberFields(childItem);
+                    if (numfields.length > 0) Helper.UpdateNumberFields(childItem, numfields);
+
+                    rslt = await mapItems[i].func(childItem, dropDownOptions);
                     if (rslt.status) {
                         data = [
                             { key: "Product_id", value: parseInt(productId) },
@@ -272,7 +313,7 @@ const Component = (props) => {
 
         }
 
-        if ( _row[uicomponent] ) _row[uicomponent] = _rowMap;
+        if (_row[uicomponent]) _row[uicomponent] = _rowMap;
 
         setRow(_row);
         setState(!state);
