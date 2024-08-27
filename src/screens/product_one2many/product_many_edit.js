@@ -80,7 +80,7 @@ const Component = (props) => {
 
             const tmp = Object.values(obj);
             tmp.filter((x) => x.value).map((x) => {
-                if (x.type === 'dropdown') {
+                if (x.type === 'dropdown' && !Helper.IsNullValue(x.value)) {
                     vObj[x.key] = dropDownOptions.find((z) => z.Name === x.source).Values.find((m) => parseInt(m[x.valueId]) === parseInt(x.value))[x.valueId];
                 } else if (numberItems.indexOf(x.key) > -1) {
                     if (x.value) vObj[x.key] = parseFloat(x.value);
@@ -122,7 +122,7 @@ const Component = (props) => {
                     let fld = _org.find(k => k.key === z);
                     if (fld) {
                         fld.value = m[z];
-                        if (fld.type === 'dropdown') {
+                        if (fld.type === 'dropdown' && !Helper.IsNullValue(fld.value)) {
                             fld.value = dropDownOptions.find((z) => z.Name === fld.source).Values.find((k) => k[fld.nameId] === fld.value)[fld.valueId];
                             if (fld.enum) {
                                 fld.value = fld.value?.toString();
