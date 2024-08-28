@@ -76,30 +76,32 @@ const Component = (props) => {
             // Check is there any changes
             const mapItem = MapItems[i];
 
-            changes = TrackChanges(mapItem.uicomponent);
-            if (changes.length > 0) {
-                // Check any excluded items are configured
-                let tmp = changes.filter((x) => mapItem.exclude.indexOf(x) === -1);
-                if (tmp.length > 0) {
-                    let newObject = row[mapItem.uicomponent];
-                    numfields = Helper.GetAllNumberFields(newObject);
-                    if (numfields.length > 0) Helper.UpdateNumberFields(newObject, numfields);
-                    rslt = await mapItem.func(newObject, dropDownOptions, mapItem.exclude);
-                    if (rslt.status) {
-                        newObject.find((x) => x.type === 'keyid').value = rslt.id;
-                        if (Helper.IsNullValue(mapItem.navpropname)) productId = rslt.id;
+            if (!Helper.IsJSONEmpty(mapItem.navpropname)) {
+                changes = TrackChanges(mapItem.uicomponent);
+                if (changes.length > 0) {
+                    // Check any excluded items are configured
+                    let tmp = changes.filter((x) => mapItem.exclude.indexOf(x) === -1);
+                    if (tmp.length > 0) {
+                        let newObject = row[mapItem.uicomponent];
+                        numfields = Helper.GetAllNumberFields(newObject);
+                        if (numfields.length > 0) Helper.UpdateNumberFields(newObject, numfields);
+                        rslt = await mapItem.func(newObject, dropDownOptions, mapItem.exclude);
+                        if (rslt.status) {
+                            newObject.find((x) => x.type === 'keyid').value = rslt.id;
+                            if (Helper.IsNullValue(mapItem.navpropname)) productId = rslt.id;
 
-                        const mapPropKey = product.find(x => x.uicomponent === mapItem.uicomponent).key;
-                        data = [
-                            { key: "Product_id", value: parseInt(productId) },
-                            { key: mapPropKey, value: parseInt(rslt.id) }
-                        ];
-                        rslt = await Support.AddOrUpdateProduct(data, dropDownOptions);
-                        if (!rslt.status) return;
+                            const mapPropKey = product.find(x => x.uicomponent === mapItem.uicomponent).key;
+                            data = [
+                                { key: "Product_id", value: parseInt(productId) },
+                                { key: mapPropKey, value: parseInt(rslt.id) }
+                            ];
+                            rslt = await Support.AddOrUpdateProduct(data, dropDownOptions);
+                            if (!rslt.status) return;
 
-                        // Update Back for next tracking purpose
-                        UpdateBackUp(mapItem.target);
-                    } else { return; }
+                            // Update Back for next tracking purpose
+                            UpdateBackUp(mapItem.target);
+                        } else { return; }
+                    }
                 }
             }
 
@@ -180,7 +182,7 @@ const Component = (props) => {
             _row[location][_index].value = value;
             setRow(_row);
             setShowUpdate(true);
-            if (!Helper.IsNullValue(item['mapitem'])) {
+            if (!Helper.IsNullValue(item['uicomponent'])) {
                 UpdateMappingPannel(_row, item, tValue);
             }
         }
@@ -188,10 +190,10 @@ const Component = (props) => {
 
     const UpdateMappingPannel = (_row, item, value) => {
 
-        const { mapitem, source, valueId } = item;
+        const { uicomponent, source, valueId } = item;
         const { Values } = dropDownOptions.find(x => x.Name === source);
         const obj = value ? Values.find(x => x[valueId] === value) : null;
-        let _rowMap = _row[mapitem] || [];
+        let _rowMap = _row[uicomponent] || [];
 
         for (let i = 0; i < _rowMap.length; i++) {
 
@@ -216,7 +218,7 @@ const Component = (props) => {
             _rowMap[i] = tmpField;
 
         }
-        if (_row[mapitem]) _row[mapitem] = _rowMap;
+        if (_row[uicomponent]) _row[uicomponent] = _rowMap;
         setRow(_row);
         setState(!state);
     };
