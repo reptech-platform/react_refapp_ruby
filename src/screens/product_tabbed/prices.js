@@ -37,7 +37,7 @@ const Component = (props) => {
 
         let _rows = [];
 
-        global.Busy(true);
+        window.Busy(true);
         await Api.GetProductOnBoardings().then(async (res) => {
             if (res.status) {
                 let _values = res.values || [];
@@ -91,14 +91,14 @@ const Component = (props) => {
 
                 setRows(_rows);
                 setRowsCount(_rows.length);
-                global.Busy(false);
+                window.Busy(false);
             } else {
-                global.Busy(false);
+                window.Busy(false);
                 console.log(res.statusText);
             }
         }).catch((err) => {
             console.log(err);
-            global.Busy(false);
+            window.Busy(false);
         });
 
     }

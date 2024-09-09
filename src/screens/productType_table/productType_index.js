@@ -40,7 +40,7 @@ const Component = (props) => {
         setRows([]);
         setRowsCount(0);
 
-        global.Busy(true);
+        window.Busy(true);
 
         if (!Helper.IsNullValue(searchStr)) {
             filters.push(`$filter=contains(ProductTypeDesc, '${searchStr}')`);
@@ -86,7 +86,7 @@ const Component = (props) => {
             });
 
         setRows(_rows);
-        global.Busy(false);
+        window.Busy(false);
     }
 
     const OnPageClicked = (e) => { setPageInfo({ page: 0, pageSize: 5 }); if (e) setPageInfo(e); }
@@ -135,7 +135,7 @@ const Component = (props) => {
     const DoAction = async (params) => {
         return new Promise(async (resolve) => {
             const { success, failed } = httpMethodResponse[params.httpMethod];
-            global.Busy(true);
+            window.Busy(true);
             let data = { ...params, Deleted: params.httpMethod === 'DELETE' };
             delete data["httpMethod"];
 
@@ -144,11 +144,11 @@ const Component = (props) => {
 
             const { status } = await Support.AddOrUpdateProductType(data);
             if (status) {
-                global.AlertPopup("success", `Record is ${success} successful!`);
+                window.AlertPopup("success", `Record is ${success} successful!`);
             } else {
-                global.AlertPopup("error", `Something went wroing while ${failed} record!`);
+                window.AlertPopup("error", `Something went wroing while ${failed} record!`);
             }
-            global.Busy(false);
+            window.Busy(false);
             return resolve(status);
         });
     }

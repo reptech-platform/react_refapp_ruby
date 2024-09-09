@@ -161,7 +161,7 @@ const Component = (props) => {
             UpdateBackUp('product');
         }
 
-        global.AlertPopup("success", "Product is updated successfully!");
+        window.AlertPopup("success", "Product is updated successfully!");
         setShowUpdate(false);
         NavigateTo("/products");
     }

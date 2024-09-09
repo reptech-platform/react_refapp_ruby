@@ -39,9 +39,9 @@ const Component = (props) => {
 
     const FetchUserResults = async () => {
         //setRows([]);
-        global.Busy(true);
+        window.Busy(true);
         let rslt = await Api.GetUsers();
-        global.Busy(false);
+        window.Busy(false);
         if (rslt.status) {
             let usersList = rslt.values || [];
             usersList.forEach(x => x.id = x.UserId);
@@ -66,9 +66,9 @@ const Component = (props) => {
 
     const FetchChildResults = async () => {
         //setRows([]);
-        global.Busy(true);
+        window.Busy(true);
         let rslt = await Api.GetChilds();
-        global.Busy(false);
+        window.Busy(false);
 
         if (rslt.status) {
             let childsList = rslt.values || [];

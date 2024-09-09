@@ -44,7 +44,7 @@ const Component = (props) => {
         setDeletedId(0);
         setShowConfirm(false);
 
-        global.Busy(true);
+        window.Busy(true);
 
         if (!Helper.IsNullValue(searchStr)) {
             filters.push(`$filter=contains(Product_description, '${searchStr}') or contains(Name, '${searchStr}')`);
@@ -94,7 +94,7 @@ const Component = (props) => {
             });
 
         setRows(_rows);
-        global.Busy(false);
+        window.Busy(false);
         return _rows;
     }
 
@@ -120,10 +120,10 @@ const Component = (props) => {
             const rslt = await Api.SetProduct({ Product_id: deletedId, Deleted: true });
             if (rslt.status) {
                 setInitialize(true);
-                global.AlertPopup("success", "Record is deleted successful.!");
+                window.AlertPopup("success", "Record is deleted successful.!");
             } else {
                 const msg = rslt.statusText || defaultError;
-                global.AlertPopup("error", msg);
+                window.AlertPopup("error", msg);
             }
         } else {
             setDeletedId(0);

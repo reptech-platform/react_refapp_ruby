@@ -46,7 +46,7 @@ const Component = React.forwardRef((props, ref) => {
 
         await AddOrUpdatePrice().then((status) => {
             if (status) {
-                global.AlertPopup("success", "Produce price is updated successfully!");
+                window.AlertPopup("success", "Produce price is updated successfully!");
                 setIsSubmitted(true);
             }
         });

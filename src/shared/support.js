@@ -20,15 +20,15 @@ fn.AddOrUpdateProductType = async (input, excludesItems) => {
             }
         });
 
-        global.Busy(true);
+        window.Busy(true);
         let rslt = await SetProductTypes(data);
-        global.Busy(false);
+        window.Busy(false);
         if (rslt.status) {
             id = rslt.id;
             status = true;
         } else {
             const msg = rslt.statusText || defaultError;
-            global.AlertPopup("error", msg);
+            window.AlertPopup("error", msg);
         }
 
         return resolve({ status, id });
@@ -47,15 +47,15 @@ fn.AddOrUpdateProductVendor = async (input, excludesItems) => {
             }
         });
 
-        global.Busy(true);
+        window.Busy(true);
         let rslt = await SetProductVendor(data);
-        global.Busy(false);
+        window.Busy(false);
         if (rslt.status) {
             id = rslt.id;
             status = true;
         } else {
             const msg = rslt.statusText || defaultError;
-            global.AlertPopup("error", msg);
+            window.AlertPopup("error", msg);
         }
 
         return resolve({ status, id });
@@ -78,15 +78,15 @@ fn.AddOrUpdateProduct = async (input, enums, excludesItems) => {
             }
         });
 
-        global.Busy(true);
+        window.Busy(true);
         let rslt = await SetProduct(data);
-        global.Busy(false);
+        window.Busy(false);
         if (rslt.status) {
             id = rslt.id;
             status = true;
         } else {
             const msg = rslt.statusText || defaultError;
-            global.AlertPopup("error", msg);
+            window.AlertPopup("error", msg);
         }
 
         return resolve({ status, id });
@@ -105,15 +105,15 @@ fn.AddOrUpdatePrice = async (input, excludesItems) => {
             }
         });
 
-        global.Busy(true);
+        window.Busy(true);
         let rslt = await SetProductPrice(data);
-        global.Busy(false);
+        window.Busy(false);
         if (rslt.status) {
             id = rslt.id;
             status = true;
         } else {
             const msg = rslt.statusText || defaultError;
-            global.AlertPopup("error", msg);
+            window.AlertPopup("error", msg);
         }
 
         return resolve({ status, id });
@@ -138,15 +138,15 @@ fn.AddOrUpdateOtherDetails = async (input, enums, excludesItems) => {
                 }
             });
 
-        global.Busy(true);
+        window.Busy(true);
         let rslt = await SetOtherDetails(data);
-        global.Busy(false);
+        window.Busy(false);
         if (rslt.status) {
             id = rslt.id;
             status = true;
         } else {
             const msg = rslt.statusText || defaultError;
-            global.AlertPopup("error", msg);
+            window.AlertPopup("error", msg);
         }
 
         return resolve({ status, id });
@@ -157,16 +157,16 @@ fn.AddOrUpdateDocument = async (input) => {
     return new Promise(async (resolve) => {
         let status = false, id = null;
         const { DocName, DocType, DocData, DocExt, DocId } = input.value;
-        global.Busy(true);
+        window.Busy(true);
         let rslt = await SetDocument(DocData, { DocType, DocExt, DocName, DocId: DocId });
-        global.Busy(false);
+        window.Busy(false);
         if (rslt.status) {
             id = rslt.id;
             status = true;
         } else {
             const msg = rslt.statusText || defaultError;
             if (msg.indexOf('ERROR: update or delete on table') === -1) {
-                global.AlertPopup("error", msg);
+                window.AlertPopup("error", msg);
             }
         }
 
@@ -177,7 +177,7 @@ fn.AddOrUpdateDocument = async (input) => {
 fn.AddOrUpdateProductOtherImages = async (input, excludesItems) => {
     return new Promise(async (resolve) => {
         let data = {}, status = false, id = null;
-        global.Busy(true);
+        window.Busy(true);
         let excludes = excludesItems || [];
 
         const tmp = Object.values(input);
@@ -188,13 +188,13 @@ fn.AddOrUpdateProductOtherImages = async (input, excludesItems) => {
         });
 
         let rslt = await SetProductOtherImages(data);
-        global.Busy(false);
+        window.Busy(false);
         if (rslt.status) {
             id = rslt.id;
             status = true;
         } else {
             const msg = rslt.statusText || defaultError;
-            global.AlertPopup("error", msg);
+            window.AlertPopup("error", msg);
         }
 
         return resolve({ status, id });
@@ -204,15 +204,15 @@ fn.AddOrUpdateProductOtherImages = async (input, excludesItems) => {
 fn.AddOrUpdateProductComponent = async (compProductMapId, ProductId, input) => {
     return new Promise(async (resolve) => {
         let data = {}, status = false, rslt, id = null;
-        global.Busy(true);
+        window.Busy(true);
 
         if (input.Deleted) {
             data = { Id: compProductMapId, Deleted: input.Deleted };
             rslt = await SetProductPComponents(data);
             if (!rslt.status) {
-                global.Busy(false);
+                window.Busy(false);
                 const msg = rslt.statusText || defaultError;
-                global.AlertPopup("error", msg);
+                window.AlertPopup("error", msg);
                 return resolve({ status, CompId: input.CompId });
             }
 
@@ -220,9 +220,9 @@ fn.AddOrUpdateProductComponent = async (compProductMapId, ProductId, input) => {
 
             rslt = await SetPComponent(data);
             if (!rslt.status) {
-                global.Busy(false);
+                window.Busy(false);
                 const msg = rslt.statusText || defaultError;
-                global.AlertPopup("error", msg);
+                window.AlertPopup("error", msg);
                 return resolve({ status, CompId: input.CompId });
             }
 
@@ -241,18 +241,18 @@ fn.AddOrUpdateProductComponent = async (compProductMapId, ProductId, input) => {
                 data = { Id: compProductMapId, CompId: id, ProductId };
                 rslt = await SetProductPComponents(data);
                 if (!rslt.status) {
-                    global.Busy(false);
+                    window.Busy(false);
                     const msg = rslt.statusText || defaultError;
-                    global.AlertPopup("error", msg);
+                    window.AlertPopup("error", msg);
                     return resolve({ status, id });
                 }
             }
         } else {
-            global.Busy(false);
+            window.Busy(false);
             const msg = rslt.statusText || defaultError;
-            global.AlertPopup("error", msg);
+            window.AlertPopup("error", msg);
         }
-        global.Busy(false);
+        window.Busy(false);
 
         return resolve({ status, id });
     });
@@ -261,7 +261,7 @@ fn.AddOrUpdateProductComponent = async (compProductMapId, ProductId, input) => {
 fn.DeleteOrder = async (OrderId) => {
     return new Promise(async (resolve) => {
         let status = false, rslt, id = null;
-        global.Busy(true);
+        window.Busy(true);
 
         rslt = await GetMapOrderItems(OrderId);
         if (rslt.status) {
@@ -276,13 +276,13 @@ fn.DeleteOrder = async (OrderId) => {
 
         rslt = await SetOrders({ OrderId: OrderId, Deleted: true });
         if (!rslt.status) {
-            global.Busy(false);
+            window.Busy(false);
             const msg = rslt.statusText || defaultError;
-            global.AlertPopup("error", msg);
+            window.AlertPopup("error", msg);
         } else {
             status = true;
         }
-        global.Busy(false);
+        window.Busy(false);
 
         return resolve({ status });
     });

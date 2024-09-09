@@ -108,7 +108,7 @@ const Component = (props) => {
 
         let order = row['order'];
         if (Helper.IsNullValue(rowItems) || rowItems.length === 0) {
-            global.AlertPopup("error", "Atleast add one order item!");
+            window.AlertPopup("error", "Atleast add one order item!");
             return;
         }
 
@@ -136,15 +136,15 @@ const Component = (props) => {
         data.Items = orderitems;
         data.ShippingAddress = ExtractObject(row['shippingaddress'], dropDownOptions);
 
-        global.Busy(true);
+        window.Busy(true);
         let rslt = await SetOrders(data);
-        global.Busy(false);
+        window.Busy(false);
         if (rslt.status) {
-            global.AlertPopup("success", "Order is created successfully!");
+            window.AlertPopup("success", "Order is created successfully!");
             setInitialized(true);
         } else {
             const msg = rslt.statusText || defaultError;
-            global.AlertPopup("error", msg);
+            window.AlertPopup("error", msg);
         }
     }
 

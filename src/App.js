@@ -10,12 +10,12 @@ import "./App.css";
 
 const defaultToken = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJzYWluaWtoaWxhMTk5OUBnbWFpbC5jb20iLCJleHAiOjE3MjMwNzY1OTQsImlhdCI6MTcyMTI3NjU5NCwiZW1haWwiOiJzYWluaWtoaWxhMTk5OUBnbWFpbC5jb20ifQ.uUPOMMSrMOTNHnIPcEThLLsOkl6oPKhF8Rl4z9IKNgW_iuaWuh9SUjPWgoTh02LffOPy9mrir-46fITZY2RuZw";
 
-global.Busy = (bBool) => {
+window.Busy = (bBool) => {
   var x = document.getElementById("busyloader");
   if (x) x.className = bBool ? "loader display-block" : "loader display-none";
 };
 
-global.AlertPopup = (type, msg) => {
+window.AlertPopup = (type, msg) => {
   sessionStorage.setItem('alert', JSON.stringify({ msg, type }));
 };
 

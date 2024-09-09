@@ -148,7 +148,7 @@ const Component = (props) => {
         });
 
         if (inlineObjs.length === 0) {
-            global.AlertPopup("error", "Atleaset one child item should exist!");
+            window.AlertPopup("error", "Atleaset one child item should exist!");
             return;
         }
 
@@ -177,7 +177,7 @@ const Component = (props) => {
         }
 
         if (!bAllStatus && updateChild.length > 0) {
-            global.AlertPopup("error", "Somthing went wrong to update!");
+            window.AlertPopup("error", "Somthing went wrong to update!");
             return;
         }
 
@@ -248,7 +248,7 @@ const Component = (props) => {
             }
         }
 
-        global.AlertPopup("success", "Product is created successfully!");
+        window.AlertPopup("success", "Product is created successfully!");
         setShowUpdate(false);
         NavigateTo("/productsmany");
     }

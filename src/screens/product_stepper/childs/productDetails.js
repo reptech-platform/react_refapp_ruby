@@ -42,7 +42,7 @@ const Component = React.forwardRef((props, ref) => {
         if (e) e.preventDefault();
         await AddOrUpdateDocument().then((status) => {
             if (status) {
-                global.AlertPopup("success", "Other Details are updated successfully!");
+                window.AlertPopup("success", "Other Details are updated successfully!");
                 setIsSubmitted(true);
             }
         })

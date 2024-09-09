@@ -40,7 +40,7 @@ const Component = React.forwardRef((props, ref) => {
             item[elm] = items;
         });
 
-        global.Busy(true);
+        window.Busy(true);
         // Get Product Details
         let rslt = await Api.GetProduct(productId, "$expand=MainImage,PType,SellingPrice,ODetails,OtherImages");
         if (rslt.status) {
@@ -135,12 +135,12 @@ const Component = React.forwardRef((props, ref) => {
         }
 
         setRow(item);
-        global.Busy(false);
+        window.Busy(false);
     }
 
     const FetchProductTypes = async () => {
         return new Promise(async (resolve) => {
-            global.Busy(true);
+            window.Busy(true);
             const productTypes = await Api.GetProductTypes();
             const { values } = productTypes || { values: [] };
             const pValues = values.map((x) => { return { Name: x.ProductTypeName, Value: x.PtId } });
@@ -148,7 +148,7 @@ const Component = React.forwardRef((props, ref) => {
             const enums = rlst.filter((x) => x.Type === 'Enum') || [];
             enums.push({ Name: "ProductTypes", Type: 'Enum', Values: pValues });
             setDropDownOptions(enums);
-            global.Busy(false);
+            window.Busy(false);
             return resolve(enums);
         });
     }

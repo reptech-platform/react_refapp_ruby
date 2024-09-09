@@ -59,7 +59,7 @@ const Component = (props) => {
 
     const FetchProductTypes = async () => {
         return new Promise(async (resolve) => {
-            global.Busy(true);
+            window.Busy(true);
             await Api.GetProductTypes()
                 .then(async (res) => {
                     if (res.status) {
@@ -68,12 +68,12 @@ const Component = (props) => {
                             .then(async (res2) => {
                                 const enums = res2.filter((x) => x.Type === 'Enum') || [];
                                 enums.push({ Name: "ProductTypes", Type: 'Enum', Values: pValues });
-                                global.Busy(false);
+                                window.Busy(false);
                                 return resolve(enums);
                             });
 
                     } else {
-                        global.Busy(false);
+                        window.Busy(false);
                         console.log(res.statusText);
                         return resolve([]);
                     }

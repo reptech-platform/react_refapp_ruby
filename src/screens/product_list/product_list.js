@@ -25,7 +25,7 @@ const Component = (props) => {
         setRows([]);
         setRowsCount(0);
 
-        global.Busy(true);
+        window.Busy(true);
 
         const navItems = Object.values(ProductJsonConfig);
         const source = navItems.find(x => x.target === 'keyId').source;
@@ -102,14 +102,14 @@ const Component = (props) => {
                         _rows.push(_row);
                     }
                     setRows(_rows);
-                    global.Busy(false);
+                    window.Busy(false);
                 } else {
                     console.log(res.statusText);
-                    global.Busy(false);
+                    window.Busy(false);
                 }
             }).catch((err) => {
                 console.log(err);
-                global.Busy(false);
+                window.Busy(false);
             });
 
     }

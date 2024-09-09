@@ -150,7 +150,7 @@ const Component = (props) => {
             }
         }
 
-        global.AlertPopup("success", "Product is created successfully!");
+        window.AlertPopup("success", "Product is created successfully!");
         setShowUpdate(false);
         NavigateTo("/products");
     }

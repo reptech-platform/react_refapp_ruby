@@ -47,7 +47,7 @@ const FetchProductDetails = async (productId, enums) => {
         });
 
         if (productId) {
-            global.Busy(true);
+            window.Busy(true);
             // Get Product Details
             const $expand = MapItems.map(x => x.expand).join(",");
             let rslt = await Api.GetProduct(productId, `$expand=${$expand}`);
@@ -137,7 +137,7 @@ const FetchProductDetails = async (productId, enums) => {
 
             backItem = Helper.CloneObject(bItem);
 
-            global.Busy(false);
+            window.Busy(false);
         }
 
         return resolve({ row: item, backRow: backItem });
@@ -147,7 +147,7 @@ const FetchProductDetails = async (productId, enums) => {
 const FetchDropdownItems = async (items) => {
     return new Promise(async (resolve) => {
 
-        global.Busy(true);
+        window.Busy(true);
 
         // Default get all enums list items
         let res = await GetMetaDataInfo();
@@ -165,7 +165,7 @@ const FetchDropdownItems = async (items) => {
             });
         }
 
-        global.Busy(false);
+        window.Busy(false);
         return resolve(enums);
     });
 };

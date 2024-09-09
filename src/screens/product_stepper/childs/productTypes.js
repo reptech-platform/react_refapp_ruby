@@ -35,7 +35,7 @@ const Component = React.forwardRef((props, ref) => {
 
         props.row['product'].find((x) => x.key === 'ProductPType').value = productTypeId;
 
-        global.AlertPopup("success", "Product type is created successfully!");
+        window.AlertPopup("success", "Product type is created successfully!");
         setIsSubmitted(true);
     }
 

@@ -55,7 +55,7 @@ const Component = React.forwardRef((props, ref) => {
             }
         }
 
-        global.AlertPopup("success", "Product is created successfully!");
+        window.AlertPopup("success", "Product is created successfully!");
         setIsSubmitted(true);
     }
 

@@ -49,7 +49,7 @@ const FetchProductDetails = async (productId, enums) => {
         });
 
         if (productId) {
-            global.Busy(true);
+            window.Busy(true);
 
             rslt = await Api.GetProductPComponents(productId);
             if (rslt.status) productPComponents = rslt.values;
@@ -189,7 +189,7 @@ const FetchProductDetails = async (productId, enums) => {
 
             backItem = Helper.CloneObject(bItem);
 
-            global.Busy(false);
+            window.Busy(false);
         }
 
         return resolve({ row: item, backRow: backItem, mapitems: productPComponents });
@@ -199,7 +199,7 @@ const FetchProductDetails = async (productId, enums) => {
 const FetchDropdownItems = async (items) => {
     return new Promise(async (resolve) => {
 
-        global.Busy(true);
+        window.Busy(true);
 
         // Default get all enums list items
         let res = await GetMetaDataInfo();
@@ -217,7 +217,7 @@ const FetchDropdownItems = async (items) => {
             });
         }
 
-        global.Busy(false);
+        window.Busy(false);
         return resolve(enums);
     });
 };
