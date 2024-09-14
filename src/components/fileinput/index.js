@@ -1,27 +1,73 @@
 import * as React from "react";
-import { Link } from "react-router-dom";
 import { TextValidator } from 'react-material-ui-form-validator';
-import { InputAdornment, IconButton, Typography, Table, TableBody, TableRow, TableCell, Tooltip } from '@mui/material';
-import { FindInPage, Add as AddIcon, Delete as DeleteIcon } from '@mui/icons-material';
+import { Box, InputAdornment, IconButton, Typography, Table, TableBody, TableRow, TableCell, Tooltip } from '@mui/material';
+import { FindInPage, Add as AddIcon, Delete as DeleteIcon, DownloadForOfflineOutlined as DownloadIcon } from '@mui/icons-material';
 import Helper from "shared/helper";
 import { Image } from "components";
 
-const Images = ["JPG", "JPEG", "PNG"];
+const ImagesTypes = ["JPG", "JPEG", "PNG"];
+
+const RenderDocument = (props) => {
+    const { name, mode, docType, docData, alt } = props;
+
+    const OnDownloadFile = (e) => {
+        e.preventDefault();
+        var link = document.createElement('a');
+        document.body.appendChild(link);
+        link.href = docData;
+        link.download = '';
+        link.click();
+    }
+
+    let _index = ImagesTypes.findIndex((x) => x.toUpperCase() === docType);
+
+    if (_index > -1) {
+        return (
+            <Image borderRadius="4px" sx={{ width: 300, border: '1px solid #ddd', p: 1, mt: 2 }} alt={alt || "Product Image"} src={docData} />
+        );
+    } else {
+        if (mode) {
+            return (
+                <Box display="flex" alignItems="center">
+                    <Typography component="div" sx={{ ml: 1 }}>
+                        {name}
+                    </Typography>
+
+                    <Tooltip title="Download">
+                        <IconButton
+                            variant="contained"
+                            size="small"
+                            edge="start"
+                            aria-label="download"
+                            onClick={OnDownloadFile}>
+                            <DownloadIcon />
+                        </IconButton>
+                    </Tooltip>
+                </Box>
+            );
+        } else {
+            return null;
+        }
+    }
+
+}
 
 const Component = (props) => {
 
-    const { mode, index, id, name, type, value, OnInputChange, addmore, onAddMoreClicked, count, onDeleteClicked,
-        style, sx, acceptTypes, validators, validationMessages, alt } = props;
+    const { mode, index, id, name, type, value, OnInputChange, addmore, onAddMoreClicked, count, onDeleteClicked, alt,
+        style, sx, acceptTypes, validators, validationMessages } = props;
 
     const [inputValue, setInputValue] = React.useState("");
 
     const [iDocId, setIDocId] = React.useState();
-    //const [iDocType, setIDocType] = React.useState();
+    const [iDocType, setIDocType] = React.useState();
     const [iDocData, setIDocData] = React.useState();
 
     const [error, setError] = React.useState(null);
 
     let fileRef = React.createRef();
+
+    console.log(index);
 
     const OnFileBrowseClicked = () => {
         setError(null);
@@ -42,6 +88,7 @@ const Component = (props) => {
                 let tmp = `Supported Format: ${acceptTypes.toUpperCase().replace(/\./g, "").replace(/\,/g, ", ")}`;
                 setError(tmp);
             } else {
+                setIDocType(_ext.toUpperCase());
                 ReadDocument(_file);
             }
         }
@@ -93,18 +140,15 @@ const Component = (props) => {
             tValue = value.DocName && value.DocExt && `${value.DocName}.${value.DocExt}`;
             setInputValue(tValue);
             setIDocId(value.DocId);
-            //setIDocType(value.DocExt);
+            setIDocType(value.DocExt);
             setIDocData(value.DocData);
         }
     }, [value]);
 
     return (
         <>
-            {mode && mode === 'view' ? (
-                <>
-                    <Typography>{inputValue}</Typography>
-                </>
-            ) : (
+
+            {Helper.IsNullValue(mode) && (
                 <>
                     <Table sx={{ display: 'table', width: '100%', p: 0, m: 0, border: 0, ...sx }}>
                         <TableBody>
@@ -186,13 +230,10 @@ const Component = (props) => {
                             </TableRow>
                         </TableBody>
                     </Table>
-
                 </>
             )}
-            {/* {mode && mode !== 'view' && inputValue && <Image sx={{ width: 200, height: 200, m: 2 }} alt={"Product Image"} src={inputValue} />} */}
-            {!Helper.IsNullValue(iDocData) &&
-                <Image borderRadius="4px" sx={{ width: 300, border: '1px solid #ddd', p: 1, mt: 2 }} alt={alt || "Product Image"} src={iDocData} />
-            }
+
+            {!Helper.IsNullValue(iDocData) && <RenderDocument alt={alt} name={inputValue} mode={mode} docType={iDocType} docData={iDocData} />}
 
         </>
     );
