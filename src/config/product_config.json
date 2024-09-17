@@ -225,7 +225,7 @@
             "label": "MainImage",
             "width": "30%",
             "type": "doc",
-            "accept": ".JPG,.JPEG,.PNG",
+            "accept": ".JPG,.JPEG,.PNG,.PDF,.TXT,.DOC,.DOCX,.XLS,.XLSX",
             "editable": true,
             "validators": [],
             "validationMessages": []
@@ -235,7 +235,7 @@
             "label": "OtherImages",
             "type": "doc",
             "width": "30%",
-            "accept": ".JPG,.JPEG,.PNG",
+            "accept": ".JPG,.JPEG,.PNG,.PDF,.TXT,.DOC,.DOCX,.XLS,.XLSX",
             "editable": true,
             "multiple": true,
             "validators": [],
