@@ -106,6 +106,9 @@ const Component = (props) => {
                     "& .MuiDataGrid-cell:focus-within, & .MuiDataGrid-cell:focus": {
                         outline: "none !important",
                     },
+                    "& .MuiDataGrid-columnHeaders": {
+                        backgroundColor: "#F9F9F9"
+                    },
                     ...sx
                 }}
             />
