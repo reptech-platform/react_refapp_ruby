@@ -179,10 +179,27 @@ const Component = (props) => {
                         </Grid>
                     </Stack>
                 </Box>
-                <Box style={{ width: '100%' }}>
-                    <DataGrid keyId={'Product_id'} rowsCount={rowsCount} rows={rows} sortBy={sortBy} pageInfo={pageInfo} onActionClicked={OnActionClicked}
-                        onSortClicked={OnSortClicked} onPageClicked={OnPageClicked} onDeleteClicked={OnDeleteClicked} />
-                </Box>
+                {rowsCount > 0 ? (
+                    <Box style={{ width: '100%' }}>
+                        <DataGrid keyId={'Product_id'} rowsCount={rowsCount} rows={rows} sortBy={sortBy} pageInfo={pageInfo} onActionClicked={OnActionClicked}
+                            footerItems={[{ name: "Size", value: "Size" }, { name: "Weight", value: "Weight" }]}
+                            onSortClicked={OnSortClicked} onPageClicked={OnPageClicked} onDeleteClicked={OnDeleteClicked} />
+                    </Box>
+                ) : (
+                    <Box component={"div"} sx={{
+                        mt: 5,
+                        display: "flex", width: '100%',
+                        height: 150, backgroundColor: "#ffffff",
+                        justifyContent: "center", alignItems: "center",
+                        border: "1px solid lightgray"
+                    }}>
+                        <Typography noWrap variant="colorcaption" component="div" sx={{ fontSize: "0.95rem" }}>
+                            No Records found
+                        </Typography>
+                    </Box>
+
+                )}
+
                 <CustomDialog open={showConfirm} action={'delete'} title={"Confirmation"} onCloseClicked={OnCloseClicked}>
                     <Typography gutterBottom>
                         Are you sure? You want to delete?
