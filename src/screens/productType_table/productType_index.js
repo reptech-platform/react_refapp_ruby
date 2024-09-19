@@ -14,6 +14,13 @@ const columns = [
     { headerName: "Description", field: "ProductTypeDesc", flex: 1, editable: true }
 ];
 
+const dataColumns = [
+    { key: "PtId", type: "keyid" },
+    { key: "ProductTypeName", label: "Type", type: "text", value: null },
+    { key: "ProductTypeDesc", label: "Type", type: "text", value: null }
+];
+
+
 const httpMethods = { add: 'POST', edit: 'PATCH', delete: 'DELETE' };
 const httpMethodResponse = {
     POST: { success: 'created', failed: 'creating' },
@@ -139,10 +146,12 @@ const Component = (props) => {
             let data = { ...params, Deleted: params.httpMethod === 'DELETE' };
             delete data["httpMethod"];
 
-            let numfields = Helper.GetAllNumberFields(data);
-            if (numfields.length > 0) Helper.UpdateNumberFields(data, numfields);
+            let dataItems = Helper.CloneObject(dataColumns);
+            dataItems.forEach(e => {
+                e.value = data[e.key];
+            });
 
-            const { status } = await Support.AddOrUpdateProductType(data);
+            const { status } = await Support.AddOrUpdateProductType(dataItems);
             if (status) {
                 global.AlertPopup("success", `Record is ${success} successful!`);
             } else {
