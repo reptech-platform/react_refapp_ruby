@@ -151,6 +151,9 @@ const Component = (props) => {
                 e.value = data[e.key];
             });
 
+            let numfields = Helper.GetAllNumberFields(dataItems);
+            if (numfields.length > 0) Helper.UpdateNumberFields(dataItems, numfields)
+
             const { status } = await Support.AddOrUpdateProductType(dataItems);
             if (status) {
                 global.AlertPopup("success", `Record is ${success} successful!`);
