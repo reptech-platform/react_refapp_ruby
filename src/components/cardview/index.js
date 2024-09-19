@@ -80,30 +80,25 @@ const Component = (props) => {
                                     <DeleteIcon />
                                 </IconButton>
                             </Box>
-                            <Table sx={{ display: 'table', width: '100%', border: 0, backgroundColor: "#E9EAEB" }}>
-                                <TableBody>
-                                    <TableRow sx={{ borderTop: 1 }}>
+                            {footerItems && footerItems.length > 0 && (
+                                <Table sx={{ display: 'table', width: '100%', border: 0, backgroundColor: "#E9EAEB" }}>
+                                    <TableBody>
+                                        <TableRow sx={{ borderTop: 1 }}>
+                                            {footerItems.map((x, index) => (
+                                                <TableCell key={index} sx={{ width: footerItems.length > 1 ? "50%" : "100%", padding: "8px", borderRight: index === 0 && footerItems.length > 1 ? 1 : 0 }}>
+                                                    <Typography gutterBottom component="p" sx={{ fontWeight: "bold" }}>{x.name}</Typography>
+                                                    <Box sx={{ paddingTop: "2px", paddingLeft: "8px" }}>
+                                                        <Typography variant="body2" color="text.secondary" component="p">
+                                                            {row[x.value]}
+                                                        </Typography>
+                                                    </Box>
+                                                </TableCell>
+                                            ))}
 
-                                        <TableCell sx={{ width: "50%", borderRight: 1, padding: "8px" }}>
-                                            <Typography gutterBottom component="p" sx={{ fontWeight: "bold" }}>{footerItems[0].name}</Typography>
-                                            <Box sx={{ paddingTop: "2px", paddingLeft: "8px" }}>
-                                                <Typography variant="body2" color="text.secondary" component="p">
-                                                    {row[footerItems[0].value]}
-                                                </Typography>
-                                            </Box>
-                                        </TableCell>
-                                        <TableCell sx={{ width: "50%", padding: "8px" }}>
-                                            <Typography gutterBottom component="p" sx={{ fontWeight: "bold" }}>{footerItems[1].name}</Typography>
-                                            <Box sx={{ paddingTop: "2px", paddingLeft: "8px" }}>
-                                                <Typography variant="body2" color="text.secondary" component="p">
-                                                    {row[footerItems[1].value]}
-                                                </Typography>
-                                            </Box>
-                                        </TableCell>
-
-                                    </TableRow>
-                                </TableBody>
-                            </Table>
+                                        </TableRow>
+                                    </TableBody>
+                                </Table>
+                            )}
                         </TableContainer>
 
                     </CardActions>

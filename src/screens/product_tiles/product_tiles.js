@@ -23,6 +23,7 @@ const Component = (props) => {
     const [searchStr, setSearchStr] = useState("");
     const [showConfirm, setShowConfirm] = useState(false);
     const [deletedId, setDeletedId] = useState(0);
+    const [showResults, setShowResults] = useState(false);
 
     const NavigateTo = useNavigate();
 
@@ -98,6 +99,7 @@ const Component = (props) => {
             });
 
         setRows(_rows);
+        setShowResults(true);
         global.Busy(false);
         return _rows;
     }
@@ -179,25 +181,29 @@ const Component = (props) => {
                         </Grid>
                     </Stack>
                 </Box>
-                {rowsCount > 0 ? (
-                    <Box style={{ width: '100%' }}>
-                        <DataGrid keyId={'Product_id'} rowsCount={rowsCount} rows={rows} sortBy={sortBy} pageInfo={pageInfo} onActionClicked={OnActionClicked}
-                            footerItems={[{ name: "Size", value: "Size" }, { name: "Weight", value: "Weight" }]}
-                            onSortClicked={OnSortClicked} onPageClicked={OnPageClicked} onDeleteClicked={OnDeleteClicked} />
-                    </Box>
-                ) : (
-                    <Box component={"div"} sx={{
-                        mt: 5,
-                        display: "flex", width: '100%',
-                        height: 150, backgroundColor: "#ffffff",
-                        justifyContent: "center", alignItems: "center",
-                        border: "1px solid lightgray"
-                    }}>
-                        <Typography noWrap variant="colorcaption" component="div" sx={{ fontSize: "0.95rem" }}>
-                            No Records found
-                        </Typography>
-                    </Box>
+                {showResults && (
+                    <>
+                        {rowsCount > 0 ? (
+                            <Box style={{ width: '100%' }}>
+                                <DataGrid keyId={'Product_id'} rowsCount={rowsCount} rows={rows} sortBy={sortBy} pageInfo={pageInfo} onActionClicked={OnActionClicked}
+                                    footerItems={[{ name: "Size", value: "Size" }, { name: "Weight", value: "Weight" }]}
+                                    onSortClicked={OnSortClicked} onPageClicked={OnPageClicked} onDeleteClicked={OnDeleteClicked} />
+                            </Box>
+                        ) : (
+                            <Box component={"div"} sx={{
+                                mt: 5,
+                                display: "flex", width: '100%',
+                                height: 150, backgroundColor: "#ffffff",
+                                justifyContent: "center", alignItems: "center",
+                                border: "1px solid lightgray"
+                            }}>
+                                <Typography noWrap variant="colorcaption" component="div" sx={{ fontSize: "0.95rem" }}>
+                                    No Records found
+                                </Typography>
+                            </Box>
 
+                        )}
+                    </>
                 )}
 
                 <CustomDialog open={showConfirm} action={'delete'} title={"Confirmation"} onCloseClicked={OnCloseClicked}>
