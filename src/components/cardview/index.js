@@ -18,10 +18,9 @@ const Component = (props) => {
                 <Card sx={{
                     width: width || 345,
                     height: '100%',
-                    boxShadow: "0px 0px 40px rgba(0, 0, 0, 0.25)",
                     display: "flex",
                     flexDirection: "column",
-                    border: '0.75px solid #00000080',
+                    border: '0.75px solid #D2D4D7',
                     borderRadius: '15px',
                     ...sx
                 }}>
@@ -81,11 +80,11 @@ const Component = (props) => {
                                 </IconButton>
                             </Box>
                             {footerItems && footerItems.length > 0 && (
-                                <Table sx={{ display: 'table', width: '100%', border: 0, backgroundColor: "#E9EAEB" }}>
+                                <Table sx={{ display: 'table', width: '100%', border: 0, backgroundColor: "#ffffff" }}>
                                     <TableBody>
-                                        <TableRow sx={{ borderTop: 1 }}>
+                                        <TableRow sx={{ borderTop: '0.75px solid #D2D4D7' }}>
                                             {footerItems.map((x, index) => (
-                                                <TableCell key={index} sx={{ width: footerItems.length > 1 ? "50%" : "100%", padding: "8px", borderRight: index === 0 && footerItems.length > 1 ? 1 : 0 }}>
+                                                <TableCell key={index} sx={{ width: footerItems.length > 1 ? "50%" : "100%", padding: "8px", borderRight: index === 0 && footerItems.length > 1 ? "0.75px solid #D2D4D7" : 0 }}>
                                                     <Typography gutterBottom component="p" sx={{ fontWeight: "bold" }}>{x.name}</Typography>
                                                     <Box sx={{ paddingTop: "2px", paddingLeft: "8px" }}>
                                                         <Typography variant="body2" color="text.secondary" component="p">
