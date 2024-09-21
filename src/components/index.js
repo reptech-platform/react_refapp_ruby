@@ -22,9 +22,10 @@ import Stepper from "./stepper";
 import Select from "./select";
 import CounterContainer from "./counterContainer";
 import LineChart from "./lineChart";
+import DocViewer from "./docviewer";
 
 export {
     Header, Drawer, Container, Image, FileInput, CheckInput, GridContainer, CardItem, CustomDialog, RatingGroup, Select, LineChart,
     DropDown, SearchInput, TextInput, ColorPicker, AlertMessage, DateTimePicker, TimePicker, ToggleButtons, RadioGroup, Stepper, CardView,
-    CounterContainer
+    CounterContainer, DocViewer
 };

@@ -62,6 +62,97 @@ const Component = (props) => {
         return changes;
     }
 
+    const TrackChildChanges = (name) => {
+
+        if (Helper.IsNullValue(backRow[name])) return [];
+        const sourceItems = JSON.parse(JSON.stringify(backRow[name]));
+        let tmp = JSON.parse(JSON.stringify(row[name]));
+        let docKeyId = tmp.find(x => x.type === 'doc')['key'];
+        let keyName = tmp.find(x => x.type === 'keyid')['key'];
+
+        let fields = tmp.filter(m => m.type !== 'keyid').map(x => x.key);
+        const targetItems = tmp.find(z => z.type === 'keyid')?.values;
+
+        let changes = [];
+        let finalChanges = [];
+
+        let tFiltered;
+        if (targetItems.length > sourceItems.length) {
+            tFiltered = targetItems.filter(mm => mm.action === 'add');
+            tFiltered.forEach(x => {
+                changes.push({ values: x, fields, keyName, docKeyId, action: 'add' });
+            })
+
+        }
+
+        tFiltered = targetItems.filter(mm => mm.action !== 'add');
+
+        for (let sIndex = 0; sIndex < sourceItems.length; sIndex++) {
+
+            const source = sourceItems[sIndex];
+            const target = targetItems.find(x => parseInt(x[keyName]) === parseInt(source[keyName]));
+            let changeFields = [];
+            fields.forEach(mm => {
+                let value1 = source[mm] ?? "";
+                let value2 = target[mm] ?? "";
+                if (value1.toString() !== value2.toString()) {
+                    changeFields.push(mm);
+                }
+            })
+
+            if (changeFields.length > 0) {
+                changes.push({ values: target, fields: changeFields, keyName, docKeyId, action: 'edit' });
+            }
+        }
+
+        if (changes.length > 0) {
+            finalChanges = [];
+
+            for (let changeIndex = 0; changeIndex < changes.length; changeIndex++) {
+                let tmp = JSON.parse(JSON.stringify(row[name]));
+
+                let _index = tmp.findIndex(x => x.type === 'keyid');
+                delete tmp[_index]['values'];
+
+                let fldInfo = JSON.parse(JSON.stringify(row[name]));
+
+                let item = changes[changeIndex].values;
+                let docKeyId = changes[changeIndex].docKeyId;
+
+
+                fldInfo.forEach(p => {
+                    let _value = item[p.key];
+                    if (p.type === 'dropdown' && !Helper.IsNullValue(_value)) {
+                        _value = dropDownOptions.find(kk => kk.Name === p.source).Values.find(jj => jj[p.nameId] === _value)[p.valueId];
+                        if (p.enum) {
+                            _value = _value?.toString();
+                        }
+                    }
+                    tmp.find(x => x.key === p.key).value = _value;
+                });
+
+                let numfields = Helper.GetAllNumberFields(fldInfo);
+                if (numfields.length > 0) Helper.UpdateNumberFields(tmp, numfields);
+
+                // Set Images and streams
+                if (!Helper.IsNullValue(item['stream'])) {
+                    [`${docKeyId}_Image`, 'stream', 'id'].forEach(x => {
+                        let tIndex = tmp.findIndex(m => m.key === docKeyId);
+                        tmp[tIndex][x] = item[x];
+                    });
+                }
+
+                changes[changeIndex].values = tmp;
+
+                finalChanges.push(changes[changeIndex]);
+
+            }
+
+        }
+
+        return finalChanges;
+    }
+
     const OnSubmit = async () => {
         let rslt, data, prodImages, productId, changes, numfields;
         const mapItems = MapItems;
@@ -92,64 +183,73 @@ const Component = (props) => {
         });
 
         // Add or Update Collection Items
-        let updateChild = [];
         inlineObjs = childCollections.filter(x => x.child) || [];
-        inlineObjs.forEach(x => {
-            let _org = row[x.name];
-            let _obj = row[x.name].find(z => z.type === 'keyid');
-            let _values = _obj?.values;
-            let _keyId = _obj?.key;
-            let filterRowItems = Helper.CloneObject(_values).filter(x => ['add', 'edit', 'delete'].indexOf(x.action) > -1);
-            let valueList = [];
-            filterRowItems.forEach(m => {
-                delete m['id'];
-                switch (m['action']) {
-                    case 'add': break;
-                    case 'edit': m.Edited = true; break;
-                    case 'delete': m.Deleted = true; break;
-                }
-                if (m['action'] === 'delete') {
-                    m.Deleted = true;
-                } else if (m['action'] === 'add') {
-                    delete m[_keyId];
-                }
-                delete m['id'];
-                delete m['action'];
-
-                let oValues = Object.keys(m);
-                let newFldList = [];
-                oValues.forEach(z => {
-                    let fld = _org.find(k => k.key === z);
-                    if (fld) {
-                        fld.value = m[z];
-                        if (fld.type === 'dropdown' && !Helper.IsNullValue(fld.value)) {
-                            fld.value = dropDownOptions.find((z) => z.Name === fld.source).Values.find((k) => k[fld.nameId] === fld.value)[fld.valueId];
-                            if (fld.enum) {
-                                fld.value = fld.value?.toString();
-                            }
-                        }
-                        newFldList.push(fld);
-                    }
-                });
-
-                numfields = Helper.GetAllNumberFields(newFldList);
-                if (numfields.length > 0) Helper.UpdateNumberFields(newFldList, numfields);
-
-                let tmp2 = {};
-
-                newFldList.forEach(j => {
-                    tmp2 = { ...tmp2, [j.key]: j.value };
-                });
-
-                updateChild.push(tmp2);
-
-            });
-
-        });
 
         if (inlineObjs.length === 0) {
             global.AlertPopup("error", "Atleaset one child item should exist!");
             return;
+        }
+
+        for (let parentCnt = 0; parentCnt < inlineObjs.length; parentCnt++) {
+
+            let parentObj = inlineObjs[parentCnt];
+            let changes = TrackChildChanges(parentObj.name);
+
+            if (changes.length > 0) {
+
+                for (let changeIndex = 0; changeIndex < changes.length; changeIndex++) {
+                    let changeItem = changes[changeIndex];
+                    let docKeyId = changes[changeIndex].docKeyId;
+                    let newItem = changes[changeIndex].values;
+                    let keyName = changes[changeIndex].keyName;
+                    let fields = changes[changeIndex].fields;
+                    fields.push(keyName);
+
+                    // Add or Update document
+                    if (changeItem.fields.indexOf(docKeyId) > -1) {
+                        let docIndex = newItem.findIndex(x => x.key === docKeyId);
+                        let item = newItem[docIndex];
+                        if (!Helper.IsNullValue(item.stream)) {
+                            rslt = await Support.AddOrUpdateDocument({ value: item.stream });
+                            if (rslt.status) {
+                                newItem[docIndex].value = parseInt(rslt.id);
+                                delete newItem[docIndex]['stream'];
+                                delete newItem[docIndex][`${docKeyId}_Image`];
+                            } else { return; }
+                        }
+                    }
+
+                    let compProductMapId = productPComponents.find(x =>
+                        parseInt(x[keyName]) === parseInt(newItem[keyName]) && x.Product_id === productId)?.Id;
+
+                    let CompId = newItem.find(x => x.key === keyName)?.value;
+                    let data = { compProductMapId, ProductId: productId, CompId, action: changeItem.action };
+
+                    if (changeItem.action === 'add') {
+                        let _index = newItem.findIndex(x => x.key === keyName);
+                        newItem[_index].value = null;
+                        data = { ...data, values: newItem };
+                    } else if (changeItem.action === 'edit') {
+                        let editItem = [];
+                        fields.forEach(x => {
+                            let item = newItem.find(z => z.key === x);
+                            editItem.push(item);
+                        })
+                        data = { ...data, values: editItem };
+                    } else if (changeItem.action === 'delete') {
+                        data = { ...data, values: newItem };
+                    }
+
+                    rslt = await Support.AddOrUpdateProductComponent(data);
+                    if (!rslt.status) {
+                        global.AlertPopup("error", "Somthing went wrong to update!");
+                        return;
+                    }
+
+                }
+
+            }
+
         }
 
         // Add Or Update Product
@@ -165,49 +265,35 @@ const Component = (props) => {
             } else { return; }
         }
 
-        let bAllStatus = false;
-        for (let i = 0; i < updateChild.length; i++) {
-            let _data = updateChild[i];
-            let compProductMapId = null;
-            if (_data.Deleted && !Helper.IsNullValue(_data.CompId)) {
-                compProductMapId = productPComponents.find(x => x.CompId === _data.CompId && x.Product_id === productId).Id;
-            }
-            rslt = await Support.AddOrUpdateProductComponent(compProductMapId, productId, _data);
-            bAllStatus = !bAllStatus ? rslt.status : bAllStatus;
-        }
-
-        if (!bAllStatus && updateChild.length > 0) {
-            global.AlertPopup("error", "Somthing went wrong to update!");
-            return;
-        }
-
         for (let i = 0; i < mapItems.length; i++) {
 
             // Check is there any changes
             const mapItem = MapItems[i];
-            changes = TrackChanges(mapItem.uicomponent);
-            if (changes.length > 0) {
-                // Add or Update the product and navigation entity if it is deos not exist
-                let navItem = product.find(x => x.uicomponent === mapItems[i].uicomponent);
-                if (!Helper.IsJSONEmpty(navItem)) {
+            if (!mapItem.child) {
+                changes = TrackChanges(mapItem.uicomponent);
+                if (changes.length > 0) {
+                    // Add or Update the product and navigation entity if it is deos not exist
+                    let navItem = product.find(x => x.uicomponent === mapItems[i].uicomponent);
+                    if (!Helper.IsJSONEmpty(navItem)) {
 
-                    let childItem = row[navItem.uicomponent];
-                    numfields = Helper.GetAllNumberFields(childItem);
-                    if (numfields.length > 0) Helper.UpdateNumberFields(childItem, numfields);
+                        let childItem = row[navItem.uicomponent];
+                        numfields = Helper.GetAllNumberFields(childItem);
+                        if (numfields.length > 0) Helper.UpdateNumberFields(childItem, numfields);
 
-                    rslt = await mapItems[i].func(childItem, dropDownOptions);
-                    if (rslt.status) {
-                        data = [
-                            { key: "Product_id", value: parseInt(productId) },
-                            { key: navItem.key, value: parseInt(rslt.id) }
-                        ];
-                        rslt = await Support.AddOrUpdateProduct(data, dropDownOptions);
-                        if (!rslt.status) return;
+                        rslt = await mapItems[i].func(childItem, dropDownOptions);
+                        if (rslt.status) {
+                            data = [
+                                { key: "Product_id", value: parseInt(productId) },
+                                { key: navItem.key, value: parseInt(rslt.id) }
+                            ];
+                            rslt = await Support.AddOrUpdateProduct(data, dropDownOptions);
+                            if (!rslt.status) return;
 
-                        // Update Back for next tracking purpose
-                        UpdateBackUp(mapItem.target);
+                            // Update Back for next tracking purpose
+                            UpdateBackUp(mapItem.target);
 
-                    } else { return; }
+                        } else { return; }
+                    }
                 }
             }
         }

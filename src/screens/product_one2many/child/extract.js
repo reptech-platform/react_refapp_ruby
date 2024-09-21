@@ -83,10 +83,15 @@ const FetchProductDetails = async (productId, enums) => {
                     if (parent && child) {
                         let _tmpItems = [];
                         let _fItem = item[target];//.filter(z => z.type !== 'keyid');
-                        sourceObj.forEach(x => {
+                        for (let xx = 0; xx < sourceObj.length; xx++) {
+                            let x = sourceObj[xx];
                             let _tmpItem = {};
                             _tmpItem['id'] = Helper.GetGUID();
-                            _fItem.forEach(m => {
+
+                            for (let mm = 0; mm < _fItem.length; mm++) {
+
+                                let m = _fItem[mm];
+
                                 if (m.type === 'keyid' && !Helper.IsNullValue(x[m.key])) {
                                     _tmpItem['id'] = x[m.key];
                                 }
@@ -99,17 +104,27 @@ const FetchProductDetails = async (productId, enums) => {
                                 } else if (m.type === 'date') {
                                     let tmpDate = _nValue.indexOf("T") > 0 ? _nValue.split('T') : [_nValue];
                                     _nValue = tmpDate[0];
+                                } else if (m.type === 'doc') {
+                                    if (parseInt(_nValue, 0) > 0) {
+                                        let trslt = await Api.GetDocument(parseInt(_nValue));
+                                        if (trslt.status) {
+                                            _tmpItem[`${m.key}_Image`] = _nValue;
+                                            let docRslt = trslt.values;
+                                            _nValue = `${docRslt.DocName}.${docRslt.DocExt}`;
+                                        }
+                                    }
                                 }
 
                                 _tmpItem[m.key] = _nValue;
-                            })
+                            }
+
                             _tmpItems.push(_tmpItem);
-                        });
+                        }
 
                         item[target].find((x) => x.type === "keyid").values = _tmpItems;
                     } else {
                         for (let prop in sourceObj) {
-                            const tItem = item[target].find((x) => x.key === prop);
+                            const tItem = item[target]?.find((x) => x.key === prop);
                             if (tItem && !Helper.IsNullValue(sourceObj[prop])) {
 
                                 let _nValue = null;
@@ -181,8 +196,13 @@ const FetchProductDetails = async (productId, enums) => {
             let bItem = {};
             keyItems.forEach(elm => {
                 let bItems = [];
-                for (let prop of item[elm]) {
-                    bItems.push({ key: prop.key, value: prop.value });
+                let tmp = MapItems.find(x => x.uicomponent === elm);
+                if (!tmp.child) {
+                    for (let prop of item[elm]) {
+                        bItems.push({ key: prop.key, value: prop.value });
+                    }
+                } else {
+                    bItems = item[elm].find(z => z.type === 'keyid').values;
                 }
                 bItem[elm] = bItems;
             });

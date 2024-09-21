@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { Typography, Grid, Stack, Box, IconButton, useTheme } from '@mui/material';
 import { Add as AddBoxIcon } from '@mui/icons-material';
-import { SearchInput, CustomDialog } from "components";
+import { SearchInput, CustomDialog, DocViewer, Image } from "components";
 import { DataTable } from '../../childs';
 import { ValidatorForm } from 'react-material-ui-form-validator';
 import RenderFormContols from "components/formControls/RenderFormContols";
 import Helper from "shared/helper";
+import { GetDocument } from "shared/services";
 
 // <CustomTable location={x} title={UIComponentTitle} controls={props.controls[x]} rows={dataRows} options={props.options} />
 const Component = (props) => {
@@ -19,6 +21,8 @@ const Component = (props) => {
     const [searchStr, setSearchStr] = useState("");
     const [sortBy, setSortBy] = useState(null);
     const [actions, setActions] = useState({ id: 0, action: null });
+    const [showDocument, setShowDocument] = useState(false);
+    const [imageSource, setImageSource] = useState(null);
 
     const [configInfo, setConfigInfo] = useState(null);
     const [columns, setColumns] = useState([]);
@@ -27,9 +31,22 @@ const Component = (props) => {
     const [configBackInfo, setConfigBackInfo] = useState(null);
 
     const form = React.useRef(null);
+    /*  */
 
     const InitializeConfig = async () => {
         let _columns = controls.filter(x => x.type !== 'keyid').map(z => {
+
+            if (z.type === 'doc') {
+                return {
+                    headerName: z.label, field: z.key,
+                    flex: 1, flexGrow: 1, flexShrink: 1, ctype: z.type,
+                    renderCell: (params) => (
+                        <Link to="#" className="textlink">
+                            {params.value}
+                        </Link>
+                    )
+                };
+            }
             return { headerName: z.label, field: z.key, flex: 1, flexGrow: 1, flexShrink: 1 };
         });
 
@@ -45,6 +62,28 @@ const Component = (props) => {
         setConfigInfo(controls);
     }
 
+    const OnDocViewerClosed = async (e) => {
+        setShowDocument(false);
+    }
+
+    const OnDataGridCellClicked = async (e) => {
+        const { field, row, type } = e;
+        if (type === 'doc') {
+            setImageSource(null);
+            let docId = row[`${field}_Image`];
+            let docName = row[`${field}`];
+
+            let rslt = await GetDocument(docId, true);
+            if (rslt.status) {
+                let type = docName.split(".").pop();
+                const srcUrl = await Helper.GetBlobUrl(rslt.values, type.toLowerCase());
+                setImageSource(srcUrl);
+                setShowDocument(true);
+            }
+        }
+
+    };
+
     const OnPageClicked = (e) => { setPageInfo({ page: 0, pageSize: 5 }); if (e) setPageInfo(e); }
     const OnSortClicked = (e) => { setSortBy(e); }
     const OnSearchChanged = (e) => { setSearchStr(e); }
@@ -56,29 +95,50 @@ const Component = (props) => {
 
             if (tmp.type === 'dropdown') {
                 e.value = options.find((z) => z.Name === tmp.source).Values.find((m) => parseInt(m[tmp.valueId]) === parseInt(e.value))[tmp.nameId];
+            } else if (tmp.type === 'doc') {
+                setNewItem((prev) => ({ ...prev, stream: e.value }));
+                setNewItem((prev) => ({ ...prev, [e.name]: `${e.value.DocName}.${e.value.DocExt}` }));
             }
 
-            setNewItem((prev) => ({ ...prev, [e.name]: e.value }));
+            if (tmp.type !== 'doc') {
+                setNewItem((prev) => ({ ...prev, [e.name]: e.value }));
+            }
         }
     }
 
-    const OnActionClicked = (id, type) => {
+    const OnActionClicked = async (id, type) => {
+        ClearSettings();
         if (type === 'edit' || type === 'view' || type === 'delete') {
-            ClearSettings();
             const selectedRow = rows.find((x) => x[keyIdName] === id);
             let tmpInfo = Helper.CloneObject(configInfo);
             tmpInfo.forEach(x => x.value = selectedRow[x.key]);
 
-            tmpInfo.forEach(m => {
+            for (let mm = 0; mm < tmpInfo.length; mm++) {
+                let m = tmpInfo[mm];
                 let _nValue = m.value;
                 if (m.type === 'dropdown') {
                     const { Values } = options.find((z) => z.Name === m.source);
                     const _value = Values.find((z) => z[m.valueId] === _nValue || z[m.contentId] === _nValue) || {};
                     _nValue = _value[m.valueId];
+                } else if (m.type === 'doc') {
+                    let docId = selectedRow[`${m.key}_Image`];
+                    let _doc = {};
+                    let rslt = await GetDocument(docId);
+                    if (rslt.status) {
+                        const { DocName, DocExt, DocId, DocType } = Helper.CloneObject(rslt.values);
+                        _doc = { DocName, DocExt, DocId, DocType };
+                        rslt = await GetDocument(docId, true);
+                        if (rslt.status) {
+                            _doc = { ..._doc, DocData: rslt.values };
+                        }
+                    }
+                    tmpInfo[mm].value = _doc;
+                    tmpInfo[mm].docId = docId;
                 }
-
-                m.value = _nValue;
-            })
+                if (m.type !== 'doc') {
+                    tmpInfo[mm].value = _nValue;
+                }
+            }
 
             setConfigInfo(tmpInfo);
             setNewItem(selectedRow);
@@ -107,6 +167,10 @@ const Component = (props) => {
 
     const handleSubmit = async () => {
         if (onTableRowUpdated) {
+            if (actions.action === 'add') {
+                delete newItem[keyIdName];
+                delete newItem["id"];
+            }
             onTableRowUpdated({ ...actions, rows, keyIdName, location, data: newItem });
             ClearSettings();
         }
@@ -157,7 +221,7 @@ const Component = (props) => {
             </Box>
             <Box style={{ width: '100%' }}>
                 <DataTable keyId={keyIdName} columns={columns} rowsCount={rows ? rows.length : 0} rows={rows || []} noActions={mode === 'view'}
-                    sortBy={sortBy} pageInfo={pageInfo} onActionClicked={OnActionClicked} localPaginationMode={true} localSorting={true}
+                    sortBy={sortBy} pageInfo={pageInfo} onActionClicked={OnActionClicked} localPaginationMode={true} localSorting={true} onColumnClicked={OnDataGridCellClicked}
                     onSortClicked={OnSortClicked} onPageClicked={OnPageClicked} />
             </Box>
 
@@ -172,12 +236,16 @@ const Component = (props) => {
                     open={!Helper.IsNullValue(actions.action)} title={`${Helper.ToFirstCharCapital(actions.action)} ${title}`} onCloseClicked={OnCloseClicked}>
                     <ValidatorForm ref={form} onSubmit={handleSubmit}>
                         <Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
-                            <RenderFormContols shadow={true} location="newItem" mode={actions.action} onInputChange={OnInputChange}
+                            <RenderFormContols shadow={true} location="newItem" mode={actions.action === 'view' ? 'view' : undefined} onInputChange={OnInputChange}
                                 controls={configInfo} options={props.options} />
                         </Grid>
                     </ValidatorForm>
                 </CustomDialog>
             )}
+
+            <DocViewer open={showDocument} width={500} title={"Document"} onCloseClicked={OnDocViewerClosed}>
+                <Image borderRadius="4px" sx={{ width: "100%" }} alt={"Image"} src={imageSource} />
+            </DocViewer>
         </>
     )
 
