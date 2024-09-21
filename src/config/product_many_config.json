@@ -387,7 +387,17 @@
                 "Status status is required",
                 "Status status is required"
             ],
-            "value": 2
+            "value": "NotStarted"
+        },
+        {
+            "key": "PComponentPCompImage",
+            "label": "PCompImage",
+            "width": "30%",
+            "type": "doc",
+            "accept": ".JPG,.JPEG,.PNG,.PDF,.TXT,.DOC,.DOCX,.XLS,.XLSX",
+            "editable": true,
+            "validators": [],
+            "validationMessages": []
         }
     ]
 }

@@ -67,8 +67,6 @@ const Component = (props) => {
 
     let fileRef = React.createRef();
 
-    console.log(index);
-
     const OnFileBrowseClicked = () => {
         setError(null);
         fileRef.click();

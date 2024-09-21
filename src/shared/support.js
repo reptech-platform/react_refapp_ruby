@@ -201,56 +201,70 @@ fn.AddOrUpdateProductOtherImages = async (input, excludesItems) => {
     });
 }
 
-fn.AddOrUpdateProductComponent = async (compProductMapId, ProductId, input) => {
+fn.AddOrUpdateProductComponent = async (input, excludesItems) => {
     return new Promise(async (resolve) => {
-        let data = {}, status = false, rslt, id = null;
+        const { CompId, compProductMapId, ProductId, action, values } = input;
+        let data = {}, status = true, rslt, id = null;
         global.Busy(true);
+        let excludes = excludesItems || [];
 
-        if (input.Deleted) {
-            data = { Id: compProductMapId, Deleted: input.Deleted };
+        const tmp = Object.values(values);
+        tmp.filter((x) => x.value).map((x) => {
+            if (excludes.indexOf(x.key) === -1) {
+                data[x.key] = x.value;
+            }
+        });
+
+        if (action === 'delete') {
+            data = { Id: compProductMapId, Deleted: true };
             rslt = await SetProductPComponents(data);
             if (!rslt.status) {
                 global.Busy(false);
                 const msg = rslt.statusText || defaultError;
                 global.AlertPopup("error", msg);
-                return resolve({ status, CompId: input.CompId });
+                return resolve({ status: false, CompId });
             }
 
-            data = { CompId: input.CompId, Deleted: input.Deleted };
+            data = { CompId, Deleted: true };
 
             rslt = await SetPComponent(data);
             if (!rslt.status) {
                 global.Busy(false);
                 const msg = rslt.statusText || defaultError;
                 global.AlertPopup("error", msg);
-                return resolve({ status, CompId: input.CompId });
+                return resolve({ status: false, CompId });
             }
+            id = rslt.id;
 
             return resolve({ status: true });
-        }
-
-        const edited = input.Edited || false;
-
-        delete input['Edited'];
-
-        rslt = await SetPComponent(input);
-        if (rslt.status) {
-            id = rslt.id;
-            status = true;
-            if (!Helper.IsNullValue(id) && !edited) {
-                data = { Id: compProductMapId, CompId: id, ProductId };
-                rslt = await SetProductPComponents(data);
-                if (!rslt.status) {
-                    global.Busy(false);
-                    const msg = rslt.statusText || defaultError;
-                    global.AlertPopup("error", msg);
-                    return resolve({ status, id });
-                }
+        } else if (action === 'edit') {
+            rslt = await SetPComponent(data);
+            if (!rslt.status) {
+                global.Busy(false);
+                const msg = rslt.statusText || defaultError;
+                global.AlertPopup("error", msg);
+                return resolve({ status: false, CompId });
+            } else {
+                id = rslt.id;
             }
-        } else {
-            global.Busy(false);
-            const msg = rslt.statusText || defaultError;
-            global.AlertPopup("error", msg);
+        } else if (action === 'add') {
+            rslt = await SetPComponent(data);
+            if (!rslt.status) {
+                global.Busy(false);
+                const msg = rslt.statusText || defaultError;
+                global.AlertPopup("error", msg);
+                return resolve({ status: false });
+            }
+            id = rslt.id;
+
+            data = { ProductId, CompId: id };
+            rslt = await SetProductPComponents(data);
+            if (!rslt.status) {
+                global.Busy(false);
+                const msg = rslt.statusText || defaultError;
+                global.AlertPopup("error", msg);
+                return resolve({ status: false, CompId: id });
+            }
         }
         global.Busy(false);
 

@@ -150,4 +150,30 @@ fn.GetAllNumberFields = (obj) => {
 
 }
 
+function base64ToBlob(base64, contentType) {
+    const byteCharacters = atob(base64.split(',')[1]);
+    const byteNumbers = new Array(byteCharacters.length);
+    for (let i = 0; i < byteCharacters.length; i++) {
+        byteNumbers[i] = byteCharacters.charCodeAt(i);
+    }
+    const byteArray = new Uint8Array(byteNumbers);
+    return new Blob([byteArray], { type: contentType });
+}
+
+fn.GetBlobUrl = async (data, type) => {
+
+    return new Promise(resolve => {
+        // Create a Blob from the image data
+        const blob = base64ToBlob(data, `image/${type}`);
+        // Generate a Blob URL
+        const blobURL = URL.createObjectURL(blob);
+
+        return resolve(blobURL);
+    })
+
+}
+
+
+
+
 export default fn;
