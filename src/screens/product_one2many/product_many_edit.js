@@ -67,7 +67,7 @@ const Component = (props) => {
         if (Helper.IsNullValue(backRow[name])) return [];
         const sourceItems = JSON.parse(JSON.stringify(backRow[name]));
         let tmp = JSON.parse(JSON.stringify(row[name]));
-        let docKeyId = tmp.find(x => x.type === 'doc')['key'];
+        let docKeyId = tmp.find(x => x.type === 'doc')?.key;
         let keyName = tmp.find(x => x.type === 'keyid')['key'];
 
         let fields = tmp.filter(m => m.type !== 'keyid').map(x => x.key);
