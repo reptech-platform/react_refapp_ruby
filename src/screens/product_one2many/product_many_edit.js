@@ -102,6 +102,8 @@ const Component = (props) => {
 
             if (changeFields.length > 0) {
                 changes.push({ values: target, fields: changeFields, keyName, docKeyId, action: 'edit' });
+            } else if (target.action === 'delete') {
+                changes.push({ values: target, fields: changeFields, keyName, docKeyId, action: 'delete' });
             }
         }
 
@@ -236,10 +238,9 @@ const Component = (props) => {
                         }
                     }
 
-                    let compProductMapId = productPComponents.find(x =>
-                        parseInt(x[keyName]) === parseInt(newItem[keyName]) && x.Product_id === productId)?.Id;
-
                     let CompId = newItem.find(x => x.key === keyName)?.value;
+                    let compProductMapId = productPComponents.find(x =>
+                        parseInt(x[keyName]) === parseInt(CompId) && x.Product_id === productId)?.Id;
                     let data = { compProductMapId, ProductId: productId, CompId, action: changeItem.action };
 
                     if (changeItem.action === 'add') {
