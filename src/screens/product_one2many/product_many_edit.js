@@ -183,9 +183,12 @@ const Component = (props) => {
         });
 
         // Add or Update Collection Items
+
+        let isChildExist = mapItems.filter(x => x.child) || [];
+
         inlineObjs = childCollections.filter(x => x.child) || [];
 
-        if (inlineObjs.length === 0) {
+        if (isChildExist.length > 0 && inlineObjs.length === 0) {
             global.AlertPopup("error", "Atleaset one child item should exist!");
             return;
         }
