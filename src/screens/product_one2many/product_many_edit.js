@@ -162,25 +162,39 @@ const Component = (props) => {
         productId = row['product'].find((x) => x.type === 'keyid').value;
 
         let inlineObjs = childCollections.filter(x => !x.child);
-        inlineObjs.forEach(x => {
+
+        for (let inLineCnt = 0; inLineCnt < inlineObjs.length; inLineCnt++) {
+            let x = inlineObjs[inLineCnt];
+
             let vObj = {};
-            let obj = row[x.name];
+            let changes = TrackChanges(x.name);
+            if (changes.length > 0) {
+                let obj = row[x.name];
 
-            numfields = Helper.GetAllNumberFields(obj);
-            if (numfields.length > 0) Helper.UpdateNumberFields(obj, numfields);
+                numfields = Helper.GetAllNumberFields(obj);
+                if (numfields.length > 0) Helper.UpdateNumberFields(obj, numfields);
 
-            const tmp = Object.values(obj);
-            tmp.filter((x) => x.value).map((x) => {
-                if (x.type === 'dropdown' && !Helper.IsNullValue(x.value)) {
-                    vObj[x.key] = dropDownOptions.find((z) => z.Name === x.source).Values.find((m) => parseInt(m[x.valueId]) === parseInt(x.value))[x.valueId];
-                } else if (numberItems.indexOf(x.key) > -1) {
-                    if (x.value) vObj[x.key] = parseFloat(x.value);
-                } else {
-                    vObj[x.key] = x.value;
-                }
-            });
-            product.push({ key: x.property, value: vObj, type: "inline" });
-        });
+                const tmp = Object.values(obj);
+                tmp.filter((x) => x.value).map((x) => {
+                    if (x.type === 'dropdown' && !Helper.IsNullValue(x.value)) {
+                        vObj[x.key] = dropDownOptions.find((z) => z.Name === x.source).Values.find((m) => parseInt(m[x.valueId]) === parseInt(x.value))[x.valueId];
+                    } else if (numberItems.indexOf(x.key) > -1) {
+                        if (x.value) vObj[x.key] = parseFloat(x.value);
+                    } else {
+                        vObj[x.key] = x.value;
+                    }
+                });
+                let _dtKey = row['product'].find((x) => x.type === 'keyid');
+                let _data = [_dtKey,
+                    { key: x.property, value: vObj, type: "inline" }
+                ]
+
+                rslt = await Support.AddOrUpdateProduct(_data, dropDownOptions, ['MainImage', 'OtherImages']);
+                if (rslt.status) {
+                    productId = rslt.id;
+                } else { return; }
+            }
+        }
 
         // Add or Update Collection Items
 
@@ -277,7 +291,7 @@ const Component = (props) => {
                 if (changes.length > 0) {
                     // Add or Update the product and navigation entity if it is deos not exist
                     let navItem = product.find(x => x.uicomponent === mapItems[i].uicomponent);
-                    if (!Helper.IsJSONEmpty(navItem)) {
+                    if (!Helper.IsJSONEmpty(navItem) && Helper.IsNullValue(navItem.value)) {
 
                         let childItem = row[navItem.uicomponent];
                         numfields = Helper.GetAllNumberFields(childItem);
@@ -432,6 +446,14 @@ const Component = (props) => {
         setRow(_row);
         setShowUpdate(true);
     }
+
+    useEffect(() => {
+        let product = row['product'] || [];
+        let uiList = product.filter(x => !Helper.IsNullValue(x.uicomponent));
+        uiList.forEach(m => {
+            UpdateMappingPannel(row, m, m.value);
+        });
+    }, [row, dropDownOptions]);
 
     useEffect(() => { setShowButton(true); }, []);
     if (initialized) { setInitialized(false); fetchData(); }
