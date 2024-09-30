@@ -380,9 +380,9 @@ const SetProduct = async (input) => {
 }
 
 /* Document */
-const SetDocument = async (input, headers) => {
+const SetDocument = async (input, keyId) => {
     return new Promise(async (resolve) => {
-        let id = headers.DocId;
+        //let id = headers.DocId;
         let method = "POST";
         let url = `${serverApi}Documents`;
         /* if (headers.DocId && !input.Deleted) {
@@ -392,23 +392,20 @@ const SetDocument = async (input, headers) => {
             method = "DELETE";
             url = `${serverApi}Documents(${headers.DocId})`;
         } */
-        delete headers['DocId'];
-        delete headers['Deleted'];
+        //delete headers['DocId'];
+        //delete headers['Deleted'];
 
         const formData = new FormData();
         formData.append('file', input);
 
         try {
             const res = await fetch(url, {
-                method, body: formData,
-                headers: {
-                    ...headers
-                }
+                method, body: formData
             });
 
             if (res.status === 201) {
                 const json = await res.json();
-                return resolve({ status: res.ok, id: json.DocId });
+                return resolve({ status: res.ok, id: json[keyId] });
             } else if (res.status === 200 || res.status === 204) {
                 return resolve({ status: res.ok, id });
             } else {

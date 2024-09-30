@@ -1,9 +1,10 @@
 import {
     SetProduct, SetProductPrice, SetProductOtherImages, SetProductVendor,
     SetOtherDetails, SetDocument, SetProductTypes,
-    SetPComponent, SetProductPComponents
+    SetPComponent, SetProductPComponents,
+    GetDocument
 } from "./services";
-import Helper from "shared/helper";
+
 var fn = {};
 
 const defaultError = "Something went wrong while processing request!";
@@ -301,5 +302,9 @@ fn.DeleteOrder = async (OrderId) => {
         return resolve({ status });
     });
 }
+
+fn.DocFunctions = [
+    { entityTypeName: "Document", getFun: GetDocument, setFun: SetDocument }
+]
 
 export default fn;

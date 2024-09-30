@@ -101,46 +101,48 @@ const FetchProductDetails = async (productId, enums) => {
 
                 // Main Image
                 if (product.MainImage) {
-                    tmp = {};
-                    ['DocData', 'DocId', 'DocName', 'DocType', 'DocExt'].forEach((x) => {
-                        tmp[x] = product.MainImage[x]
-                    });
 
-                    if (tmp.DocId > 0) {
-                        rslt = await Api.GetDocument(tmp.DocId, true);
-                        if (rslt.status) tmp['DocData'] = rslt.values;
-                    }
-
-                    if (item['product'].find((x) => x.key === "MainImage")) {
-                        item['product'].find((x) => x.key === "MainImage").value = tmp;
+                    let mainImage = item['product'].find((x) => x.key === "MainImage");
+                    let entityTypeKeyName = mainImage?.entityTypeKeyName;
+                    let entityTypeName = mainImage?.entityTypeName;
+                    if (!Helper.IsNullValue(entityTypeKeyName)) {
+                        let docId = product.MainImage[entityTypeKeyName];
+                        let DocData = null;
+                        let docFuns = Support.DocFunctions.find(x => x.entityTypeName === entityTypeName);
+                        if (docId > 0) {
+                            rslt = await docFuns.getFun(docId, true);
+                            if (rslt.status) DocData = rslt.values;
+                        }
+                        item['product'].find((x) => x.key === "MainImage").value = DocData;
                     }
 
                 }
 
                 // Get Product Other Images
                 if (!Helper.IsJSONEmpty(product.OtherImages) && product.OtherImages.length > 0) {
-                    let _document = [];
+                    let otherImages = item['product'].find((x) => x.key === "OtherImages");
+                    let entityTypeKeyName = otherImages?.entityTypeKeyName;
+                    let entityTypeName = otherImages?.entityTypeName;
+                    if (!Helper.IsNullValue(entityTypeKeyName)) {
+                        let _document = [];
+                        for (let i = 0; i < product.OtherImages.length; i++) {
+                            let docId = product.OtherImages[i][entityTypeKeyName];
+                            let DocData = null;
+                            let docFuns = Support.DocFunctions.find(x => x.entityTypeName === entityTypeName);
+                            if (docId > 0) {
+                                rslt = await docFuns.getFun(docId, true);
+                                if (rslt.status) DocData = rslt.values;
+                            }
 
-                    for (let i = 0; i < product.OtherImages.length; i++) {
-                        let docItem = product.OtherImages[i];
-                        let tmp = {};
-
-                        ['DocData', 'DocId', 'DocName', 'DocType', 'DocExt'].forEach((x) => { tmp[x] = docItem[x] });
-
-                        if (parseInt(tmp.DocId) > 0) {
-                            rslt = await Api.GetDocument(tmp.DocId, true);
-                            if (rslt.status) tmp['DocData'] = rslt.values;
+                            let tmp = { index: i, docId, DocData };
+                            _document.push(tmp);
                         }
 
-                        tmp['index'] = i;
-                        _document.push(tmp);
-                    }
-
-                    if (item['product'].find((x) => x.key === "OtherImages")) {
-                        item['product'].find((x) => x.key === "OtherImages").value = _document;
+                        if (item['product'].find((x) => x.key === "OtherImages")) {
+                            item['product'].find((x) => x.key === "OtherImages").value = _document;
+                        }
                     }
                 }
-
             }
 
             let bItem = {};

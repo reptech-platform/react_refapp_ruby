@@ -173,6 +173,14 @@ fn.GetBlobUrl = async (data, type) => {
 
 }
 
+fn.ExtractFileType = (input) => {
+    let pos = input?.toString().indexOf(";");
+    if (pos > -1) {
+        let leftPart = input.substring(0, pos);
+        return leftPart.substring(leftPart.indexOf("/") + 1).toUpperCase();
+    }
+    return input;
+}
 
 
 

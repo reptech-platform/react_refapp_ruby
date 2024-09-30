@@ -228,7 +228,9 @@
             "accept": ".JPG,.JPEG,.PNG,.PDF,.TXT,.DOC,.DOCX,.XLS,.XLSX",
             "editable": true,
             "validators": [],
-            "validationMessages": []
+            "validationMessages": [],
+            "entityTypeName": "Document",
+            "entityTypeKeyName": "DocId"
         },
         {
             "key": "OtherImages",
@@ -239,7 +241,9 @@
             "editable": true,
             "multiple": true,
             "validators": [],
-            "validationMessages": []
+            "validationMessages": [],
+            "entityTypeName": "Document",
+            "entityTypeKeyName": "DocId"
         }
     ],
     "otherdetails": [
