@@ -79,17 +79,17 @@ const Component = (props) => {
         }
 
         // Add Product Other Images
-        prodImages = product.find((x) => x.key === 'OtherImages').value;
-        if (prodImages && !Helper.IsNullValue(prodImages)) {
+        prodImages = product.find((x) => x.key === 'OtherImages');
+        if (prodImages && !Helper.IsNullValue(prodImages.value)) {
 
-            let keyItems = product.find((x) => x.key === 'OtherImages');
             let entityTypeKeyName = keyItems?.entityTypeKeyName;
             let entityTypeName = keyItems?.entityTypeName;
 
             if (!Helper.IsNullValue(entityTypeKeyName)) {
                 let docFuns = Support.DocFunctions.find(x => x.entityTypeName === entityTypeName);
-                for (let i = 0; i < prodImages.length; i++) {
-                    rslt = await docFuns.setFun(prodImages[i].DocData, entityTypeKeyName);
+                let values = prodImages.value;
+                for (let i = 0; i < values.length; i++) {
+                    rslt = await docFuns.setFun(values[i].DocData, entityTypeKeyName);
                     if (rslt.status) {
                         let newImageId = parseInt(rslt.id);
                         data = [

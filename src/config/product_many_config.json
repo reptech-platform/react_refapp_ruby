@@ -137,6 +137,19 @@
             "validationMessages": [],
             "entityTypeName": "Document",
             "entityTypeKeyName": "DocId"
+        },
+        {
+            "key": "OtherImages",
+            "label": "OtherImages",
+            "type": "doc",
+            "width": "30%",
+            "accept": ".JPG,.JPEG,.PNG,.PDF,.TXT,.DOC,.DOCX,.XLS,.XLSX",
+            "editable": true,
+            "multiple": true,
+            "validators": [],
+            "validationMessages": [],
+            "entityTypeName": "Document",
+            "entityTypeKeyName": "DocId"
         }
     ],
     "producttype": [

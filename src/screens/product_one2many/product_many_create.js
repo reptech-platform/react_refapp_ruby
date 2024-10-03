@@ -182,9 +182,9 @@ const Component = (props) => {
 
             if (!Helper.IsNullValue(entityTypeKeyName)) {
                 let docFuns = Support.DocFunctions.find(x => x.entityTypeName === entityTypeName);
-
-                for (let i = 0; i < prodImages.length; i++) {
-                    rslt = await docFuns.setFun(prodImages[i], entityTypeKeyName);
+                let values = prodImages.value;
+                for (let i = 0; i < values.length; i++) {
+                    rslt = await docFuns.setFun(values[i].DocData, entityTypeKeyName);
                     if (rslt.status) {
                         data = [
                             { key: "Product_id", value: parseInt(productId) },
@@ -199,7 +199,7 @@ const Component = (props) => {
 
         global.AlertPopup("success", "Product is created successfully!");
         setShowUpdate(false);
-        NavigateTo("/products");
+        NavigateTo("/productsmany");
     }
 
     const OnInputChange = (e) => {
