@@ -28,6 +28,8 @@
     {
         "key": "ProductMainImage",
         "type": "doc",
-        "target": "property6"
+        "target": "property6",
+        "entityTypeName": "Document",
+        "entityTypeKeyName": "DocId"
     }
 ]

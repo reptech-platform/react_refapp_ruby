@@ -173,7 +173,9 @@
             ],
             "validationMessages": [
                 "Product main image is required"
-            ]
+            ],
+            "entityTypeName": "Document",
+            "entityTypeKeyName": "DocId"
         },
         {
             "key": "OtherImages",
@@ -188,7 +190,9 @@
             ],
             "validationMessages": [
                 "Product other image is required"
-            ]
+            ],
+            "entityTypeName": "Document",
+            "entityTypeKeyName": "DocId"
         }
     ],
     "otherdetails": [

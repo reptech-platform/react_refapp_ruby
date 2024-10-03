@@ -13,7 +13,9 @@
     ],
     "MainImage": [
         {
-            "key": "DocId"
+            "key": "DocId",
+            "entityTypeName": "Document",
+            "entityTypeKeyName": "DocId"
         }
     ]
 }
