@@ -134,7 +134,9 @@
             "accept": ".JPG,.JPEG,.PNG",
             "editable": true,
             "validators": [],
-            "validationMessages": []
+            "validationMessages": [],
+            "entityTypeName": "Document",
+            "entityTypeKeyName": "DocId"
         }
     ],
     "producttype": [
@@ -397,7 +399,9 @@
             "accept": ".JPG,.JPEG,.PNG,.PDF,.TXT,.DOC,.DOCX,.XLS,.XLSX",
             "editable": true,
             "validators": [],
-            "validationMessages": []
+            "validationMessages": [],
+            "entityTypeName": "Document",
+            "entityTypeKeyName": "DocId"
         }
     ]
 }

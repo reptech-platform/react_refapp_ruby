@@ -8,6 +8,7 @@ import { ValidatorForm } from 'react-material-ui-form-validator';
 import RenderFormContols from "components/formControls/RenderFormContols";
 import Helper from "shared/helper";
 import { GetDocument } from "shared/services";
+import { Attachment as AttachmentIcon } from '@mui/icons-material';
 
 // <CustomTable location={x} title={UIComponentTitle} controls={props.controls[x]} rows={dataRows} options={props.options} />
 const Component = (props) => {
@@ -31,7 +32,17 @@ const Component = (props) => {
     const [configBackInfo, setConfigBackInfo] = useState(null);
 
     const form = React.useRef(null);
-    /*  */
+
+    const OnDocumentClicked = async (e, value) => {
+        e.preventDefault();
+        if (!Helper.IsNullValue(value)) {
+            setImageSource(null);
+            let type = Helper.ExtractFileType(value, true);
+            const srcUrl = await Helper.GetBlobUrl(value, type);
+            setImageSource(srcUrl);
+            setShowDocument(true);
+        }
+    }
 
     const InitializeConfig = async () => {
         let _columns = controls.filter(x => x.type !== 'keyid').map(z => {
@@ -40,11 +51,22 @@ const Component = (props) => {
                 return {
                     headerName: z.label, field: z.key,
                     flex: 1, flexGrow: 1, flexShrink: 1, ctype: z.type,
-                    renderCell: (params) => (
-                        <Link to="#" className="textlink">
-                            {params.value}
-                        </Link>
-                    )
+                    renderCell: ({ value }) => {
+                        if (Helper.IsNullValue(value)) return null;
+                        return (
+                            <>
+                                <IconButton
+                                    variant="contained"
+                                    size="small"
+                                    edge="start"
+                                    aria-label="download"
+                                    onClick={(e) => OnDocumentClicked(e, value)}>
+                                    <AttachmentIcon />
+                                </IconButton>
+                            </>
+                        )
+
+                    }
                 };
             }
             return { headerName: z.label, field: z.key, flex: 1, flexGrow: 1, flexShrink: 1 };
@@ -65,24 +87,6 @@ const Component = (props) => {
     const OnDocViewerClosed = async (e) => {
         setShowDocument(false);
     }
-
-    const OnDataGridCellClicked = async (e) => {
-        const { field, row, type } = e;
-        if (type === 'doc') {
-            setImageSource(null);
-            let docId = row[`${field}_Image`];
-            let docName = row[`${field}`];
-
-            let rslt = await GetDocument(docId, true);
-            if (rslt.status) {
-                let type = docName.split(".").pop();
-                const srcUrl = await Helper.GetBlobUrl(rslt.values, type.toLowerCase());
-                setImageSource(srcUrl);
-                setShowDocument(true);
-            }
-        }
-
-    };
 
     const OnPageClicked = (e) => { setPageInfo({ page: 0, pageSize: 5 }); if (e) setPageInfo(e); }
     const OnSortClicked = (e) => { setSortBy(e); }
@@ -221,7 +225,7 @@ const Component = (props) => {
             </Box>
             <Box style={{ width: '100%' }}>
                 <DataTable keyId={keyIdName} columns={columns} rowsCount={rows ? rows.length : 0} rows={rows || []} noActions={mode === 'view'}
-                    sortBy={sortBy} pageInfo={pageInfo} onActionClicked={OnActionClicked} localPaginationMode={true} localSorting={true} onColumnClicked={OnDataGridCellClicked}
+                    sortBy={sortBy} pageInfo={pageInfo} onActionClicked={OnActionClicked} localPaginationMode={true} localSorting={true}
                     onSortClicked={OnSortClicked} onPageClicked={OnPageClicked} />
             </Box>
 

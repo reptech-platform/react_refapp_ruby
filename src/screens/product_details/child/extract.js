@@ -32,7 +32,7 @@ const FetchProductInfo = async () => {
 const FetchProductDetails = async (productId, enums) => {
 
     return new Promise(async (resolve) => {
-        let item = {}, backItem = {}, tmp;
+        let item = {},rslt, backItem = {}, tmp;
 
         const keyItems = Object.keys(ProductJsonConfig);
 
@@ -59,7 +59,7 @@ const FetchProductDetails = async (productId, enums) => {
 
             $expand = Helper.RemoveDuplicatesFromArray($expand);
 
-            let rslt = await Api.GetProduct(productId, `$expand=${$expand}`);
+            rslt = await Api.GetProduct(productId, `$expand=${$expand}`);
             if (rslt.status) {
 
                 const product = rslt.values;
