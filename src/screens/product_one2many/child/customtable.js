@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
 import { Typography, Grid, Stack, Box, IconButton, useTheme } from '@mui/material';
 import { Add as AddBoxIcon } from '@mui/icons-material';
 import { SearchInput, CustomDialog, DocViewer, Image } from "components";
@@ -240,7 +239,7 @@ const Component = (props) => {
                     open={!Helper.IsNullValue(actions.action)} title={`${Helper.ToFirstCharCapital(actions.action)} ${title}`} onCloseClicked={OnCloseClicked}>
                     <ValidatorForm ref={form} onSubmit={handleSubmit}>
                         <Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
-                            <RenderFormContols shadow={true} location="newItem" mode={actions.action === 'view' ? 'view' : undefined} onInputChange={OnInputChange}
+                            <RenderFormContols shadow={true} location="newItem" nocreate={true} mode={actions.action === 'view' ? 'view' : undefined} onInputChange={OnInputChange}
                                 controls={configInfo} options={props.options} />
                         </Grid>
                     </ValidatorForm>

@@ -8,6 +8,9 @@ import Support from "shared/support";
 import { ArrowLeft as ArrowLeftIcon } from '@mui/icons-material';
 import Helper from "shared/helper";
 
+import { GetProductOtherImages, SetProductOtherImages } from "shared/services";
+
+
 import { Extract, MapItems } from "./child/extract";
 
 const numberItems = ['Pincode'];
@@ -52,11 +55,10 @@ const Component = (props) => {
                 } else {
 
                     // Check any deleted images
-                    value1.forEach(e => {
-                        let index = value2.findIndex(x => x.DocData === e.DocData);
-                        if (index === -1) {
-                            changesItems.push({ key: prop.key, index: e.index, Delete: true });
-                        }
+                    let _deleteditems = value1.filter(x => value2.findIndex(z => z.docId === x.docId) === -1);
+
+                    _deleteditems.forEach(e => {
+                        changesItems.push({ key: prop.key, index: e.index, Deleted: true, value: e.docId });
                     });
 
                     // Check any new images
@@ -379,6 +381,16 @@ const Component = (props) => {
                             rslt = await Support.AddOrUpdateProductOtherImages(data);
                             if (!rslt.status) return;
                         } else { return; }
+                    } else if (change.Deleted) {
+                        let filter = `Product_id eq ${parseInt(productId)} and DocId eq ${parseInt(change.value)}`;
+                        rslt = await GetProductOtherImages(null, filter);
+                        if (rslt.status) {
+                            let oldImageId = parseInt(rslt.values[0].Id);
+                            if (oldImageId > 0) {
+                                await SetProductOtherImages({ Id: rslt.values[0].Id, Deleted: true });
+                            }
+                        }
+
                     }
 
                 }

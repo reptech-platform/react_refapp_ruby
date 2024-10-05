@@ -60,7 +60,7 @@ const RenderUploadDocument = (props) => {
 
 const Component = (props) => {
 
-    const { mode, step, title, review, controls, options, onInputChange,
+    const { mode, step, title, review, controls, options, onInputChange, nocreate,
         location, onEditClicked, shadow, excludes, excludestepper } = props;
 
     const paddingTop = mode && mode === 'view' ? undefined : 3;
@@ -164,7 +164,7 @@ const Component = (props) => {
                                         )}
                                         {x.type === 'dropdown' && (
                                             <DropDown mode={mode} id={x.key} name={x.key} value={x.value} options={GetDropDownOptions(x.source, x.nameId)} valueId={x.valueId} size="small"
-                                                nameId={x.nameId} contentId={x.contentId} defaultLabel={`Select ${x.label}`} createOption={x.create} createLabel={`Create ${x.label}`} sx={{ width: x.width }}
+                                                nameId={x.nameId} contentId={x.contentId} defaultLabel={`Select ${x.label}`} createOption={nocreate ? false : x.create} createLabel={`Create ${x.label}`} sx={{ width: x.width }}
                                                 validators={x.validators} validationMessages={x.validationMessages} onDropDownChange={OnInputChange} />
                                         )}
                                     </TableCell>
