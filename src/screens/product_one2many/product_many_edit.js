@@ -307,19 +307,19 @@ const Component = (props) => {
         for (let i = 0; i < mapItems.length; i++) {
 
             // Check is there any changes
-            const mapItem = MapItems[i];
+            const mapItem = mapItems[i];
             if (!mapItem.child) {
                 changes = TrackChanges(mapItem.uicomponent);
                 if (changes.length > 0) {
                     // Add or Update the product and navigation entity if it is deos not exist
-                    let navItem = product.find(x => x.uicomponent === mapItems[i].uicomponent);
+                    let navItem = product.find(x => x.uicomponent === mapItem.uicomponent);
                     if (!Helper.IsJSONEmpty(navItem) && Helper.IsNullValue(navItem.value)) {
 
                         let childItem = row[navItem.uicomponent];
                         numfields = Helper.GetAllNumberFields(childItem);
                         if (numfields.length > 0) Helper.UpdateNumberFields(childItem, numfields);
 
-                        rslt = await mapItems[i].func(childItem, dropDownOptions);
+                        rslt = await mapItem.func(childItem, dropDownOptions);
                         if (rslt.status) {
                             data = [
                                 { key: "Product_id", value: parseInt(productId) },
