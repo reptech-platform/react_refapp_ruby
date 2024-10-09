@@ -163,8 +163,8 @@ function base64ToBlob(base64, contentType) {
 fn.GetBlobUrl = async (data, type) => {
 
     return new Promise(resolve => {
-        // Create a Blob from the image data
-        const blob = base64ToBlob(data, `image/${type}`);
+        // Create a Blob from the binary data
+        const blob = base64ToBlob(data, type);
         // Generate a Blob URL
         const blobURL = URL.createObjectURL(blob);
 
@@ -173,6 +173,17 @@ fn.GetBlobUrl = async (data, type) => {
 
 }
 
+fn.ExtractFileType = (input, isBlob) => {
+    let pos = input?.toString().indexOf(";");
+    if (pos > -1) {
+        let leftPart = input.substring(0, pos);
+        if (isBlob) {
+            return leftPart.substring(leftPart.indexOf(":") + 1);
+        }
+        return leftPart.substring(leftPart.indexOf("/") + 1).toUpperCase();
+    }
+    return input;
+}
 
 
 

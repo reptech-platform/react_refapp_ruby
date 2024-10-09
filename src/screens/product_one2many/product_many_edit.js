@@ -8,6 +8,9 @@ import Support from "shared/support";
 import { ArrowLeft as ArrowLeftIcon } from '@mui/icons-material';
 import Helper from "shared/helper";
 
+import { GetProductOtherImages, SetProductOtherImages } from "shared/services";
+
+
 import { Extract, MapItems } from "./child/extract";
 
 const numberItems = ['Pincode'];
@@ -29,37 +32,51 @@ const Component = (props) => {
     const [showUpdate, setShowUpdate] = useState(false);
     const { title } = props;
 
-    const TrackChanges = (name) => {
+    const TrackChanges = (name, excludes) => {
+
         if (Helper.IsNullValue(backRow[name])) return [];
+        let tExcludes = excludes || [];
         const source = JSON.parse(JSON.stringify(backRow[name]));
         const target = JSON.parse(JSON.stringify(row[name]));
 
-        let changes = [];
+        let changesItems = [];
         for (let prop of source) {
             let value1 = source.find((x) => x.key === prop.key).value ?? "";
             let value2 = target.find((x) => x.key === prop.key).value ?? "";
-
+            if (tExcludes?.indexOf(prop.key) > -1) continue;
             if (prop.key === 'MainImage') {
-                value1 = value1.DocName ?? "";
-                value2 = value2.DocName ?? "";
+                value1 = value1 ?? "";
+                value2 = value2 ?? "";
             } else if (prop.key === 'OtherImages') {
-                if (value1.length !== value2.length) {
-                    value1 = ""; value2 = "CHANGED";
+                if (value1.length === 0 && value2.length > 0) {
+                    value2.forEach(e => {
+                        changesItems.push({ key: prop.key, index: e.index, value: e.DocData });
+                    });
                 } else {
-                    for (let k = 0; k < value1.length; k++) {
-                        if (value1[k].DocName !== value2[k].DocName) {
-                            value1 = ""; value2 = "CHANGED";
-                            break;
+
+                    // Check any deleted images
+                    let _deleteditems = value1.filter(x => value2.findIndex(z => z.docId === x.docId) === -1);
+
+                    _deleteditems.forEach(e => {
+                        changesItems.push({ key: prop.key, index: e.index, Deleted: true, value: e.docId });
+                    });
+
+                    // Check any new images
+                    value2.forEach(e => {
+                        let index = value1.findIndex(x => x.DocData === e.DocData);
+                        if (index === -1) {
+                            changesItems.push({ key: prop.key, index: e.index, value: e.DocData });
                         }
-                    }
+                    });
                 }
             }
-            if (value1.toString() !== value2.toString()) {
-                changes.push(prop.key);
+
+            if (prop.key !== 'OtherImages' && value1.toString() !== value2.toString()) {
+                changesItems.push(prop.key);
             }
         }
 
-        return changes;
+        return changesItems;
     }
 
     const TrackChildChanges = (name) => {
@@ -156,7 +173,7 @@ const Component = (props) => {
     }
 
     const OnSubmit = async () => {
-        let rslt, data, prodImages, productId, changes, numfields;
+        let rslt, data, productId, changes, numfields;
         const mapItems = MapItems;
 
         // Attach inline objects
@@ -169,7 +186,7 @@ const Component = (props) => {
             let x = inlineObjs[inLineCnt];
 
             let vObj = {};
-            let changes = TrackChanges(x.name);
+            let changes = TrackChanges(x.name, ['MainImage', 'OtherImages']);
             if (changes.length > 0) {
                 let obj = row[x.name];
 
@@ -226,10 +243,14 @@ const Component = (props) => {
 
                     // Add or Update document
                     if (changeItem.fields.indexOf(docKeyId) > -1) {
+                        debugger;
                         let docIndex = newItem.findIndex(x => x.key === docKeyId);
                         let item = newItem[docIndex];
-                        if (!Helper.IsNullValue(item.stream)) {
-                            rslt = await Support.AddOrUpdateDocument({ value: item.stream });
+                        let entityTypeKeyName = item?.entityTypeKeyName;
+                        let entityTypeName = item?.entityTypeName;
+                        if (!Helper.IsNullValue(item.stream) && !Helper.IsNullValue(entityTypeKeyName)) {
+                            let docFuns = Support.DocFunctions.find(x => x.entityTypeName === entityTypeName);
+                            rslt = await docFuns.setFun(item.stream, entityTypeKeyName);
                             if (rslt.status) {
                                 newItem[docIndex].value = parseInt(rslt.id);
                                 delete newItem[docIndex]['stream'];
@@ -271,7 +292,7 @@ const Component = (props) => {
         }
 
         // Add Or Update Product
-        changes = TrackChanges('product');
+        changes = TrackChanges('product', ['MainImage', 'OtherImages']);
         if (changes.length > 0) {
 
             numfields = Helper.GetAllNumberFields(product);
@@ -286,19 +307,19 @@ const Component = (props) => {
         for (let i = 0; i < mapItems.length; i++) {
 
             // Check is there any changes
-            const mapItem = MapItems[i];
+            const mapItem = mapItems[i];
             if (!mapItem.child) {
                 changes = TrackChanges(mapItem.uicomponent);
                 if (changes.length > 0) {
                     // Add or Update the product and navigation entity if it is deos not exist
-                    let navItem = product.find(x => x.uicomponent === mapItems[i].uicomponent);
+                    let navItem = product.find(x => x.uicomponent === mapItem.uicomponent);
                     if (!Helper.IsJSONEmpty(navItem) && Helper.IsNullValue(navItem.value)) {
 
                         let childItem = row[navItem.uicomponent];
                         numfields = Helper.GetAllNumberFields(childItem);
                         if (numfields.length > 0) Helper.UpdateNumberFields(childItem, numfields);
 
-                        rslt = await mapItems[i].func(childItem, dropDownOptions);
+                        rslt = await mapItem.func(childItem, dropDownOptions);
                         if (rslt.status) {
                             data = [
                                 { key: "Product_id", value: parseInt(productId) },
@@ -319,35 +340,59 @@ const Component = (props) => {
         // Add Product Main Image
         changes = TrackChanges('product');
         if (changes.length > 0 && changes.indexOf('MainImage') > -1) {
-            prodImages = product.find((x) => x.key === 'MainImage');
-            if (prodImages && !Helper.IsNullValue(prodImages.value)) {
-                rslt = await Support.AddOrUpdateDocument(prodImages);
+            data = product.find((x) => x.key === 'MainImage');
+            let entityTypeKeyName = data?.entityTypeKeyName;
+            let entityTypeName = data?.entityTypeName;
+            if (!Helper.IsNullValue(entityTypeKeyName)) {
+                let docFuns = Support.DocFunctions.find(x => x.entityTypeName === entityTypeName);
+                rslt = await docFuns.setFun(data.value, entityTypeKeyName);
                 if (rslt.status) {
+                    let newImageId = parseInt(rslt.id);
                     data = [
                         { key: "Product_id", value: parseInt(productId) },
-                        { key: "ProductMainImage", value: parseInt(rslt.id) }
+                        { key: "ProductMainImage", value: newImageId }
                     ];
                     rslt = await Support.AddOrUpdateProduct(data, dropDownOptions);
                     if (!rslt.status) return;
+
                 } else { return; }
             }
         }
 
         // Add Product Other Images
         changes = TrackChanges('product');
-        if (changes.length > 0 && changes.indexOf('OtherImages') > -1) {
-            prodImages = product.find((x) => x.key === 'OtherImages');
-            if (prodImages && !Helper.IsNullValue(prodImages.value)) {
-                for (let i = 0; i < prodImages.length; i++) {
-                    rslt = await Support.AddOrUpdateDocument({ value: prodImages[i] });
-                    if (rslt.status) {
-                        data = [
-                            { key: "Product_id", value: parseInt(productId) },
-                            { key: "DocId", value: parseInt(rslt.id) }
-                        ];
-                        rslt = await Support.AddOrUpdateProductOtherImages(data);
-                        if (!rslt.status) return;
+        if (changes.length > 0 && changes.findIndex(x => x.key === 'OtherImages') > -1) {
+            changes = changes.filter(x => x.key === 'OtherImages');
+            let data = product.find((x) => x.key === 'OtherImages');
+            let entityTypeKeyName = data?.entityTypeKeyName;
+            let entityTypeName = data?.entityTypeName;
+            if (!Helper.IsNullValue(entityTypeKeyName)) {
+                let docFuns = Support.DocFunctions.find(x => x.entityTypeName === entityTypeName);
+                for (let changeIndex = 0; changeIndex < changes.length; changeIndex++) {
+                    let change = changes[changeIndex];
+                    if (!change.Deleted) {
+                        rslt = await docFuns.setFun(change.value, entityTypeKeyName);
+                        if (rslt.status) {
+                            let newImageId = parseInt(rslt.id);
+                            data = [
+                                { key: "Product_id", value: parseInt(productId) },
+                                { key: entityTypeKeyName, value: newImageId }
+                            ];
+                            rslt = await Support.AddOrUpdateProductOtherImages(data);
+                            if (!rslt.status) return;
+                        } else { return; }
+                    } else if (change.Deleted) {
+                        let filter = `Product_id eq ${parseInt(productId)} and DocId eq ${parseInt(change.value)}`;
+                        rslt = await GetProductOtherImages(null, filter);
+                        if (rslt.status) {
+                            let oldImageId = parseInt(rslt.values[0].Id);
+                            if (oldImageId > 0) {
+                                await SetProductOtherImages({ Id: rslt.values[0].Id, Deleted: true });
+                            }
+                        }
+
                     }
+
                 }
             }
         }

@@ -6,15 +6,15 @@ import Helper from "shared/helper";
 
 const RenderUploadDocument = (props) => {
 
-    const { mode, name, type, acceptTypes, value, validators, validationMessages, width, onInputChange } = props;
+    const { mode, name, acceptTypes, value, validators, validationMessages, width, onInputChange } = props;
 
     const [values, setValues] = React.useState([]);
     const [state, setState] = React.useState(false);
 
     const OnInputChange = (e) => {
-        const nvalue = e.value;
+        const { name, index, value } = e;
         let tmp = values || [];
-        tmp[nvalue.index] = nvalue;
+        tmp[index].DocData = value;
         setValues(tmp);
         if (onInputChange) onInputChange({ name, value: tmp });
         setState(!state);
@@ -50,7 +50,7 @@ const RenderUploadDocument = (props) => {
     return (
         <>
             {values && values.length > 0 && values.map((x) => (
-                <FileInput key={x.index} mode={mode} id={name} name={name} type={type} value={x} index={x.index} count={values.length}
+                <FileInput key={x.index} mode={mode} id={name} name={name} value={x} index={x.index} count={values.length}
                     validators={validators} validationMessages={validationMessages} sx={{ width: width }} addmore={true} onDeleteClicked={OnDeleteClicked}
                     acceptTypes={acceptTypes} OnInputChange={OnInputChange} onAddMoreClicked={OnAddMoreClicked} />
             ))}
@@ -60,7 +60,7 @@ const RenderUploadDocument = (props) => {
 
 const Component = (props) => {
 
-    const { mode, step, title, review, controls, options, onInputChange,
+    const { mode, step, title, review, controls, options, onInputChange, nocreate,
         location, onEditClicked, shadow, excludes, excludestepper } = props;
 
     const paddingTop = mode && mode === 'view' ? undefined : 3;
@@ -141,12 +141,12 @@ const Component = (props) => {
                                             <ColorPicker mode={mode} id={x.key} name={x.key} value={x.value} OnInputChange={OnInputChange} sx={{ width: x.width }} />
                                         )}
                                         {!x.multiple && x.type === 'doc' && (
-                                            <FileInput mode={mode} id={x.key} name={x.key} type={x.type} value={x.value}
+                                            <FileInput mode={mode} id={x.key} name={x.key} value={x.value}
                                                 validators={x.validators} validationMessages={x.validationMessages} sx={{ width: x.width }}
                                                 acceptTypes={x.accept} OnInputChange={OnInputChange} />
                                         )}
                                         {x.multiple && x.type === 'doc' && (
-                                            <RenderUploadDocument mode={mode} name={x.key} type={x.type} value={x.value}
+                                            <RenderUploadDocument mode={mode} name={x.key} value={x.value}
                                                 validators={x.validators} validationMessages={x.validationMessages} width={x.width}
                                                 acceptTypes={x.accept} onInputChange={OnInputChange} />
                                         )}
@@ -164,7 +164,7 @@ const Component = (props) => {
                                         )}
                                         {x.type === 'dropdown' && (
                                             <DropDown mode={mode} id={x.key} name={x.key} value={x.value} options={GetDropDownOptions(x.source, x.nameId)} valueId={x.valueId} size="small"
-                                                nameId={x.nameId} contentId={x.contentId} defaultLabel={`Select ${x.label}`} createOption={x.create} createLabel={`Create ${x.label}`} sx={{ width: x.width }}
+                                                nameId={x.nameId} contentId={x.contentId} defaultLabel={`Select ${x.label}`} createOption={nocreate ? false : x.create} createLabel={`Create ${x.label}`} sx={{ width: x.width }}
                                                 validators={x.validators} validationMessages={x.validationMessages} onDropDownChange={OnInputChange} />
                                         )}
                                     </TableCell>

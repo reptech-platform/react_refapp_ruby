@@ -54,12 +54,12 @@ const RenderDocument = (props) => {
 
 const Component = (props) => {
 
-    const { mode, index, id, name, type, value, OnInputChange, addmore, onAddMoreClicked, count, onDeleteClicked, alt,
+    const { mode, index, id, name, value, OnInputChange,
+        addmore, onAddMoreClicked, count, onDeleteClicked, alt,
         style, sx, acceptTypes, validators, validationMessages } = props;
 
     const [inputValue, setInputValue] = React.useState("");
 
-    const [iDocId, setIDocId] = React.useState();
     const [iDocType, setIDocType] = React.useState();
     const [iDocData, setIDocData] = React.useState();
 
@@ -95,23 +95,11 @@ const Component = (props) => {
     const ReadDocument = (input) => {
         var reader = new FileReader();
         reader.onload = (e) => {
-            setIDocData(e.target.result);
-            setInputValue(input.name);
-
-            const iDocName = input.name.split(".")[0];
-            const tDocType = input.type;
-            const iDocExt = input.name.split(".").pop().toUpperCase();
             const tDocData = e.target.result;
-
+            setIDocData(tDocData);
+            setInputValue(input.name);
             if (OnInputChange) {
-                OnInputChange({
-                    name,
-                    value: {
-                        index, DocId: iDocId, DocName: iDocName,
-                        DocExt: iDocExt, DocType: tDocType, DocData: tDocData
-                    },
-                    type
-                });
+                OnInputChange({ name, index, value: tDocData });
             }
         };
         reader.readAsDataURL(input);
@@ -125,28 +113,19 @@ const Component = (props) => {
         if (onDeleteClicked) onDeleteClicked(e, index);
     }
 
-    /* React.useEffect(() => {
-        setIDocType(null);
-        if (inputValue) {
-            let tmp = inputValue.split(".").pop().toUpperCase(); setIDocType(tmp);
-        }
-    }, [inputValue]); */
-
     React.useEffect(() => {
-        let tValue = "";
         if (value) {
-            tValue = value.DocName && value.DocExt && `${value.DocName}.${value.DocExt}`;
-            setInputValue(tValue);
-            setIDocId(value.DocId);
-            setIDocType(value.DocExt);
-            setIDocData(value.DocData);
+            let tmp = !Helper.IsNullValue(index?.toString()) ? value.DocData : value;
+            let fileType = Helper.ExtractFileType(tmp);
+            setIDocType(fileType);
+            setIDocData(tmp);
         }
     }, [value]);
 
     return (
         <>
 
-            {Helper.IsNullValue(mode) && (
+            {Helper.IsNullValue(mode) && mode !== 'view' && (
                 <>
                     <Table sx={{ display: 'table', width: '100%', p: 0, m: 0, border: 0, ...sx }}>
                         <TableBody>

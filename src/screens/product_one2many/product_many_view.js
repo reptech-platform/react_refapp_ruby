@@ -20,7 +20,6 @@ const Component = (props) => {
 
     const fetchData = async () => {
         await Extract(id).then(rslt => {
-            console.log(rslt);
             const { row, options, collections } = rslt;
             setRow(row);
             setChildCollections(collections);

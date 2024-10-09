@@ -28,30 +28,47 @@ const Component = React.forwardRef((props, ref) => {
 
         // Add Product Main Image
         prodImages = product.find((x) => x.key === 'MainImage');
-        rslt = await Support.AddOrUpdateDocument(prodImages);
-        if (rslt.status) {
-            product.find((x) => x.key === 'ProductMainImage')['value'] = rslt.id;
-            // Add Or Update Product
-            data = [
-                { key: "Product_id", value: parseInt(productId) },
-                { key: "ProductMainImage", value: parseInt(rslt.id) }
-            ];
-            rslt = await Support.AddOrUpdateProduct(data, dropDownOptions);
-            if (!rslt.status) return;
+        if (prodImages && !Helper.IsNullValue(prodImages.value)) {
+            let entityTypeKeyName = prodImages?.entityTypeKeyName;
+            let entityTypeName = prodImages?.entityTypeName;
+            if (!Helper.IsNullValue(entityTypeKeyName)) {
+                let docFuns = Support.DocFunctions.find(x => x.entityTypeName === entityTypeName);
+                rslt = await docFuns.setFun(prodImages.value, entityTypeKeyName);
+                if (rslt.status) {
+                    let newImageId = parseInt(rslt.id);
+                    data = [
+                        { key: "Product_id", value: parseInt(productId) },
+                        { key: "ProductMainImage", value: newImageId }
+                    ];
+                    rslt = await Support.AddOrUpdateProduct(data, dropDownOptions);
+                    if (!rslt.status) return;
 
-        } else { return; }
+                } else { return; }
+            }
+        }
 
         // Add Product Other Images
-        prodImages = product.find((x) => x.key === 'OtherImages').value;
-        for (let i = 0; i < prodImages.length; i++) {
-            rslt = await Support.AddOrUpdateDocument({ value: prodImages[i] });
-            if (rslt.status) {
-                data = [
-                    { key: "Product_id", value: parseInt(productId) },
-                    { key: "DocId", value: parseInt(rslt.id) }
-                ];
-                rslt = await Support.AddOrUpdateProductOtherImages(data);
-                if (!rslt.status) return;
+        prodImages = product.find((x) => x.key === 'OtherImages');
+        if (prodImages && !Helper.IsNullValue(prodImages.value)) {
+
+            let entityTypeKeyName = keyItems?.entityTypeKeyName;
+            let entityTypeName = keyItems?.entityTypeName;
+
+            if (!Helper.IsNullValue(entityTypeKeyName)) {
+                let docFuns = Support.DocFunctions.find(x => x.entityTypeName === entityTypeName);
+                let values = prodImages.value;
+                for (let i = 0; i < values.length; i++) {
+                    rslt = await docFuns.setFun(values[i].DocData, entityTypeKeyName);
+                    if (rslt.status) {
+                        let newImageId = parseInt(rslt.id);
+                        data = [
+                            { key: "Product_id", value: parseInt(productId) },
+                            { key: entityTypeKeyName, value: newImageId }
+                        ];
+                        rslt = await Support.AddOrUpdateProductOtherImages(data);
+                        if (!rslt.status) return;
+                    } else { return; }
+                }
             }
         }
 

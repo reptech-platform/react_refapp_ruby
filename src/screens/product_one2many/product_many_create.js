@@ -63,19 +63,25 @@ const Component = (props) => {
             let obj = row[parentObj.name];
 
             // Check any doc type is defined
-            let docKeyId = obj.find(x => x.type === 'doc')['key'];
+            let docObj = obj.find(x => x.type === 'doc');
+            let docKeyId = docObj['key'];
 
             let _values = obj.find(z => z.type === 'keyid')?.values;
             if (!Helper.IsNullValue(docKeyId)) {
 
-                for (let valCnt = 0; valCnt < _values.length; valCnt++) {
-                    let docObject = _values[valCnt];
+                let entityTypeKeyName = docObj?.entityTypeKeyName;
+                let entityTypeName = docObj?.entityTypeName;
 
-                    if (!Helper.IsNullValue(docObject?.stream)) {
-                        rslt = await Support.AddOrUpdateDocument({ value: docObject.stream });
-                        if (rslt.status) {
-                            _values[valCnt][docKeyId] = parseInt(rslt.id);
-                        } else { return; }
+                if (!Helper.IsNullValue(entityTypeKeyName)) {
+                    let docFuns = Support.DocFunctions.find(x => x.entityTypeName === entityTypeName);
+                    for (let valCnt = 0; valCnt < _values.length; valCnt++) {
+                        let docObject = _values[valCnt];
+                        if (!Helper.IsNullValue(docObject?.stream)) {
+                            rslt = await docFuns.setFun(docObject.stream, entityTypeKeyName);
+                            if (rslt.status) {
+                                _values[valCnt][docKeyId] = parseInt(rslt.id);
+                            } else { return; }
+                        }
                     }
                 }
 
@@ -124,60 +130,76 @@ const Component = (props) => {
         } else { return; }
 
         for (let i = 0; i < mapItems.length; i++) {
-            // Add or Update the product and navigation entity if it is deos not exist
-            let navItem = product.find(x => x.uicomponent === mapItems[i].uicomponent);
-            if (!Helper.IsJSONEmpty(navItem) && Helper.IsNullValue(navItem.value)) {
+            if (!mapItems[i].child) {
+                // Add or Update the product and navigation entity if it is deos not exist
+                let navItem = product.find(x => x.uicomponent === mapItems[i].uicomponent);
+                if (!Helper.IsJSONEmpty(navItem) && Helper.IsNullValue(navItem.value)) {
 
-                let childItem = row[navItem.uicomponent];
-                numfields = Helper.GetAllNumberFields(childItem);
-                if (numfields.length > 0) Helper.UpdateNumberFields(childItem, numfields);
+                    let childItem = row[navItem.uicomponent];
+                    numfields = Helper.GetAllNumberFields(childItem);
+                    if (numfields.length > 0) Helper.UpdateNumberFields(childItem, numfields);
 
-                rslt = await mapItems[i].func(childItem, dropDownOptions);
-                if (rslt.status) {
-                    data = [
-                        { key: "Product_id", value: parseInt(productId) },
-                        { key: navItem.key, value: parseInt(rslt.id) }
-                    ];
-                    rslt = await Support.AddOrUpdateProduct(data, dropDownOptions);
-                    if (!rslt.status) return;
+                    rslt = await mapItems[i].func(childItem, dropDownOptions);
+                    if (rslt.status) {
+                        data = [
+                            { key: "Product_id", value: parseInt(productId) },
+                            { key: navItem.key, value: parseInt(rslt.id) }
+                        ];
+                        rslt = await Support.AddOrUpdateProduct(data, dropDownOptions);
+                        if (!rslt.status) return;
 
-                } else { return; }
+                    } else { return; }
+                }
             }
         }
 
         // Add Product Main Image
         prodImages = product.find((x) => x.key === 'MainImage');
         if (prodImages && !Helper.IsNullValue(prodImages.value)) {
-            rslt = await Support.AddOrUpdateDocument(prodImages);
-            if (rslt.status) {
-                data = [
-                    { key: "Product_id", value: parseInt(productId) },
-                    { key: "ProductMainImage", value: parseInt(rslt.id) }
-                ];
-                rslt = await Support.AddOrUpdateProduct(data, dropDownOptions);
-                if (!rslt.status) return;
-            } else { return; }
+
+            let entityTypeKeyName = prodImages?.entityTypeKeyName;
+            let entityTypeName = prodImages?.entityTypeName;
+            if (!Helper.IsNullValue(entityTypeKeyName)) {
+                let docFuns = Support.DocFunctions.find(x => x.entityTypeName === entityTypeName);
+                rslt = await docFuns.setFun(prodImages.value, entityTypeKeyName);
+                if (rslt.status) {
+                    data = [
+                        { key: "Product_id", value: parseInt(productId) },
+                        { key: "ProductMainImage", value: parseInt(rslt.id) }
+                    ];
+                    rslt = await Support.AddOrUpdateProduct(data, dropDownOptions);
+                    if (!rslt.status) return;
+                } else { return; }
+            }
         }
 
         // Add Product Other Images
         prodImages = product.find((x) => x.key === 'OtherImages');
         if (prodImages && !Helper.IsNullValue(prodImages.value)) {
-            for (let i = 0; i < prodImages.length; i++) {
-                rslt = await Support.AddOrUpdateDocument({ value: prodImages[i] });
-                if (rslt.status) {
-                    data = [
-                        { key: "Product_id", value: parseInt(productId) },
-                        { key: "DocId", value: parseInt(rslt.id) }
-                    ];
-                    rslt = await Support.AddOrUpdateProductOtherImages(data);
-                    if (!rslt.status) return;
+
+            let entityTypeKeyName = prodImages?.entityTypeKeyName;
+            let entityTypeName = prodImages?.entityTypeName;
+
+            if (!Helper.IsNullValue(entityTypeKeyName)) {
+                let docFuns = Support.DocFunctions.find(x => x.entityTypeName === entityTypeName);
+                let values = prodImages.value;
+                for (let i = 0; i < values.length; i++) {
+                    rslt = await docFuns.setFun(values[i].DocData, entityTypeKeyName);
+                    if (rslt.status) {
+                        data = [
+                            { key: "Product_id", value: parseInt(productId) },
+                            { key: "DocId", value: parseInt(rslt.id) }
+                        ];
+                        rslt = await Support.AddOrUpdateProductOtherImages(data);
+                        if (!rslt.status) return;
+                    }
                 }
             }
         }
 
         global.AlertPopup("success", "Product is created successfully!");
         setShowUpdate(false);
-        NavigateTo("/products");
+        NavigateTo("/productsmany");
     }
 
     const OnInputChange = (e) => {

@@ -8,6 +8,7 @@ import { SearchInput } from "components";
 import { Add as AddBoxIcon } from '@mui/icons-material';
 import ProductJsonConfig from "config/product_list_config.json";
 import Helper from "shared/helper";
+import Support from "shared/support";
 
 const Component = (props) => {
     const { title } = props;
@@ -87,9 +88,17 @@ const Component = (props) => {
                         for (let j = 0; j < navItems.length; j++) {
                             let tNav = navItems[j];
                             if (tNav.type === 'doc' && !Helper.IsNullValue(_value[tNav.key])) {
-                                await Api.GetDocument(_value[tNav.key], true).then((rslt) => {
-                                    _row[tNav.target] = rslt.values;
-                                })
+
+                                if (!Helper.IsNullValue(tNav.entityTypeKeyName)) {
+                                    let docId = _value[tNav.key] || 0;
+                                    let docFuns = Support.DocFunctions.find(x => x.entityTypeName === tNav.entityTypeName);
+                                    if (docId > 0) {
+                                        await docFuns.getFun(docId, true).then((rslt) => {
+                                            _row[tNav.target] = rslt.values;
+                                        })
+                                    }
+                                }
+
                             } else {
                                 if (tNav.expand) {
                                     let navItem = _value[tNav.expand] || {};

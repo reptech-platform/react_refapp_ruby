@@ -5,7 +5,7 @@ import Container from "screens/container";
 import { DataGrid } from '../childs';
 import * as Api from "shared/services";
 import ProductJsonConfig from "config/product_tiles_config.json";
-
+import Support from "shared/support";
 import { SearchInput, CustomDialog } from "components";
 import Helper from "shared/helper";
 import { Add as AddBoxIcon } from '@mui/icons-material';
@@ -82,9 +82,15 @@ const Component = (props) => {
                             for (let prop of ProductJsonConfig[nameId]) {
                                 if (_rows[i][nameId]) {
                                     if (nameId === 'MainImage') {
-                                        await Api.GetDocument(_rows[i][nameId].DocId, true).then((rslt) => {
-                                            _rows[i].ProductMainImageData = rslt.values;
-                                        })
+                                        if (!Helper.IsNullValue(prop.entityTypeKeyName)) {
+                                            let docId = _rows[i][nameId][prop.entityTypeKeyName] || 0;
+                                            let docFuns = Support.DocFunctions.find(x => x.entityTypeName === prop.entityTypeName);
+                                            if (docId > 0) {
+                                                await docFuns.getFun(docId, true).then((rslt) => {
+                                                    _rows[i].ProductMainImageData = rslt.values;
+                                                })
+                                            }
+                                        }
                                     } else {
                                         _rows[i][prop.key] = _rows[i][nameId][prop.key] || prop.default;
                                     }
