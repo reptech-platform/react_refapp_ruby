@@ -6,7 +6,7 @@ import { ROWSPERPAGE } from "config";
 
 const Component = (props) => {
 
-    const { columns, rowsCount, rows, pageInfo, onActionClicked, sortBy, keyId, pageMode,
+    const { columns, rowsCount, rows, pageInfo, onActionClicked, sortBy, keyId, pageMode, onColumnClicked,
         onSortClicked, onPageClicked, sx, noActions, hideFooter } = props;
 
     const paginationMode = pageMode || "server";
@@ -107,6 +107,11 @@ const Component = (props) => {
                         outline: "none !important",
                     },
                     ...sx
+                }}
+                onCellClick={(params, event) => {
+                    event.defaultMuiPrevented = true;
+                    const { field, row, colDef } = params;
+                    if (onColumnClicked) onColumnClicked({ field, row, type: colDef["ctype"] });
                 }}
             />
         </>

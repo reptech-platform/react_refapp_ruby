@@ -44,20 +44,45 @@ const Component = (props) => {
             if (numfields.length > 0) Helper.UpdateNumberFields(obj, numfields);
 
             const tmp = Object.values(obj);
-            tmp.filter((x) => x.value).map((x) => {
-                if (x.type === 'dropdown' && !Helper.IsNullValue(x.value)) {
-                    vObj[x.key] = dropDownOptions.find((z) => z.Name === x.source).Values.find((m) => parseInt(m[x.valueId]) === parseInt(x.value))[x.valueId];
+            tmp.filter((m) => m.value).map((k) => {
+                if (k.type === 'dropdown' && !Helper.IsNullValue(k.value)) {
+                    vObj[k.key] = dropDownOptions.find((z) => z.Name === k.source).Values.find((m) => parseInt(m[k.valueId]) === parseInt(k.value))[k.valueId];
                 } else {
-                    vObj[x.key] = x.value;
+                    vObj[k.key] = k.value;
                 }
             });
             product.push({ key: x.property, value: vObj, type: "inline" });
         });
 
         inlineObjs = childCollections.filter(x => x.child);
-        inlineObjs.forEach(x => {
-            let obj = row[x.name];
+
+        for (let parentCnt = 0; parentCnt < inlineObjs.length; parentCnt++) {
+
+            let parentObj = inlineObjs[parentCnt];
+
+            let obj = row[parentObj.name];
+
+            // Check any doc type is defined
+            let docKeyId = obj.find(x => x.type === 'doc')['key'];
+
             let _values = obj.find(z => z.type === 'keyid')?.values;
+            if (!Helper.IsNullValue(docKeyId)) {
+
+                for (let valCnt = 0; valCnt < _values.length; valCnt++) {
+                    let docObject = _values[valCnt];
+
+                    if (!Helper.IsNullValue(docObject?.stream)) {
+                        rslt = await Support.AddOrUpdateDocument({ value: docObject.stream });
+                        if (rslt.status) {
+                            _values[valCnt][docKeyId] = parseInt(rslt.id);
+                        } else { return; }
+                    }
+                }
+
+                _values.forEach(m => {
+                    ['stream'].forEach(z => delete m[z]);
+                });
+            }
             let valueList = [];
             _values.forEach(m => {
                 ['action', 'CompId', 'id'].forEach(z => delete m[z]);
@@ -89,8 +114,8 @@ const Component = (props) => {
 
             });
 
-            product.push({ key: x.property, value: valueList, type: "collections" });
-        });
+            product.push({ key: parentObj.property, value: valueList, type: "collections" });
+        }
 
         // Add Or Update Product
         rslt = await Support.AddOrUpdateProduct(product, dropDownOptions, ['MainImage', 'OtherImages']);

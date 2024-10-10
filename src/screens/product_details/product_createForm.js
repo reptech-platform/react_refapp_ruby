@@ -73,7 +73,7 @@ const Component = (props) => {
 
         // Add Product Other Images
         prodImages = product.find((x) => x.key === 'OtherImages').value;
-        if (prodImages && !Helper.IsNullValue(prodImages.value)) {
+        if (prodImages && !Helper.IsNullValue(prodImages)) {
             for (let i = 0; i < prodImages.length; i++) {
                 rslt = await Support.AddOrUpdateDocument({ value: prodImages[i] });
                 if (rslt.status) {
