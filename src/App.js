@@ -3,7 +3,7 @@ import { ThemeProvider } from '@mui/material/styles';
 import { Box, CssBaseline } from '@mui/material';
 import { Header, Container, Drawer, AlertMessage } from 'components';
 import RouteItems from "./Routes";
-import { DefaultTheme, DarkTheme, LightTheme } from "./theme";
+import { DarkTheme, LightTheme } from "./theme";
 import TimerSession from "shared/useTimerSession";
 
 import "./App.css";
@@ -21,7 +21,7 @@ global.AlertPopup = (type, msg) => {
 
 const Component = () => {
   const [open, setOpen] = React.useState(false);
-  const [customTheme, setCustomTheme] = React.useState(DefaultTheme);
+  const [customTheme, setCustomTheme] = React.useState(LightTheme);
   const [theme] = TimerSession('theme');
 
   const OnDrawerClicked = () => { setOpen(!open); }

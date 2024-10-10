@@ -8,7 +8,7 @@ const Component = (props) => {
 
     return (
         <>
-            <div className="product-container" style={{ backgroundColor: theme.workspaceBackColor }}>
+            <div className="product-container">
                 <div className={"product-list-full"} style={{ ...styles }}>
                     {children}
                 </div>
