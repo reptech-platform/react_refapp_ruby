@@ -26,7 +26,7 @@ const Component = (props) => {
             <Box sx={{
                 width: 280,
                 height: 160,
-                backgroundColor: "#ffffff",
+                //backgroundColor: "#ffffff",
                 border: "1px solid",
                 borderColor,
                 boxShadow: "6px 6px 54px 0px #0000000D",

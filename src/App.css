@@ -142,6 +142,7 @@ main,
 
 .product-container .product-list-full {
   width: 100%;
+  border-radius: 10px;
 }
 
 .product-container .product-tabs {

@@ -80,11 +80,11 @@ const Component = (props) => {
                                     <DeleteIcon />
                                 </IconButton>
                             </Box>
-                            <Table sx={{ display: 'table', width: '100%', border: 0, backgroundColor: "#E9EAEB" }}>
+                            <Table sx={{ display: 'table', width: '100%', border: 0 }}>
                                 <TableBody>
-                                    <TableRow sx={{ borderTop: 1 }}>
+                                    <TableRow sx={{ borderWidth: "1px 0px 0px 0px", borderStyle: "solid" }}>
 
-                                        <TableCell sx={{ width: "50%", borderRight: 1, padding: "8px" }}>
+                                        <TableCell sx={{ width: "50%", borderWidth: "0px 1px 0px 0px", borderStyle: "solid", padding: "8px" }}>
                                             <Typography gutterBottom component="p" sx={{ fontWeight: "bold" }}>{footerItems[0].name}</Typography>
                                             <Box sx={{ paddingTop: "2px", paddingLeft: "8px" }}>
                                                 <Typography variant="body2" color="text.secondary" component="p">

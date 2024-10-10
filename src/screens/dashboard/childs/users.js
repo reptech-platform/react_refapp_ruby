@@ -43,7 +43,6 @@ const Component = (props) => {
                 width: "100%",
                 height: "100%",
                 border: "1px solid #E7E7E7",
-                backgroundColor: "#FFFFFF",
                 boxShadow: "6px 6px 54px 0px #0000000D",
                 borderRadius: 1,
                 p: 2
@@ -54,7 +53,6 @@ const Component = (props) => {
             <Box sx={{
                 width: "100%",
                 border: "1px solid #E7E7E7",
-                backgroundColor: "#FFFFFF",
                 boxShadow: "6px 6px 54px 0px #0000000D",
                 borderRadius: 1,
                 p: 2
@@ -82,7 +80,7 @@ const Component = (props) => {
                             minHeight: "48px !important",
                             maxHeight: "48px !important",
                             lineHeight: "48px !important",
-                            backgroundColor: "#F1F4F9 !important"
+                            //backgroundColor: "#F1F4F9 !important"
                         },
                         "& .MuiDataGrid-columnHeaderTitle": {
                             fontFamily: "Poppins",

@@ -9,6 +9,7 @@ import * as Api from "shared/services";
 import UserView from "./childs/users";
 import LocationView from "./childs/locations";
 import ChildView from "./childs/childview";
+import { useTheme } from "@emotion/react";
 
 const Component = (props) => {
 
@@ -21,6 +22,7 @@ const Component = (props) => {
         hobbiesCount: 0, hobbiesGrowth: 0
     });
     const [state, setState] = useState(false);
+    const theme = useTheme();
 
     const UpdateCounts = (name, value) => {
         setCounts((prev) => ({ ...prev, [name]: value }));
@@ -103,7 +105,7 @@ const Component = (props) => {
     return (
 
         <>
-            <Container {...props} styles={{ backgroundColor: "#F7F9FD" }}>
+            <Container {...props}>
                 <Grid container rowGap={6} sx={{ p: 2 }} >
                     <Stack direction={"row"} columnGap={5}>
                         <CounterContainer id={1} selected={selectedItem} title="Users" count={counts.usersCount} onItemSeleted={(e) => setSelectedItem(e)}
