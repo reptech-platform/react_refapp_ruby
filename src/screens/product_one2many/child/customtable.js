@@ -182,22 +182,13 @@ const Component = (props) => {
 
     return (
         <>
-            <Box style={{
-                width: '100%', paddingBottom: 5, backgroundColor: "#F9F9F9",
-                borderTop: "1px solid rgba(0,0,0,.15)",
-                borderLeft: "1px solid rgba(0,0,0,.15)",
-                borderRight: "1px solid rgba(0,0,0,.15)",
-                borderRadius: "3px !important"
-            }}>
-                <Stack direction="row" sx={{ padding: "5px" }}>
-                    <Typography noWrap variant="subheader" component="div"
-                        sx={{
-                            display: "flex", alignSelf: "center",
-                            paddingLeft: "5px", width: "100%"
-
-                        }}>
-                        {title}
-                    </Typography>
+            <Box sx={{ ...theme.customtableheader }}>
+                <Stack direction="row" sx={{ padding: "5px", width: '100%' }}>
+                    <Grid container sx={{ justifyContent: 'flex-start', alignItems: "center" }}>
+                        <Typography noWrap variant="subheader" sx={{ borderBottom: "none" }}>
+                            {title}s
+                        </Typography>
+                    </Grid>
                     <Grid container sx={{ justifyContent: 'flex-end' }}>
                         <SearchInput searchStr={searchStr} onSearchChanged={OnSearchChanged} />
                         {mode !== 'view' && (

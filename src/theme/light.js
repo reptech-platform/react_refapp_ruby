@@ -4,6 +4,12 @@ const theme = createTheme({
     palette: {
         mode: "light"
     },
+    customtableheader: {
+        width: '100%', backgroundColor: "#F9F9F9",
+        borderTop: "1px solid rgba(0,0,0,.15)",
+        borderLeft: "1px solid rgba(0,0,0,.15)",
+        borderRight: "1px solid rgba(0,0,0,.15)"
+    },
     typography: {
         fontFamily: [
             '-apple-system',

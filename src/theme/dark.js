@@ -7,6 +7,13 @@ const theme = createTheme({
             paper: '#252631'
         }
     },
+    customtableheader: {
+        width: '100%',
+        borderTop: "1px solid rgba(81, 81, 81, 1)",
+        borderLeft: "1px solid rgba(81, 81, 81, 1)",
+        borderRight: "1px solid rgba(81, 81, 81, 1)",
+        borderRadius: "3px !important"
+    },
     typography: {
         fontFamily: [
             '-apple-system',
