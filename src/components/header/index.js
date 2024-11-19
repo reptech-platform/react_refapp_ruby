@@ -44,7 +44,7 @@ const Component = ({ open, onDrawerClicked }) => {
                     <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
                         XYZ Company
                     </Typography>
-                    <Typography noWrap>{themeLabel}</Typography><Switch value="active" onChange={onSwitchChanged} checked={themeName === 'Dark'}></Switch>
+                    {/* <Typography noWrap>{themeLabel}</Typography><Switch value="active" onChange={onSwitchChanged} checked={themeName === 'Dark'}></Switch> */}
                     <Typography variant="avatar" noWrap component="div" sx={{ marginRight: 1 }}>Welcome! User</Typography>
                     <Avatar
                         style={{ cursor: "pointer" }}
