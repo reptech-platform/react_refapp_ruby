@@ -146,7 +146,7 @@ const Component = (props) => {
     return (
         <>
 
-            {Helper.IsNullValue(mode) && (
+            {(Helper.IsNullValue(mode) || mode === 'edit') && (
                 <>
                     <Table sx={{ display: 'table', width: '100%', p: 0, m: 0, border: 0, ...sx }}>
                         <TableBody>
