@@ -1,154 +1,56 @@
-import { useState, useEffect } from "react";
-import { Typography, Grid, Stack, Box, Divider, IconButton, Tooltip } from '@mui/material';
-import { AddBox as AddBoxIcon, Edit as EditIcon, DeleteOutlined as DeleteIcon, Close as CancelIcon, Done as DoneIcon } from '@mui/icons-material';
-import { DataGrid, GridActionsCellItem, GridRowModes } from '@mui/x-data-grid';
+import React, { useState, useEffect } from "react";
+import { Typography, Grid, Stack, Box, Divider, IconButton, useTheme } from '@mui/material';
+import { Add as AddBoxIcon } from '@mui/icons-material';
 import Container from "screens/container";
-import { SearchInput } from "components";
-import { GetProductTypesApi, SetProductTypesApi, GetProductTypesCount } from "shared/services";
+import { SearchInput, CustomDialog, TextInput } from "components";
+import { GetProductTypes, GetProductTypesCount, SetProductTypes } from "shared/services";
+import Support from "shared/support";
 import Helper from "shared/helper";
+import { DataTable } from '../childs';
+import { ValidatorForm } from 'react-material-ui-form-validator';
 
 const columns = [
-    { headerName: "Code", field: "ProductTypeCode", flex: 1, editable: false },
-    { headerName: "Description", field: "ProductTypeDescription", flex: 1, editable: true }
+    { headerName: "Name", field: "ProductTypeName", flex: 1, editable: false },
+    { headerName: "Description", field: "ProductTypeDesc", flex: 1, editable: true }
 ];
+
+const dataColumns = [
+    { key: "PtId", type: "keyid" },
+    { key: "ProductTypeName", label: "Type", type: "text", value: null },
+    { key: "ProductTypeDesc", label: "Type", type: "text", value: null }
+];
+
+
+const httpMethods = { add: 'POST', edit: 'PATCH', delete: 'DELETE' };
+const httpMethodResponse = {
+    POST: { success: 'created', failed: 'creating' },
+    PATCH: { success: 'updated', failed: 'updating' },
+    DELETE: { success: 'deleted', failed: 'deleting' }
+};
 
 const Component = (props) => {
     const { title } = props;
-
+    const theme = useTheme();
     const [initialize, setInitialize] = useState(false);
     const [pageInfo, setPageInfo] = useState({ page: 0, pageSize: 5 });
     const [rowsCount, setRowsCount] = useState(0);
     const [rows, setRows] = useState([]);
-    const [loading, setLoading] = useState(false);
     const [searchStr, setSearchStr] = useState("");
-    const [rowModesModel, setRowModesModel] = useState({});
     const [sortBy, setSortBy] = useState(null);
-
-    const handleSaveClick = (id, row) => () => {
-        const { mode, ProductTypeCode, ProductTypeDescription } = row;
-        if (mode === 'Delete') {
-            DoAction('DELETE', ProductTypeCode, ProductTypeDescription)
-                .then((status) => {
-                    if (status) {
-                        const tmp = rows.filter((row) => row.id !== id);
-                        setRows(tmp);
-                        setRowsCount(tmp.length);
-                    }
-                });
-        }
-        setRowModesModel({ [id]: { mode: GridRowModes.View } });
-    };
-
-    const handleEditClick = (id) => () => {
-        setRowModesModel({ [id]: { mode: GridRowModes.Edit, fieldToFocus: 'ProductTypeDescription' } });
-    };
-
-    const handleDeleteClick = (id) => () => {
-        setRowModesModel({ [id]: { mode: "Delete" } });
-    };
-
-    const handleCancelClick = (id) => () => {
-        setRowModesModel({ [id]: { mode: GridRowModes.View, ignoreModifications: true } });
-
-        const editedRow = rows.find((row) => row.id === id);
-        if (editedRow.isNew) {
-            setRows(rows.filter((row) => row.id !== id));
-        }
-
-    };
-
-    const RenderGridActions = () => {
-
-        return {
-            headerName: "Actions", type: 'actions', field: "actions", width: 115,
-            getActions: (props) => {
-                const { id, row } = props;
-                const isInEditMode = rowModesModel[id]?.mode === GridRowModes.Edit || rowModesModel[id]?.mode === 'Delete';
-                if (isInEditMode) {
-                    return [
-                        <GridActionsCellItem
-                            icon={<DoneIcon />}
-                            label="Save"
-                            sx={{
-                                color: 'secondary.main',
-                            }}
-                            onClick={handleSaveClick(id, { ...row, mode: rowModesModel[id]?.mode })}
-                        />,
-                        <GridActionsCellItem
-                            icon={<CancelIcon />}
-                            label="Cancel"
-                            className="textPrimary"
-                            color="inherit"
-                            onClick={handleCancelClick(id)}
-                        />,
-                    ];
-                }
-                return [
-                    <GridActionsCellItem
-                        icon={
-                            <Tooltip title="Edit" arrow>
-                                <EditIcon />
-                            </Tooltip>
-                        }
-                        label="Edit"
-                        className="textPrimary"
-                        color="inherit"
-                        onClick={handleEditClick(id)}
-                    />,
-                    <GridActionsCellItem
-                        icon={
-                            <Tooltip title="Delete" arrow>
-                                <DeleteIcon />
-                            </Tooltip>
-                        }
-                        label="Delete"
-                        color="inherit"
-                        onClick={handleDeleteClick(id)}
-                    />,
-                ];
-            }
-        };
-
-    }
-
-    const handleSortModelChange = (e) => {
-        setSortBy(null); if (e && e.length > 0) setSortBy(e[0]);
-    }
-
-    const OnSearchChanged = (e) => {
-        setSearchStr(e);
-    }
-
-    const OnAddClicked = (e) => {
-        e.preventDefault();
-        const newId = rows.length + 1;
-        let newRow = { id: newId, ProductTypeCode: '', ProductTypeDescription: '', isNew: true };
-        const tmp = [newRow, ...rows];
-        setRows(tmp);
-        setRowsCount(tmp.length);
-        setRowModesModel({
-            [newId]: { id: newId, mode: GridRowModes.Edit, fieldToFocus: 'ProductTypeDescription', isNew: true }
-        });
-    }
+    const [actions, setActions] = useState({ id: 0, action: null });
+    const [product, setProduct] = useState({ PtId: null, ProductTypeName: null, ProductTypeDesc: null });
+    const form = React.useRef(null);
 
     const LoadData = async () => {
 
         let query = null, filters = [];
-        setLoading(true); setRowsCount(0);
+        setRows([]);
+        setRowsCount(0);
 
         global.Busy(true);
 
         if (!Helper.IsNullValue(searchStr)) {
-            filters.push(`$filter=contains(ProductTypeDescription, '${searchStr}')`);
-        }
-
-        if (!Helper.IsJSONEmpty(sortBy)) {
-            filters.push(`$orderby=${sortBy.field} ${sortBy.sort}`);
-        }
-
-        if (pageInfo.page > 0) {
-            const _skip = pageInfo.page * pageInfo.pageSize;
-            filters.push(`$skip=${_skip}`);
+            filters.push(`$filter=contains(ProductTypeDesc, '${searchStr}')`);
         }
 
         if (!Helper.IsJSONEmpty(filters)) {
@@ -157,67 +59,102 @@ const Component = (props) => {
 
         await GetProductTypesCount(query)
             .then(async (res) => {
-                if (res) setRowsCount(parseInt(res));
-            })
-            .catch((err) => console.log(err));
+                if (res.status) {
+                    setRowsCount(parseInt(res.values));
+                } else {
+                    console.log(res.statusText);
+                }
+            });
 
-        const productTypes = await GetProductTypesApi(query);
-        const { value } = productTypes || { value: [] };
+        if (!Helper.IsJSONEmpty(sortBy)) {
+            filters.push(`$orderby=${sortBy.field} ${sortBy.sort}`);
+        }
 
-        let _rows = value || [];
-        _rows.map((x, index) => { x['id'] = index + 1; });
+        const _top = pageInfo.pageSize;
+        const _skip = pageInfo.page * pageInfo.pageSize;
+        filters.push(`$skip=${_skip}`);
+        filters.push(`$top=${_top}`);
+
+        if (!Helper.IsJSONEmpty(filters)) {
+            query = filters.join("&");
+        }
+
+        let _rows = [];
+        await GetProductTypes(query)
+            .then(async (res) => {
+                if (res.status) {
+                    _rows = res.values || [];
+                    for (let i = 0; i < _rows.length; i++) {
+                        _rows[i].id = Helper.GetGUID();
+                    }
+                } else {
+                    console.log(res.statusText);
+                }
+            });
+
         setRows(_rows);
-        setRowsCount(_rows.length);
-        setLoading(false);
         global.Busy(false);
     }
 
-    if (initialize) { setInitialize(false); LoadData(); }
-    useEffect(() => { setInitialize(true); }, []);
+    const OnPageClicked = (e) => { setPageInfo({ page: 0, pageSize: 5 }); if (e) setPageInfo(e); }
+    const OnSortClicked = (e) => { setSortBy(e); }
+    const OnSearchChanged = (e) => { setSearchStr(e); }
+    const OnInputChange = (e) => { setProduct((prev) => ({ ...prev, [e.name]: e.value })); }
 
-    const processRowUpdate = async (newRow) => {
-        const { id, isNew, ProductTypeDescription, ProductTypeCode } = newRow;
+    const OnActionClicked = (id, type) => {
+        ClearSettings();
+        setActions({ id, action: type });
+        if (type === 'edit' || type === 'delete') {
+            const { PtId, ProductTypeName, ProductTypeDesc } = rows.find((x) => x.PtId === id);
+            setProduct({ PtId, ProductTypeName, ProductTypeDesc });
+        }
+    }
 
-        if (Helper.IsNullValue(ProductTypeDescription)) {
-            global.AlertPopup("error", `Product type description is required`);
-            setRowModesModel({ [id]: { mode: GridRowModes.Edit, fieldToFocus: 'ProductTypeDescription', isNew } });
+    const ClearSettings = () => {
+        setActions({ id: 0, action: null });
+        setProduct({ PtId: null, ProductTypeName: null, ProductTypeDesc: null });
+    }
+
+    const OnCloseClicked = (e) => {
+        if (!e) {
+            ClearSettings();
             return;
         }
+        if (actions.action === 'add' || actions.action === 'edit') {
+            if (form) form.current.submit();
+        } else if (actions.action === 'delete') {
+            handleSubmit();
+        }
+    }
 
-        const httpMethod = isNew ? 'POST' : 'PATCH';
-        let updatedRow;
-
-        DoAction(httpMethod, ProductTypeCode, ProductTypeDescription)
+    const handleSubmit = async () => {
+        const httpMethod = httpMethods[actions.action] || null;
+        await DoAction({ httpMethod, ...product })
             .then((status) => {
                 if (status) {
-                    updatedRow = { ...newRow, isNew: false };
-                    const tmp = rows.map((row) => (row.id === newRow.id ? updatedRow : row));
-                    setRows(tmp);
-                    setRowsCount(tmp.length);
+                    setInitialize(true);
+                    ClearSettings();
+                    setPageInfo({ page: 0, pageSize: 5 });
                 }
-                return updatedRow;
+            });
+    }
+
+    const DoAction = async (params) => {
+        return new Promise(async (resolve) => {
+            const { success, failed } = httpMethodResponse[params.httpMethod];
+            global.Busy(true);
+            let data = { ...params, Deleted: params.httpMethod === 'DELETE' };
+            delete data["httpMethod"];
+
+            let dataItems = Helper.CloneObject(dataColumns);
+            dataItems.forEach(e => {
+                e.value = data[e.key];
             });
 
-    };
+            let numfields = Helper.GetAllNumberFields(dataItems);
+            if (numfields.length > 0) Helper.UpdateNumberFields(dataItems, numfields)
 
-    const DoAction = async (httpMethod, productCode, description) => {
-        return new Promise(async (resolve) => {
-            let success, failed;
-
-            if (httpMethod === 'POST') {
-                success = 'created';
-                failed = 'creating';
-            }
-            else if (httpMethod === 'PATCH') {
-                success = 'updated';
-                failed = 'updating';
-            } else if (httpMethod === 'DELETE') {
-                success = 'deleted';
-                failed = 'deleting';
-            }
-
-            global.Busy(true);
-            const { status } = await SetProductTypesApi(httpMethod, description, productCode);
+            const { status } = await Support.AddOrUpdateProductType(dataItems);
             if (status) {
                 global.AlertPopup("success", `Record is ${success} successful!`);
             } else {
@@ -228,7 +165,9 @@ const Component = (props) => {
         });
     }
 
+    if (initialize) { setInitialize(false); LoadData(); }
     useEffect(() => { setInitialize(true); }, [sortBy, pageInfo, searchStr]);
+    useEffect(() => { setInitialize(true); }, []);
 
     return (
         <>
@@ -246,9 +185,11 @@ const Component = (props) => {
                                 color="inherit"
                                 aria-label="Add"
                                 sx={{
-                                    color: 'secondary.main',
+                                    marginLeft: "2px",
+                                    borderRadius: "4px",
+                                    border: theme.borderBottom
                                 }}
-                                onClick={OnAddClicked}
+                                onClick={() => OnActionClicked(undefined, 'add')}
                             >
                                 <AddBoxIcon />
                             </IconButton>
@@ -257,38 +198,58 @@ const Component = (props) => {
                 </Box>
                 <Divider />
                 <Box style={{ width: '100%' }}>
-                    <DataGrid
-                        sx={{
-                            '& .MuiDataGrid-row--editing': {
-                                boxShadow: "none"
-                            },
-                            '& .MuiDataGrid-cell.MuiDataGrid-cell--editing': {
-                                borderWidth: 1,
-                                borderColor: "rgba(0, 0, 0, 0.87)"
-                            },
-                            "& .MuiDataGrid-cell:focus-within, & .MuiDataGrid-cell:focus": {
-                                outline: "none !important",
-                            }
-                        }}
-                        editMode="row"
-                        rowModesModel={rowModesModel}
-                        autoHeight
-                        disableColumnMenu
-                        columns={[...columns, RenderGridActions()]}
-                        rowCount={rowsCount}
-                        rows={rows}
-                        initialState={{
-                            pagination: {
-                                paginationModel: pageInfo,
-                            },
-                        }}
-                        pageSizeOptions={[5, 10, 15, 20, 25]}
-                        loading={loading}
-                        processRowUpdate={processRowUpdate}
-                        onSortModelChange={handleSortModelChange}
-                        onProcessRowUpdateError={(err) => console.log(err)}
-                    />
+                    <DataTable keyId={'PtId'} columns={columns} rowsCount={rowsCount} rows={rows} noView={true}
+                        sortBy={sortBy} pageInfo={pageInfo} onActionClicked={OnActionClicked}
+                        onSortClicked={OnSortClicked} onPageClicked={OnPageClicked} />
                 </Box>
+
+                <CustomDialog open={actions.action == 'delete'} action={actions.action} title={"Confirmation"} onCloseClicked={OnCloseClicked}>
+                    <Typography gutterBottom>
+                        Are you sure? You want to delete?
+                    </Typography>
+                </CustomDialog>
+
+                <CustomDialog width="auto" open={actions.action == 'add'} action={actions.action} title={"Add Product Type"} onCloseClicked={OnCloseClicked}>
+                    <ValidatorForm ref={form} onSubmit={handleSubmit}>
+                        <Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
+                            <Grid item xs={6}>
+                                <Typography noWrap gutterBottom>Enter Product Name</Typography>
+                            </Grid>
+                            <Grid item xs={6}>
+                                <TextInput editable={true} id={"ProductTypeName"} name={"ProductTypeName"} value={product.ProductTypeName} validators={['required']}
+                                    validationMessages={['Name is required']} OnInputChange={OnInputChange} />
+                            </Grid>
+                            <Grid item xs={6}>
+                                <Typography noWrap gutterBottom>Enter Product Description</Typography>
+                            </Grid>
+                            <Grid item xs={6}>
+                                <TextInput editable={true} id={"ProductTypeDesc"} name={"ProductTypeDesc"} value={product.ProductTypeDesc} validators={['required']}
+                                    validationMessages={['Description is required']} OnInputChange={OnInputChange} />
+                            </Grid>
+                        </Grid>
+                    </ValidatorForm>
+                </CustomDialog>
+
+                <CustomDialog width="auto" open={actions.action == 'edit'} action={actions.action} title={"Edit Product Type"} onCloseClicked={OnCloseClicked}>
+                    <ValidatorForm ref={form} onSubmit={handleSubmit}>
+                        <Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
+                            <Grid item xs={6}>
+                                <Typography noWrap gutterBottom>Enter Product Name</Typography>
+                            </Grid>
+                            <Grid item xs={6}>
+                                <TextInput editable={true} id={"ProductTypeName"} name={"ProductTypeName"} value={product.ProductTypeName} validators={['required']}
+                                    validationMessages={['Name is required']} OnInputChange={OnInputChange} />
+                            </Grid>
+                            <Grid item xs={6}>
+                                <Typography noWrap gutterBottom>Enter Product Description</Typography>
+                            </Grid>
+                            <Grid item xs={6}>
+                                <TextInput editable={true} id={"ProductTypeDesc"} name={"ProductTypeDesc"} value={product.ProductTypeDesc} validators={['required']}
+                                    validationMessages={['Description is required']} OnInputChange={OnInputChange} />
+                            </Grid>
+                        </Grid>
+                    </ValidatorForm>
+                </CustomDialog>
 
             </Container>
         </>

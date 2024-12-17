@@ -1,0 +1,19 @@
+{
+    "PType": [
+        {
+            "key": "ProductTypeDesc",
+            "default": "NA"
+        }
+    ],
+    "SellingPrice": [
+        {
+            "key": "Price",
+            "default": 0
+        }
+    ],
+    "MainImage": [
+        {
+            "key": "DocId"
+        }
+    ]
+}

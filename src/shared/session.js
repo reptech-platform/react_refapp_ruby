@@ -33,4 +33,12 @@ fn.RetrieveAsync = async (key, parse) => {
     });
 };
 
+fn.GetHeader = async () => {
+    const token = await fn.RetrieveAsync("jwtToken");
+    return {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+    };
+};
+
 export default fn;

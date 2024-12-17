@@ -1,0 +1,403 @@
+{
+    "product": [
+        {
+            "key": "Product_id",
+            "type": "keyid",
+            "UIComponentTitle": "Product"
+        },
+        {
+            "key": "ProductPType",
+            "label": "Product Type",
+            "type": "dropdown",
+            "valueId": "PtId",
+            "nameId": "ProductTypeName",
+            "contentId": "ProductTypeName",
+            "source": "ProductType",
+            "uicomponent": "producttype",
+            "editable": true,
+            "create": true,
+            "validators": [],
+            "validationMessages": [],
+            "value": null
+        },
+        {
+            "key": "Name",
+            "label": "Name",
+            "type": "text",
+            "editable": true,
+            "validators": [
+                "required"
+            ],
+            "validationMessages": [
+                "Product name is required"
+            ],
+            "value": "Product 001"
+        },
+        {
+            "key": "Product_description",
+            "label": "Description",
+            "type": "text",
+            "editable": true,
+            "width": "30%",
+            "validators": [
+                "required"
+            ],
+            "validationMessages": [
+                "Product description is required"
+            ],
+            "value": "Product 001 Description"
+        },
+        {
+            "key": "Manufacturer",
+            "label": "Manufacturer",
+            "type": "text",
+            "editable": true,
+            "validators": [
+                "required"
+            ],
+            "validationMessages": [
+                "Product image is required"
+            ],
+            "value": "Product Manufacturer"
+        },
+        {
+            "key": "UnitOfMeasurement",
+            "label": "Unit Of Measurement",
+            "type": "dropdown",
+            "valueId": "Value",
+            "nameId": "Name",
+            "contentId": "Name",
+            "source": "Weight",
+            "editable": true,
+            "validators": [
+                "required",
+                "isNumber"
+            ],
+            "validationMessages": [
+                "Unit Of Measurement is required",
+                "Unit Of Measurement is required"
+            ],
+            "value": 2
+        },
+        {
+            "key": "Weight",
+            "label": "Weight",
+            "type": "text",
+            "editable": true,
+            "validators": [
+                "required",
+                "isFloat",
+                "isPositive"
+            ],
+            "validationMessages": [
+                "Product weight is required",
+                "Product weight should be number",
+                "Product weight should be positive number"
+            ],
+            "value": 10.25
+        },
+        {
+            "key": "Size",
+            "label": "Size",
+            "type": "text",
+            "editable": true,
+            "validators": [
+                "required",
+                "isNumber",
+                "isPositive"
+            ],
+            "validationMessages": [
+                "Size is required",
+                "Size must be a number",
+                "Size must be a pasitive number"
+            ],
+            "value": 10
+        },
+        {
+            "key": "Color",
+            "label": "Color",
+            "type": "color",
+            "editable": true,
+            "validators": [
+                "required"
+            ],
+            "validationMessages": [
+                "Product color is required"
+            ],
+            "value": "#7e2020"
+        },
+        {
+            "key": "MainImage",
+            "label": "MainImage",
+            "width": "30%",
+            "type": "doc",
+            "accept": ".JPG,.JPEG,.PNG",
+            "editable": true,
+            "validators": [],
+            "validationMessages": []
+        }
+    ],
+    "producttype": [
+        {
+            "key": "PtId",
+            "type": "keyid",
+            "UIComponentTitle": "Product Type"
+        },
+        {
+            "key": "ProductTypeName",
+            "label": "Type",
+            "type": "text",
+            "editable": true,
+            "validators": [
+                "required"
+            ],
+            "validationMessages": [
+                "Product type is required"
+            ],
+            "value": "Product Type 001"
+        },
+        {
+            "key": "ProductTypeDesc",
+            "label": "Description",
+            "type": "text",
+            "editable": true,
+            "width": "30%",
+            "validators": [
+                "required"
+            ],
+            "validationMessages": [
+                "Description is required"
+            ],
+            "value": "Product Type 001 Description"
+        }
+    ],
+    "vendoraddress": [
+        {
+            "key": "VendorAddress",
+            "type": "keyid",
+            "parent": "product",
+            "property": "VendorAddress",
+            "UIComponentTitle": "Vendor Address"
+        },
+        {
+            "key": "Area",
+            "label": "Area",
+            "type": "text",
+            "editable": true,
+            "validators": [
+                "required"
+            ],
+            "validationMessages": [
+                "Area is required"
+            ],
+            "value": "Whitefield"
+        },
+        {
+            "key": "HouseNumber",
+            "label": "House Number",
+            "type": "text",
+            "editable": true,
+            "validators": [
+                "required"
+            ],
+            "validationMessages": [
+                "House Number is required"
+            ],
+            "value": "Flat No: 12"
+        },
+        {
+            "key": "Street",
+            "label": "Street",
+            "type": "text",
+            "editable": true,
+            "validators": [
+                "required"
+            ],
+            "validationMessages": [
+                "Street is required"
+            ],
+            "value": "My Streat"
+        },
+        {
+            "key": "AddressLine2",
+            "label": "Address Line",
+            "type": "text",
+            "editable": true,
+            "validators": [
+                "required"
+            ],
+            "validationMessages": [
+                "Address Line is required"
+            ],
+            "value": "Address Line"
+        },
+        {
+            "key": "State",
+            "label": "State",
+            "type": "text",
+            "editable": true,
+            "validators": [
+                "required"
+            ],
+            "validationMessages": [
+                "State is required"
+            ],
+            "value": "Karnataka"
+        },
+        {
+            "key": "Country",
+            "label": "Country",
+            "type": "text",
+            "editable": true,
+            "validators": [
+                "required"
+            ],
+            "validationMessages": [
+                "Country is required"
+            ],
+            "value": "IN"
+        },
+        {
+            "key": "Pincode",
+            "label": "Pincode",
+            "type": "text",
+            "editable": true,
+            "validators": [
+                "required",
+                "isNumber",
+                "isPositive"
+            ],
+            "validationMessages": [
+                "Pincode is required",
+                "Pincode must be a number",
+                "Pincode must be a pasitive number"
+            ],
+            "value": 560066
+        }
+    ],
+    "pcomponent": [
+        {
+            "key": "CompId",
+            "type": "keyid",
+            "UIComponentTitle": "PComponent",
+            "child": true,
+            "parent": "product",
+            "property": "PComponents",
+            "values": []
+        },
+        {
+            "key": "Name",
+            "label": "Name",
+            "type": "text",
+            "editable": true,
+            "validators": [
+                "required"
+            ],
+            "validationMessages": [
+                "Product name is required"
+            ],
+            "value": "Component 01"
+        },
+        {
+            "key": "Description",
+            "label": "Description",
+            "type": "text",
+            "editable": true,
+            "width": "30%",
+            "validators": [
+                "required"
+            ],
+            "validationMessages": [
+                "Product description is required"
+            ],
+            "value": "Component 01 Description"
+        },
+        {
+            "key": "Manufacturer",
+            "label": "Manufacturer",
+            "type": "text",
+            "editable": true,
+            "validators": [
+                "required"
+            ],
+            "validationMessages": [
+                "Product image is required"
+            ],
+            "value": "Component 01 Manufacturer"
+        },
+        {
+            "key": "Size",
+            "label": "Size",
+            "type": "text",
+            "editable": true,
+            "validators": [
+                "required",
+                "isNumber",
+                "isPositive"
+            ],
+            "validationMessages": [
+                "Size is required",
+                "Size must be a number",
+                "Size must be a pasitive number"
+            ],
+            "value": 10
+        },
+        {
+            "key": "Color",
+            "label": "Color",
+            "type": "color",
+            "editable": true,
+            "validators": [
+                "required"
+            ],
+            "validationMessages": [
+                "Product color is required"
+            ],
+            "value": "#7e2020"
+        },
+        {
+            "key": "PComponentPCompVendor",
+            "label": "Vendor",
+            "type": "dropdown",
+            "valueId": "VId",
+            "nameId": "VendorName",
+            "contentId": "VendorName",
+            "source": "Vendor",
+            "editable": true,
+            "create": true,
+            "validators": [],
+            "validationMessages": [],
+            "value": null
+        },
+        {
+            "key": "Status",
+            "label": "Status",
+            "type": "dropdown",
+            "valueId": "Value",
+            "nameId": "Name",
+            "contentId": "Name",
+            "source": "OnBoardingStatus",
+            "editable": true,
+            "enum": true,
+            "validators": [
+                "required",
+                "isNumber"
+            ],
+            "validationMessages": [
+                "Status status is required",
+                "Status status is required"
+            ],
+            "value": "NotStarted"
+        },
+        {
+            "key": "PComponentPCompImage",
+            "label": "PCompImage",
+            "width": "30%",
+            "type": "doc",
+            "accept": ".JPG,.JPEG,.PNG,.PDF,.TXT,.DOC,.DOCX,.XLS,.XLSX",
+            "editable": true,
+            "validators": [],
+            "validationMessages": []
+        }
+    ]
+}

@@ -1,0 +1,33 @@
+[
+    {
+        "key": "Product_id",
+        "source": "Products",
+        "target": "keyId"
+    },
+    {
+        "key": "Name",
+        "target": "property1"
+    },
+    {
+        "key": "Product_description",
+        "target": "property2"
+    },
+    {
+        "key": "ProductTypeName",
+        "target": "property3",
+        "expand": "PType"
+    },
+    {
+        "key": "Weight",
+        "target": "property4"
+    },
+    {
+        "key": "UnitOfMeasurement",
+        "target": "property5"
+    },
+    {
+        "key": "ProductMainImage",
+        "type": "doc",
+        "target": "property6"
+    }
+]

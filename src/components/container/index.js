@@ -27,6 +27,7 @@ const ContentBody = styled('main', {
 })(({ theme, open }) => ({
     padding: 0,
     height: "100vh",
+    height: "100%",
     ...(open && {
         ...openedMixin(theme),
         '& .MuiDrawer-paper': openedMixin(theme),

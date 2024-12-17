@@ -1,5 +1,5 @@
 {
-  "name": "mututorial",
+  "name": "refapp_ruby",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -8,14 +8,17 @@
     "@emotion/styled": "^11.11.0",
     "@mui/icons-material": "^5.14.7",
     "@mui/material": "^5.14.7",
+    "@mui/x-charts": "^7.11.0",
     "@mui/x-data-grid": "^6.12.1",
     "@mui/x-date-pickers": "^6.16.0",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
+    "chart.js": "^4.4.3",
     "dayjs": "^1.11.10",
     "moment": "^2.29.4",
     "react": "^18.2.0",
+    "react-chartjs-2": "^5.2.0",
     "react-dom": "^18.2.0",
     "react-material-ui-form-validator": "^3.0.1",
     "react-router-dom": "^6.15.0",
@@ -26,7 +29,8 @@
     "start": "npm cache clean --force && react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "deploy": "npm run build && aws s3 rm --profile mediasoup s3://refappecom --recursive & aws s3 sync --profile mediasoup build/ s3://refappecom"
   },
   "eslintConfig": {
     "extends": [

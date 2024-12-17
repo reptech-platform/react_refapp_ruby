@@ -1,105 +1,166 @@
+
 import { useEffect, useState } from "react";
 import { Box, Typography, Grid, Stack, Button, Divider } from '@mui/material';
-import Container from "../container";
-import { useTheme } from '@mui/material/styles';
-import ProductJsonConfig from "config/productConfig.json";
-import RenderFormContols from "components/formControls/RenderFormContols";
+import Container from "screens/container";
+import RenderFormContols from "./child/formcontrols";
 import { useNavigate } from "react-router-dom";
-import { SetProductImage, SetProducts, GetProductTypesApi } from "shared/services";
+import Support from "shared/support";
 import { ArrowLeft as ArrowLeftIcon } from '@mui/icons-material';
 import Helper from "shared/helper";
+
+import { Extract, MapItems } from "./child/extract";
 
 const Component = (props) => {
 
     const [form, setForm] = useState(null);
     const [row, setRow] = useState({});
-    const [newRow, setNewRow] = useState({});
     const [initialized, setInitialized] = useState(false);
+    const [state, setState] = useState(false);
     const [showButton, setShowButton] = useState(true);
-    const [productTypes, setProductTypes] = useState([]);
+    const [dropDownOptions, setDropDownOptions] = useState([]);
     const NavigateTo = useNavigate();
-    const theme = useTheme();
+    const [showUpdate, setShowUpdate] = useState(false);
     const { title } = props;
 
     const OnSubmit = async () => {
-        let rslt, data = newRow;
-        global.Busy(true);
-        const { status, Doc_Id } = await UploadImage();
-        if (status) {
-            OnInputChange('ProductProductImage', Doc_Id);
-            delete data['ProductImageData'];
-            data.ProductProductImage = Doc_Id;
-            data.ProductSize = parseFloat(data.ProductSize);
-            data.ProductPrice = parseFloat(data.ProductPrice);
-            console.log(data)
-            rslt = await SetProducts(data);
-            global.Busy(false);
-            if (rslt.status) {
-                global.AlertPopup("success", "Record is created successful!");
-                setShowButton(false);
-                setNewRow({});
-            } else {
-                global.AlertPopup("error", "Something went wroing while creating record!");
-            }
+        let rslt, data, prodImages, productId, numfields;
+        const mapItems = MapItems;
 
-        } else {
-            global.Busy(false);
-            global.AlertPopup("error", "Failed uploading image!");
+        let product = row['product'];
+
+        numfields = Helper.GetAllNumberFields(product);
+        if (numfields.length > 0) Helper.UpdateNumberFields(product, numfields);
+
+        // Add Or Update Product
+        rslt = await Support.AddOrUpdateProduct(product, dropDownOptions, ['MainImage', 'OtherImages']);
+        if (rslt.status) {
+            productId = rslt.id;
+        } else { return; }
+
+        for (let i = 0; i < mapItems.length; i++) {
+            // Add or Update the product and navigation entity if it is deos not exist
+            let navItem = product.find(x => x.uicomponent === mapItems[i].uicomponent);
+            if (!Helper.IsJSONEmpty(navItem) && Helper.IsNullValue(navItem.value)) {
+                let childItem = row[navItem.uicomponent];
+                numfields = Helper.GetAllNumberFields(childItem);
+                if (numfields.length > 0) Helper.UpdateNumberFields(childItem, numfields);
+                rslt = await mapItems[i].func(childItem, dropDownOptions);
+                if (rslt.status) {
+                    data = [
+                        { key: "Product_id", value: parseInt(productId) },
+                        { key: navItem.key, value: parseInt(rslt.id) }
+                    ];
+                    rslt = await Support.AddOrUpdateProduct(data, dropDownOptions);
+                    if (!rslt.status) return;
+
+                } else { return; }
+            }
         }
+
+        // Add Product Main Image
+        prodImages = product.find((x) => x.key === 'MainImage');
+        if (prodImages && !Helper.IsNullValue(prodImages.value)) {
+            rslt = await Support.AddOrUpdateDocument(prodImages);
+            if (rslt.status) {
+                data = [
+                    { key: "Product_id", value: parseInt(productId) },
+                    { key: "ProductMainImage", value: parseInt(rslt.id) }
+                ];
+                rslt = await Support.AddOrUpdateProduct(data, dropDownOptions);
+                if (!rslt.status) return;
+            } else { return; }
+        }
+
+        // Add Product Other Images
+        prodImages = product.find((x) => x.key === 'OtherImages').value;
+        if (prodImages && !Helper.IsNullValue(prodImages)) {
+            for (let i = 0; i < prodImages.length; i++) {
+                rslt = await Support.AddOrUpdateDocument({ value: prodImages[i] });
+                if (rslt.status) {
+                    data = [
+                        { key: "Product_id", value: parseInt(productId) },
+                        { key: "DocId", value: parseInt(rslt.id) }
+                    ];
+                    rslt = await Support.AddOrUpdateProductOtherImages(data);
+                    if (!rslt.status) return;
+                }
+            }
+        }
+
+        global.AlertPopup("success", "Product is created successfully!");
+        setShowUpdate(false);
+        NavigateTo("/products");
     }
 
     const OnInputChange = (e) => {
-        setNewRow((prev) => ({
-            ...prev,
-            [e.name]: e.value
-        }));
+        const { name, value, location, ...others } = e;
+        let _row = row;
+        let _index = row[location].findIndex((x) => x.key === name && x.type !== "keyid");
+        if (_index > -1) {
+            const item = _row[location][_index];
+            let tValue = Helper.IsNullValue(value) ? null : value;
+            if (tValue === 'CNONE') tValue = null;
+            _row[location][_index].value = tValue;
+            setRow(_row);
+            setShowUpdate(true);
+            if (!Helper.IsNullValue(item['uicomponent'])) {
+                UpdateMappingPannel(_row, item, tValue);
+            }
+        }
     }
+
+    const UpdateMappingPannel = (_row, item, value) => {
+
+        const { uicomponent, source, valueId } = item;
+        const { Values } = dropDownOptions.find(x => x.Name === source);
+        const obj = value ? Values.find(x => x[valueId] === value) : null;
+        let _rowMap = _row[uicomponent] || [];
+
+        for (let i = 0; i < _rowMap.length; i++) {
+
+            let tmpField = _rowMap[i];
+            let bEditable = true;
+            let _cValue = null;
+
+            if (!Helper.IsNullValue(obj)) {
+                _cValue = obj[tmpField.key];
+                if (tmpField.type === 'dropdown') {
+                    const _dValues = dropDownOptions.find(x => x.Name === _rowMap[i].source).Values;
+                    _cValue = _dValues.find(x => x.Name === _cValue)[_rowMap[i].valueId];
+                } else if (tmpField.type === 'date') {
+                    _cValue = Helper.ToDate(_cValue, "YYYY-MM-DD");
+                }
+                bEditable = false;
+            }
+
+            tmpField.editable = bEditable;
+            tmpField.value = _cValue;
+
+            _rowMap[i] = tmpField;
+
+        }
+        if (_row[uicomponent]) _row[uicomponent] = _rowMap;
+        setRow(_row);
+        setState(!state);
+    };
 
     const OnSubmitForm = (e) => {
         e.preventDefault();
         form.current.submit();
     }
 
-    const UploadImage = async () => {
-        return new Promise(async (resolve) => {
-            const body = newRow.ProductImageData;
-            let splits = newRow.ProductProductImage.split(".");
-            const rslt = await SetProductImage(body, { FileType: splits[0], FileName: splits[1] });
-            return resolve(rslt);
+    const fetchData = async () => {
+        await Extract().then(rslt => {
+            const { row, options } = rslt;
+            setRow(row);
+            setDropDownOptions(options);
+            setState(!state);
         })
-    }
+    };
 
-    const GetProductTypes = async () => {
-        return new Promise(async (resolve) => {
-            global.Busy(true);
-            const productTypes = await GetProductTypesApi();
-            const { value } = productTypes || { value: [] };
-            setProductTypes(value);
-            global.Busy(false);
-            return resolve(true);
-        });
-    }
-
-    useEffect(() => {
-        setShowButton(true);
-    }, []);
-
-    if (initialized) {
-        setInitialized(false);
-        GetProductTypes();
-
-        ['details', 'others', 'types'].forEach(elm => {
-            for (let prop of ProductJsonConfig[elm]) {
-                delete prop['value'];
-            }
-        });
-
-        setRow(ProductJsonConfig);
-    }
-
-    useEffect(() => {
-        setInitialized(true);
-    }, []);
+    useEffect(() => { setShowButton(true); }, []);
+    if (initialized) { setInitialized(false); fetchData(); }
+    useEffect(() => { setInitialized(true); }, []);
 
     return (
 
@@ -114,34 +175,21 @@ const Component = (props) => {
                         </Box>
                         <Grid container sx={{ justifyContent: 'flex-end' }}>
                             <Button variant="contained" startIcon={<ArrowLeftIcon />}
-                                sx={{
-                                    color: theme.palette.primary.main,
-                                    backgroundColor: theme.palette.secondary.main,
-                                    '&:hover': {
-                                        backgroundColor: theme.palette.secondary.dark
-                                    },
-                                }}
                                 onClick={() => NavigateTo("/products")}
                             >Back</Button>
                         </Grid>
                     </Stack>
                 </Box>
                 <Divider />
-                <RenderFormContols {...props} setForm={setForm} onInputChange={OnInputChange} productTypes={productTypes}
-                    controls={row} onSubmit={OnSubmit} />
-                {!Helper.IsJSONEmpty(newRow) && (
+                <RenderFormContols shadow={true} {...props} setForm={setForm} onInputChange={OnInputChange}
+                    controls={row} onSubmit={OnSubmit} options={dropDownOptions} />
+                {showUpdate && (
                     <>
                         <Divider />
                         <Box sx={{ width: '100%' }}>
                             <Grid container sx={{ flex: 1, alignItems: "center", justifyContent: 'flex-start', gap: 1, pt: 1, pb: 1 }}>
                                 {showButton && <Button variant="contained" onClick={(e) => OnSubmitForm(e)} >Save</Button>}
-                                <Button variant="contained" onClick={() => NavigateTo("/products")} sx={{
-                                    color: theme.palette.primary.main,
-                                    backgroundColor: theme.palette.secondary.main,
-                                    '&:hover': {
-                                        backgroundColor: theme.palette.secondary.dark
-                                    },
-                                }}>Cancel</Button>
+                                <Button variant="outlined" onClick={() => NavigateTo("/products")}>Cancel</Button>
                             </Grid>
                         </Box>
                     </>

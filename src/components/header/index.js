@@ -1,15 +1,31 @@
 import * as React from 'react';
-import { IconButton, AppBar, Toolbar, Typography, CssBaseline, Avatar } from '@mui/material';
-import { useTheme } from '@mui/material/styles';
-import Person from '@mui/icons-material/Person';
-import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import MenuIcon from '@mui/icons-material/Menu';
+import { IconButton, AppBar, Toolbar, Typography, CssBaseline, Avatar, Switch, ToggleButton, ToggleButtonGroup } from '@mui/material';
+import { ChevronLeft as ChevronLeftIcon, Menu as MenuIcon, Person, Settings as SettingsIcon } from '@mui/icons-material';
 import LogoIcon from "assets/logo.png";
-import { Image } from 'components';
+import { Image, CustomDialog } from 'components';
+import TimerSession from 'shared/useTimerSession';
+import Session from 'shared/session';
 
 const Component = ({ open, onDrawerClicked }) => {
+    const [showSettings, setShowSettings] = React.useState(false);
+    const [lastTheme] = TimerSession("theme");
 
-    const theme = useTheme();
+    const [backupTheme] = React.useState(lastTheme);
+
+    const handleChangeTheme = (e, value) => {
+        Session.Store('theme', value);
+    };
+
+    const onSettingsClicked = () => {
+        setShowSettings(true);
+    }
+
+    const OnCloseClicked = (e) => {
+        if (!e) {
+            Session.Store('theme', backupTheme);
+        }
+        setShowSettings(false);
+    }
 
     return (
         <>
@@ -28,16 +44,38 @@ const Component = ({ open, onDrawerClicked }) => {
                     <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
                         XYZ Company
                     </Typography>
+                    <Typography noWrap sx={{ paddingRight: 2 }}>Theme:&nbsp;{lastTheme}</Typography>
+                    <IconButton
+                        size="large"
+                        edge="start"
+                        color="inherit"
+                        aria-label="menu"
+                        onClick={() => onSettingsClicked()}>
+                        <SettingsIcon />
+                    </IconButton>
                     <Typography variant="avatar" noWrap component="div" sx={{ marginRight: 1 }}>Welcome! User</Typography>
                     <Avatar
-                        style={{
-                            backgroundColor: theme.palette.secondary.main,
-                            cursor: "pointer",
-                        }}
+                        style={{ cursor: "pointer" }}
                     ><Person />
                     </Avatar>
                 </Toolbar>
             </AppBar>
+            <CustomDialog open={showSettings} title={"Theme"} action={'apply'} onCloseClicked={OnCloseClicked}>
+
+                <ToggleButtonGroup
+                    color="primary"
+                    value={lastTheme}
+                    exclusive
+                    onChange={handleChangeTheme}
+                    aria-label="Platform"
+                >
+                    <ToggleButton value="Default">Default</ToggleButton>
+                    <ToggleButton value="Light">Light</ToggleButton>
+                    <ToggleButton value="Dark">Dark</ToggleButton>
+                    <ToggleButton value="Red">Red</ToggleButton>
+                    <ToggleButton value="Blue">Blue</ToggleButton>
+                </ToggleButtonGroup>
+            </CustomDialog>
         </>
     );
 }

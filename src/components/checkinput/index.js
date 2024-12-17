@@ -44,13 +44,13 @@ class CheckBoxValidator extends ValidatorComponent {
     }
 }
 
-
 const Component = (props) => {
 
-    const { mode, id, name, value, label, OnInputChange, validationMessages } = props;
+    const { mode, id, name, value, label, editable, OnInputChange, validationMessages } = props;
     const [inputValue, setInputValue] = React.useState(value);
 
-    const disabled = mode && mode === 'view' ? true : undefined;
+    let disabled = mode && mode === 'view' ? true : undefined;
+    if (!disabled && !editable) disabled = true;
 
     const OnCheckChanged = (e) => {
         const { name, checked } = e.target;
@@ -59,13 +59,16 @@ const Component = (props) => {
         if (OnInputChange) OnInputChange({ name, value });
     }
 
+    React.useEffect(() => {
+        setInputValue(value);
+    }, [value]);
+
     return (
         <>
             <CheckBoxValidator
                 id={id}
                 name={name}
                 size="medium"
-                color="secondary"
                 onChange={(e) => OnCheckChanged(e)}
                 value={inputValue || "false"}
                 checked={inputValue || false}

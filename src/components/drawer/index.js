@@ -1,15 +1,15 @@
 import React from 'react';
-import { Toolbar, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
+import { Toolbar, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Tooltip } from '@mui/material';
 import MuiDrawer from '@mui/material/Drawer';
 import { styled, useTheme } from '@mui/material/styles';
-import { Pages, ShoppingBasket, Toc } from '@mui/icons-material';
+import { ShoppingBasket, Toc, EditNote, Checklist, Tab, GridView as GridViewIcon, Share as ShareIcon } from '@mui/icons-material';
 import { DRAWER_WIDTH } from "config";
 import { useNavigate } from 'react-router-dom';
 
 const openedMixin = (theme) => ({
     width: DRAWER_WIDTH,
     border: 0,
-    borderRight: `dashed ${theme.palette.grey[600]} 1px`,
+    borderRight: `solid rgba(0,0,0,.15) 1px`,
     transition: theme.transitions.create('width', {
         easing: theme.transitions.easing.easeOut,
         duration: theme.transitions.duration.enteringScreen,
@@ -19,7 +19,7 @@ const openedMixin = (theme) => ({
 
 const closedMixin = (theme) => ({
     border: 0,
-    borderRight: `dashed ${theme.palette.grey[600]} 1px`,
+    borderRight: `solid rgba(0,0,0,.15) 1px`,
     transition: theme.transitions.create('width', {
         easing: theme.transitions.easing.sharp,
         duration: theme.transitions.duration.leavingScreen,
@@ -63,35 +63,72 @@ const Component = (props) => {
             <Toolbar />
             <List>
                 <ListItem disablePadding sx={{ display: 'block' }}>
-                    <ListItemButton sx={{
-                        minHeight: 48,
-                        justifyContent: open ? 'initial' : 'center',
-                        px: 2.5,
-                    }} onClick={open ? handleClick : undefined}>
-                        <ListItemIcon sx={{
-                            minWidth: 0,
-                            mr: open ? 1 : 'auto',
-                            justifyContent: 'center',
-                        }}>
-                            <Pages sx={{ width: 24, height: 24, mr: 0, color: theme.palette.secondary.main }} />
-                        </ListItemIcon>
-                        <ListItemText primary={"Pages"} sx={{ opacity: open ? 1 : 0 }} />
-                    </ListItemButton>
-                    {open && <List component="div" disablePadding>
-                        <ListItemButton sx={{ pl: 4 }} onClick={() => NavigateTo("/products")}>
+                    <List component="div" disablePadding>
+                        <ListItemButton onClick={() => NavigateTo("/products")} sx={{ height: 50 }}>
                             <ListItemIcon sx={{ minWidth: 30 }}>
-                                <ShoppingBasket sx={{ color: theme.palette.secondary.main }} />
+                                <Tooltip title="Products">
+                                    <ShoppingBasket color="primary" />
+                                </Tooltip>
                             </ListItemIcon>
-                            <ListItemText primary="Products" />
+                            {open && <ListItemText primary="Products" sx={{ pl: 1 }} />}
                         </ListItemButton>
-                        <ListItemButton sx={{ pl: 4 }} onClick={() => NavigateTo("/producttypes")}>
+                        <ListItemButton onClick={() => NavigateTo("/productsmany")} sx={{ height: 50 }}>
                             <ListItemIcon sx={{ minWidth: 30 }}>
-                                <Toc sx={{ color: theme.palette.secondary.main }} />
+                                <Tooltip title="Products One to Many">
+                                    <ShareIcon color="primary" />
+                                </Tooltip>
                             </ListItemIcon>
-                            <ListItemText primary="Product Types" />
+                            {open && <ListItemText primary="Products-One2Many" sx={{ pl: 1 }} />}
+                        </ListItemButton>
+                        <ListItemButton onClick={() => NavigateTo("/producttypes")} sx={{ height: 50 }}>
+                            <ListItemIcon sx={{ minWidth: 30 }}>
+                                <Tooltip title="Product Types">
+                                    <Toc color="primary" />
+                                </Tooltip>
+                            </ListItemIcon>
+                            {open && <ListItemText primary="Product Types" sx={{ pl: 1 }} />}
+                        </ListItemButton>
+                        <ListItemButton onClick={() => NavigateTo("/infoform")} sx={{ height: 50 }}>
+                            <ListItemIcon sx={{ minWidth: 30 }}>
+                                <Tooltip title="Information Form">
+                                    <EditNote color="primary" />
+                                </Tooltip>
+                            </ListItemIcon>
+                            {open && <ListItemText primary="Information Form" sx={{ pl: 1 }} />}
+                        </ListItemButton>
+                        <ListItemButton onClick={() => NavigateTo("/stepper")} sx={{ height: 50 }}>
+                            <ListItemIcon sx={{ minWidth: 30 }}>
+                                <Tooltip title="Stepper Form">
+                                    <Checklist color="primary" />
+                                </Tooltip>
+                            </ListItemIcon>
+                            {open && <ListItemText primary="Stepper Form" sx={{ pl: 1 }} />}
+                        </ListItemButton>
+                        <ListItemButton onClick={() => NavigateTo("/tabbed")} sx={{ height: 50 }}>
+                            <ListItemIcon sx={{ minWidth: 30 }}>
+                                <Tooltip title="Tabbed Layout">
+                                    <Tab color="primary" />
+                                </Tooltip>
+                            </ListItemIcon>
+                            {open && <ListItemText primary="Tabbed Layout" sx={{ pl: 1 }} />}
+                        </ListItemButton>
+                        <ListItemButton onClick={() => NavigateTo("/producttiles")} sx={{ height: 50 }}>
+                            <ListItemIcon sx={{ minWidth: 30 }}>
+                                <Tooltip title="Tiles Layout">
+                                    <GridViewIcon color="primary" />
+                                </Tooltip>
+                            </ListItemIcon>
+                            {open && <ListItemText primary="Tiles Layout" sx={{ pl: 1 }} />}
+                        </ListItemButton>
+                        <ListItemButton onClick={() => NavigateTo("/productlist")} sx={{ height: 50 }}>
+                            <ListItemIcon sx={{ minWidth: 30 }}>
+                                <Tooltip title="List Layout">
+                                    <Toc color="primary" />
+                                </Tooltip>
+                            </ListItemIcon>
+                            {open && <ListItemText primary="List Layout" sx={{ pl: 1 }} />}
                         </ListItemButton>
                     </List>
-                    }
                 </ListItem>
             </List>
         </CustomDrawer>

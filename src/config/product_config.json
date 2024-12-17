@@ -1,0 +1,455 @@
+{
+    "producttype": [
+        {
+            "key": "PtId",
+            "type": "keyid",
+            "UIComponentTitle": "Product Type"
+        },
+        {
+            "key": "ProductTypeName",
+            "label": "Type",
+            "type": "text",
+            "editable": true,
+            "validators": [
+                "required"
+            ],
+            "validationMessages": [
+                "Product type is required"
+            ],
+            "value": "Dummy Product Type"
+        },
+        {
+            "key": "ProductTypeDesc",
+            "label": "Description",
+            "type": "text",
+            "editable": true,
+            "width": "30%",
+            "validators": [
+                "required"
+            ],
+            "validationMessages": [
+                "Description is required"
+            ],
+            "value": "Dummy Product Type Description"
+        }
+    ],
+    "product": [
+        {
+            "key": "Product_id",
+            "type": "keyid",
+            "UIComponentTitle": "Product"
+        },
+        {
+            "key": "ProductPType",
+            "label": "Product Type",
+            "type": "dropdown",
+            "valueId": "PtId",
+            "nameId": "ProductTypeName",
+            "contentId": "ProductTypeName",
+            "source": "ProductType",
+            "uicomponent": "producttype",
+            "editable": true,
+            "create": true,
+            "validators": [],
+            "validationMessages": [],
+            "value": null
+        },
+        {
+            "key": "Name",
+            "label": "Name",
+            "type": "text",
+            "editable": true,
+            "validators": [
+                "required"
+            ],
+            "validationMessages": [
+                "Product name is required"
+            ],
+            "value": "Dummy Product"
+        },
+        {
+            "key": "Product_description",
+            "label": "Description",
+            "type": "text",
+            "editable": true,
+            "width": "30%",
+            "validators": [
+                "required"
+            ],
+            "validationMessages": [
+                "Product description is required"
+            ],
+            "value": "Dummy Product Description"
+        },
+        {
+            "key": "Manufacturer",
+            "label": "Manufacturer",
+            "type": "text",
+            "editable": true,
+            "validators": [
+                "required"
+            ],
+            "validationMessages": [
+                "Product image is required"
+            ],
+            "value": "Dummy Product Manufacturer"
+        },
+        {
+            "key": "UnitOfMeasurement",
+            "label": "Unit Of Measurement",
+            "type": "dropdown",
+            "valueId": "Value",
+            "nameId": "Name",
+            "contentId": "Name",
+            "source": "Weight",
+            "editable": true,
+            "validators": [
+                "required",
+                "isNumber"
+            ],
+            "validationMessages": [
+                "Unit Of Measurement is required",
+                "Unit Of Measurement is required"
+            ],
+            "value": 2
+        },
+        {
+            "key": "Weight",
+            "label": "Weight",
+            "type": "text",
+            "editable": true,
+            "validators": [
+                "required",
+                "isFloat",
+                "isPositive"
+            ],
+            "validationMessages": [
+                "Product weight is required",
+                "Product weight should be number",
+                "Product weight should be positive number"
+            ],
+            "value": 10.25
+        },
+        {
+            "key": "Size",
+            "label": "Size",
+            "type": "text",
+            "editable": true,
+            "validators": [
+                "required",
+                "isNumber",
+                "isPositive"
+            ],
+            "validationMessages": [
+                "Size is required",
+                "Size must be a number",
+                "Size must be a pasitive number"
+            ],
+            "value": 10
+        },
+        {
+            "key": "Color",
+            "label": "Color",
+            "type": "color",
+            "editable": true,
+            "validators": [
+                "required"
+            ],
+            "validationMessages": [
+                "Product color is required"
+            ],
+            "value": "#7e2020"
+        },
+        {
+            "key": "ProductBuyingPrice",
+            "label": "Product Buying Price",
+            "type": "dropdown",
+            "valueId": "PpId",
+            "nameId": "Price",
+            "contentId": "Price",
+            "source": "ProductPrice",
+            "uicomponent": "productbuyingprice",
+            "editable": true,
+            "create": true,
+            "validators": [],
+            "validationMessages": [],
+            "value": null
+        },
+        {
+            "key": "ProductSellingPrice",
+            "label": "Product Selling Price",
+            "type": "dropdown",
+            "valueId": "PpId",
+            "nameId": "Price",
+            "contentId": "Price",
+            "source": "ProductPrice",
+            "uicomponent": "productsellingprice",
+            "editable": true,
+            "create": true,
+            "validators": [],
+            "validationMessages": [],
+            "value": null
+        },
+        {
+            "key": "ProductProductVendor",
+            "label": "Product Vendor",
+            "type": "dropdown",
+            "valueId": "SId",
+            "nameId": "SupplierName",
+            "contentId": "SupplierName",
+            "source": "Supplier",
+            "uicomponent": "productvendor",
+            "editable": true,
+            "create": true,
+            "validators": [],
+            "validationMessages": [],
+            "value": null
+        },
+        {
+            "key": "ProductODetails",
+            "label": "Product Other Details",
+            "type": "dropdown",
+            "valueId": "OtherDetailsId",
+            "nameId": "UnitOfMeasurement",
+            "contentId": "UnitOfMeasurement",
+            "source": "OtherDetails",
+            "uicomponent": "otherdetails",
+            "editable": true,
+            "create": true,
+            "validators": [],
+            "validationMessages": [],
+            "value": null
+        },
+        {
+            "key": "MainImage",
+            "label": "MainImage",
+            "width": "30%",
+            "type": "doc",
+            "accept": ".JPG,.JPEG,.PNG,.PDF,.TXT,.DOC,.DOCX,.XLS,.XLSX",
+            "editable": true,
+            "validators": [],
+            "validationMessages": []
+        },
+        {
+            "key": "OtherImages",
+            "label": "OtherImages",
+            "type": "doc",
+            "width": "30%",
+            "accept": ".JPG,.JPEG,.PNG,.PDF,.TXT,.DOC,.DOCX,.XLS,.XLSX",
+            "editable": true,
+            "multiple": true,
+            "validators": [],
+            "validationMessages": []
+        }
+    ],
+    "otherdetails": [
+        {
+            "key": "OtherDetailsId",
+            "type": "keyid",
+            "UIComponentTitle": "Other Details"
+        },
+        {
+            "key": "ManufacturingDate",
+            "label": "ManufacturingDate",
+            "type": "date",
+            "editable": true,
+            "validators": [
+                "required"
+            ],
+            "validationMessages": [
+                "Product manufacturing date is required"
+            ]
+        },
+        {
+            "key": "AvailabilityStatus",
+            "label": "Availability Status",
+            "type": "dropdown",
+            "valueId": "Value",
+            "nameId": "Name",
+            "contentId": "Name",
+            "source": "AvailabilityStatus",
+            "editable": true,
+            "validators": [
+                "required",
+                "isNumber"
+            ],
+            "validationMessages": [
+                "Availability status is required",
+                "Availability status is required"
+            ],
+            "value": 2
+        },
+        {
+            "key": "Size",
+            "label": "Size",
+            "type": "text",
+            "editable": true,
+            "validators": [
+                "required",
+                "isNumber",
+                "isPositive"
+            ],
+            "validationMessages": [
+                "Size is required",
+                "Size must be a number",
+                "Size must be a pasitive number"
+            ],
+            "value": 10
+        },
+        {
+            "key": "UnitOfMeasurement",
+            "label": "Unit Of Measurement",
+            "type": "dropdown",
+            "valueId": "Value",
+            "nameId": "Name",
+            "contentId": "Name",
+            "source": "Size",
+            "editable": true,
+            "validators": [
+                "required",
+                "isNumber"
+            ],
+            "validationMessages": [
+                "Unit Of Measurement is required",
+                "Unit Of Measurement is required"
+            ],
+            "value": 2
+        }
+    ],
+    "productvendor": [
+        {
+            "key": "SId",
+            "type": "keyid",
+            "UIComponentTitle": "Product Vendor"
+        },
+        {
+            "key": "SupplierName",
+            "label": "Name",
+            "type": "text",
+            "editable": true,
+            "validators": [
+                "required"
+            ],
+            "validationMessages": [
+                "Supplier name is required"
+            ],
+            "value": "Dummy Product Vendor"
+        },
+        {
+            "key": "SupplierContact",
+            "label": "Contact",
+            "type": "text",
+            "editable": true,
+            "width": "30%",
+            "validators": [
+                "required"
+            ],
+            "validationMessages": [
+                "Supplier contact is required"
+            ],
+            "value": "Dummy Product Contact"
+        }
+    ],
+    "productbuyingprice": [
+        {
+            "key": "PpId",
+            "type": "keyid",
+            "UIComponentTitle": "Product Buying Price"
+        },
+        {
+            "key": "Price",
+            "label": "Price",
+            "type": "text",
+            "editable": true,
+            "validators": [
+                "required",
+                "isFloat",
+                "isPositive"
+            ],
+            "validationMessages": [
+                "Product price is required",
+                "Product price must be a number",
+                "Product price must be a pasitive number"
+            ],
+            "value": 25
+        },
+        {
+            "key": "DiscountGroup",
+            "label": "DiscountGroup",
+            "type": "text",
+            "editable": true,
+            "validators": [
+                "required"
+            ],
+            "validationMessages": [
+                "Product discount group is required"
+            ],
+            "value": "Dummy Product Buying Price"
+        },
+        {
+            "key": "IsVatIncluded",
+            "label": "IsVatIncluded",
+            "type": "check",
+            "editable": true,
+            "default": false,
+            "validators": [
+                "isTruthy"
+            ],
+            "validationMessages": [
+                "Is product vat included?"
+            ],
+            "value": true
+        }
+    ],
+    "productsellingprice": [
+        {
+            "key": "PpId",
+            "type": "keyid",
+            "UIComponentTitle": "Product Selling Price"
+        },
+        {
+            "key": "Price",
+            "label": "Price",
+            "type": "text",
+            "editable": true,
+            "validators": [
+                "required",
+                "isFloat",
+                "isPositive"
+            ],
+            "validationMessages": [
+                "Product price is required",
+                "Product price must be a number",
+                "Product price must be a pasitive number"
+            ],
+            "value": 25
+        },
+        {
+            "key": "DiscountGroup",
+            "label": "DiscountGroup",
+            "type": "text",
+            "editable": true,
+            "validators": [
+                "required"
+            ],
+            "validationMessages": [
+                "Product discount group is required"
+            ],
+            "value": "Dummy Product Selling Price"
+        },
+        {
+            "key": "IsVatIncluded",
+            "label": "IsVatIncluded",
+            "type": "check",
+            "editable": true,
+            "default": false,
+            "validators": [
+                "isTruthy"
+            ],
+            "validationMessages": [
+                "Is product vat included?"
+            ],
+            "value": true
+        }
+    ]
+}

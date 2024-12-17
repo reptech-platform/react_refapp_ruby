@@ -4,7 +4,7 @@ import { TextValidator } from 'react-material-ui-form-validator';
 
 const Component = (props) => {
 
-    const { mode, type, id, name, value, OnInputChange, style, sx, validators, validationMessages } = props;
+    const { mode, type, id, name, editable, placeHolder, value, OnInputChange, style, sx, validators, validationMessages } = props;
 
     const [inputValue, setInputValue] = React.useState(value);
 
@@ -17,6 +17,10 @@ const Component = (props) => {
     if (mode && mode === 'view') {
         return <Typography nowrap="true">{value}</Typography>
     }
+
+    React.useEffect(() => {
+        setInputValue(value);
+    }, [value])
 
     return (
         <>
@@ -31,9 +35,10 @@ const Component = (props) => {
                 validators={validators}
                 errorMessages={validationMessages}
                 InputLabelProps={{ shrink: false }}
-                fullWidth
+                placeholder={placeHolder}
+                disabled={!editable ? true : false}
                 style={{
-                    width: "100%",
+                    minWidth: 250,
                     ...style
                 }}
                 sx={{

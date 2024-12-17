@@ -70,6 +70,7 @@ const Component = (props) => {
                         "& .MuiOutlinedInput-root": {
                             paddingLeft: "10px"
                         },
+                        minWidth: 250,
                         ...sx
                     }}
                     InputProps={{
